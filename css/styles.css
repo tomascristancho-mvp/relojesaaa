@@ -108,6 +108,12 @@ ul, ol {
   transform: translateY(-1px);
 }
 
+.btn__icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
 .btn--primary {
   background: var(--accent);
   color: #1a1508;
@@ -204,7 +210,6 @@ ul, ol {
   position: relative;
   padding: 92px 0 64px;
   text-align: center;
-  border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
 
@@ -218,6 +223,16 @@ ul, ol {
   height: 420px;
   background: radial-gradient(closest-side, rgba(201, 162, 74, 0.16), transparent 70%);
   pointer-events: none;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
 }
 
 .hero__inner {
@@ -360,6 +375,7 @@ ul, ol {
 }
 
 .watch-card__media {
+  position: relative;
   border: none;
   background: var(--bg-elevated);
   padding: 0;
@@ -377,6 +393,26 @@ ul, ol {
 
 .watch-card__media:hover img {
   transform: scale(1.06);
+}
+
+.watch-card__view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 9, 12, 0.5);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.watch-card__media:hover .watch-card__view {
+  opacity: 1;
 }
 
 .watch-card__body {
@@ -405,17 +441,36 @@ ul, ol {
 }
 
 .watch-card__price {
-  color: var(--text-muted);
-  font-size: 0.92rem;
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
 /* ============ STEPS ============ */
 .steps {
+  position: relative;
   padding: 90px 0;
   background: var(--bg-elevated);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+}
+
+.steps::before,
+.steps::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+}
+
+.steps::before {
+  top: 0;
+}
+
+.steps::after {
+  bottom: 0;
 }
 
 .steps__list {

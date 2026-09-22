@@ -5,6 +5,7 @@
  */
 
 const PLACEHOLDER_IMAGE = "images/watches/placeholder.svg";
+const WHATSAPP_ICON = '<svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>';
 
 function formatPrice(price) {
   if (price === null || price === undefined) return "Escríbenos por el precio";
@@ -37,6 +38,7 @@ function watchCard(watch) {
   card.innerHTML = `
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
       <img src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
+      <span class="watch-card__view">Ver detalle</span>
     </button>
     <div class="watch-card__body">
       <span class="watch-card__ref">${watch.referencia}</span>
@@ -44,6 +46,7 @@ function watchCard(watch) {
       <h3 class="watch-card__title">${watch.nombre}</h3>
       <p class="watch-card__price">${formatPrice(watch.precio)}</p>
       <a class="btn btn--whatsapp" href="${buildWhatsAppLink(watch)}" target="_blank" rel="noopener">
+        ${WHATSAPP_ICON}
         Pedir por WhatsApp
       </a>
     </div>
