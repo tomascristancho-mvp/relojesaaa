@@ -136,6 +136,44 @@ const WATCHES = [
     imagen: "images/watches/reloj-10.jpg",
   },
 
-  // Aún faltan 4 relojes por agregar. Cuando Tomás mande las fotos y los
-  // datos restantes, se agregan aquí con la misma estructura de arriba.
+  {
+    id: 11,
+    referencia: "REF-11",
+    marca: "Tommy Hilfiger",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Crema",
+    precio: 70000,
+    descripcion: "Caja negra con esfera crema y numeración árabe, correa de caucho negro. Un diseño clásico con un toque cálido.",
+    imagen: "images/watches/reloj-11.jpg",
+  },
+  {
+    id: 12,
+    referencia: "REF-12",
+    marca: "Tissot",
+    genero: "Hombre",
+    nombre: "Cronógrafo Rosa y Azul",
+    precio: 70000,
+    descripcion: "Cronógrafo con esfera rosa, subesferas azules y bisel taquímetro, brazalete metálico y calendario. Un diseño llamativo entre lo deportivo y lo elegante.",
+    imagen: "images/watches/reloj-12.jpg",
+  },
+  {
+    id: 13,
+    referencia: "REF-13",
+    marca: "Casio",
+    genero: "Unisex",
+    nombre: "Digital Retro Dorado",
+    precio: 70000,
+    descripcion: "Diseño digital clásico en tono dorado, con pantalla LCD, alarma, cronómetro y brazalete de acero. Un ícono atemporal en versión dorada.",
+    imagen: "images/watches/reloj-13.jpg",
+  },
+  {
+    id: 14,
+    referencia: "REF-14",
+    marca: "Tommy Hilfiger",
+    genero: "Mujer",
+    nombre: "Cristales Nácar",
+    precio: 70000,
+    descripcion: "Esfera blanca nacarada con detalles en cristal y brazalete metálico plateado. Un diseño femenino y elegante para looks especiales.",
+    imagen: "images/watches/reloj-14.jpg",
+  },
 ];

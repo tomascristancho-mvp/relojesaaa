@@ -201,9 +201,27 @@ ul, ol {
 
 /* ============ HERO ============ */
 .hero {
-  padding: 76px 0 64px;
+  position: relative;
+  padding: 92px 0 64px;
   text-align: center;
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 640px;
+  height: 420px;
+  background: radial-gradient(closest-side, rgba(201, 162, 74, 0.16), transparent 70%);
+  pointer-events: none;
+}
+
+.hero__inner {
+  position: relative;
 }
 
 .hero__title {
@@ -338,6 +356,7 @@ ul, ol {
 .watch-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
+  box-shadow: 0 18px 32px -18px rgba(0, 0, 0, 0.55);
 }
 
 .watch-card__media {
@@ -411,11 +430,17 @@ ul, ol {
 }
 
 .steps__number {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   color: var(--accent);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .steps__item h3 {
