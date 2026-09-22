@@ -172,14 +172,6 @@ marca o un género nuevo en algún reloj, el filtro aparece solo, sin que
 tengas que tocar el HTML. Los dos filtros se combinan (por ejemplo, "Fossil"
 + "Hombre" muestra solo los relojes Fossil para hombre).
 
-## Favoritos
-
-Cada reloj tiene un corazón (en la tarjeta y en el detalle) para que quien
-visite la página guarde los que le gustan y los revise después con el botón
-"Favoritos" que aparece arriba del catálogo. Se guarda con `localStorage`
-en el navegador de esa persona — es solo una comodidad para que compare
-antes de escribirte, no necesitas hacer nada para que funcione.
-
 ## Carrito de compra
 
 Además de pedir un reloj individual por WhatsApp, quien visite la página
@@ -196,10 +188,9 @@ puede armar un carrito con varios relojes y pedirlos todos juntos:
   precio de cada uno) y el total, listo para enviarte.
 - Se puede quitar un reloj del carrito con la ✕ de cada fila.
 
-Igual que "Favoritos", el carrito se guarda con `localStorage` en el
-navegador de quien visita — es solo para armar el pedido antes de
-escribirte, no necesitas hacer nada para que funcione y no se comparte
-entre dispositivos.
+El carrito se guarda con `localStorage` en el navegador de quien visita —
+es solo para armar el pedido antes de escribirte, no necesitas hacer nada
+para que funcione y no se comparte entre dispositivos.
 
 ## Panel privado de pedidos y contabilidad (`admin.html`)
 

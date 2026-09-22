@@ -112,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFilters();
   renderCatalog();
   initSearch();
-  initFavoritesToggle();
   initCart();
   initMobileNav();
   initModal();

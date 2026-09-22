@@ -2,8 +2,7 @@
  * Carrito de compra: agregar varios relojes desde el catálogo o el
  * detalle, y pedirlos todos juntos con un solo mensaje de WhatsApp que
  * lista cada reloj y el total. Se guarda con localStorage en el
- * navegador de quien visita (igual que "Favoritos"), no se comparte
- * entre dispositivos.
+ * navegador de quien visita, no se comparte entre dispositivos.
  */
 
 const CART_KEY = "altitude_cart";
