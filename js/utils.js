@@ -1,7 +1,8 @@
 /**
  * Utilidades compartidas entre la página pública (catalog.js, watch-modal.js,
  * site.js) y el panel privado (admin-*.js): formato de moneda y precio,
- * texto seguro para HTML, y construcción de enlaces de WhatsApp.
+ * texto seguro para HTML, y construcción de enlaces de WhatsApp y de
+ * enlaces para compartir un reloj puntual (?reloj=REF-01).
  * Se carga antes que cualquier otro script propio en ambas páginas.
  */
 
@@ -47,4 +48,8 @@ function buildWhatsAppLink(watch) {
 function buildGeneralWhatsAppLink() {
   const message = `Hola${CONFIG.businessName ? " " + CONFIG.businessName : ""}, quisiera más información sobre tu catálogo de relojes.`;
   return buildWhatsAppUrl(CONFIG.whatsappNumber, message);
+}
+
+function buildWatchShareUrl(watch) {
+  return `${window.location.origin}${window.location.pathname}?reloj=${encodeURIComponent(watch.referencia)}`;
 }

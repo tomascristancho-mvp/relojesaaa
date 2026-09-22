@@ -1,7 +1,8 @@
 /**
  * Modal de detalle de un reloj: abrir/cerrar, la lupa de zoom que sigue
- * el mouse, y el visor 360° (arrastrar para girar cuando el reloj tiene
- * varias fotos en `imagenes360`). Ver README para cómo activar el 360°.
+ * el mouse, el botón de compartir (enlace directo a ese reloj vía
+ * ?reloj=REF-01), y el visor 360° (arrastrar para girar cuando el reloj
+ * tiene varias fotos en `imagenes360`). Ver README para cómo activar el 360°.
  */
 
 let modal360;
@@ -31,7 +32,39 @@ function openModal(watch) {
     if (cardCartBtn) updateCartButton(cardCartBtn);
   };
 
+  const shareBtn = document.getElementById("modal-share");
+  shareBtn.classList.remove("is-copied");
+  shareBtn.onclick = () => shareWatch(watch, shareBtn);
+
   modal.showModal();
+}
+
+async function shareWatch(watch, btn) {
+  const url = buildWatchShareUrl(watch);
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: `${watch.marca} ${watch.nombre} — ${CONFIG.businessName}`,
+        text: `Mira este reloj en ${CONFIG.businessName}: ${watch.marca} ${watch.nombre} (${watch.referencia})`,
+        url,
+      });
+    } catch {
+      /* el usuario cerró el diálogo de compartir, no hacer nada */
+    }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    window.prompt("Copia este enlace para compartir:", url);
+    return;
+  }
+  btn.classList.add("is-copied");
+  btn.setAttribute("aria-label", "Enlace copiado");
+  setTimeout(() => {
+    btn.classList.remove("is-copied");
+    btn.setAttribute("aria-label", "Compartir este reloj");
+  }, 1800);
 }
 
 function initModal() {

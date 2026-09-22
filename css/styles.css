@@ -928,6 +928,52 @@ section[id] {
   color: var(--accent-soft);
 }
 
+.modal__share-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.modal__share-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.modal__share-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: var(--accent);
+  color: var(--accent-soft);
+}
+
+.modal__share-check {
+  display: none;
+}
+
+.modal__share-btn.is-copied {
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.modal__share-btn.is-copied .modal__share-icon {
+  display: none;
+}
+
+.modal__share-btn.is-copied .modal__share-check {
+  display: block;
+}
+
 .modal__body {
   padding: 28px;
   display: flex;

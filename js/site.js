@@ -2,7 +2,9 @@
  * Todo lo que no es el catálogo ni el modal: aplicar los datos de tu
  * marca (js/data.js) al HTML, el menú móvil, el aviso de configuración
  * pendiente, la animación al hacer scroll, los datos estructurados para
- * buscadores, y el arranque general de la página al cargar.
+ * buscadores, abrir el detalle de un reloj cuando alguien entra desde un
+ * enlace compartido (?reloj=REF-01), y el arranque general de la página
+ * al cargar.
  */
 
 function applyBranding() {
@@ -77,6 +79,13 @@ function initYear() {
   document.getElementById("year").textContent = new Date().getFullYear();
 }
 
+function openWatchFromUrl() {
+  const ref = new URLSearchParams(window.location.search).get("reloj");
+  if (!ref) return;
+  const watch = WATCHES.find((w) => w.referencia.toLowerCase() === ref.toLowerCase());
+  if (watch) openModal(watch);
+}
+
 function injectStructuredData() {
   const siteUrl = window.location.href.split("#")[0];
   const data = {
@@ -119,4 +128,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initReveal();
   initYear();
   injectStructuredData();
+  openWatchFromUrl();
 });

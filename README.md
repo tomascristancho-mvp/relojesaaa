@@ -192,6 +192,23 @@ El carrito se guarda con `localStorage` en el navegador de quien visita —
 es solo para armar el pedido antes de escribirte, no necesitas hacer nada
 para que funcione y no se comparte entre dispositivos.
 
+## Compartir un reloj puntual
+
+En la ventana de detalle de cada reloj hay un botón de compartir (el ícono
+de conexiones, arriba a la derecha de la foto). Sirve para que alguien le
+mande a un familiar o amigo el enlace directo a ESE reloj, no solo a la
+página general:
+
+- En el celular, abre el menú nativo de "Compartir" del sistema (WhatsApp,
+  Instagram, correo, etc.) con el enlace ya listo.
+- En computador (donde no existe ese menú nativo), copia el enlace al
+  portapapeles y el botón muestra un ✓ por un momento para confirmar.
+- Quien reciba el enlace y lo abra ve la página con ese reloj ya abierto
+  en su ventana de detalle, sin tener que buscarlo en el catálogo.
+
+No requiere configuración: el enlace se arma solo con la referencia del
+reloj (por ejemplo `...?reloj=REF-01`).
+
 ## Panel privado de pedidos y contabilidad (`admin.html`)
 
 Además de la página pública, el sitio incluye un panel privado en
