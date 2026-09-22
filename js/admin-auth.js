@@ -49,6 +49,7 @@ function initAdminApp() {
   initCsvActions();
   initDetailModal();
   initSalesDetailModal();
+  initConfirmDialog();
   renderOrders();
 
   document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);

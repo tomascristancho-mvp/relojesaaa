@@ -72,6 +72,7 @@
         <h2>Nuevo pedido</h2>
         <form id="order-form" class="order-form">
           <div class="order-form__grid">
+            <span class="order-form__section">Datos del cliente</span>
             <label>
               Fecha
               <input type="date" id="order-fecha" required />
@@ -96,6 +97,8 @@
               Lugar de entrega
               <input type="text" id="order-lugar" placeholder="Ciudad y dirección" required />
             </label>
+
+            <span class="order-form__section">Detalles de la venta</span>
             <label class="order-form__wide">
               Reloj
               <input list="reloj-options" id="order-reloj" placeholder="Escribe o elige de la lista" required />
@@ -129,6 +132,8 @@
                 <option>Condia</option>
               </select>
             </label>
+
+            <span class="order-form__section">Estado del pedido</span>
             <label>
               Estado
               <select id="order-estado">
@@ -194,9 +199,21 @@
     <div id="sales-list" class="sales-list"></div>
   </dialog>
 
+  <dialog id="confirm-dialog" class="modal confirm-dialog">
+    <h3 id="confirm-dialog-title"></h3>
+    <p id="confirm-dialog-message"></p>
+    <div class="confirm-dialog__actions">
+      <button id="confirm-dialog-cancel" type="button" class="btn btn--ghost btn--small"></button>
+      <button id="confirm-dialog-ok" type="button" class="btn btn--primary btn--small"></button>
+    </div>
+  </dialog>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
   <script src="js/data.js"></script>
   <script src="js/admin-config.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/admin-ui.js"></script>
   <script src="js/admin-orders.js"></script>
   <script src="js/admin-csv.js"></script>
   <script src="js/admin-sales-detail.js"></script>

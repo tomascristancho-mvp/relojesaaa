@@ -95,6 +95,7 @@ function initOrderForm() {
     orders.push(order);
     saveOrders(orders);
     renderOrders();
+    showToast(`Pedido de ${order.nombre || "cliente"} guardado ✓`);
 
     form.reset();
     document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
@@ -150,10 +151,17 @@ function renderOrders() {
     delBtn.className = "icon-btn";
     delBtn.title = "Eliminar pedido";
     delBtn.textContent = "🗑";
-    delBtn.addEventListener("click", () => {
-      if (confirm(`¿Eliminar el pedido de ${order.nombre || "este cliente"}? Esta acción no se puede deshacer.`)) {
+    delBtn.addEventListener("click", async () => {
+      const confirmed = await confirmDialog({
+        title: "Eliminar pedido",
+        message: `¿Eliminar el pedido de ${order.nombre || "este cliente"}? Esta acción no se puede deshacer.`,
+        confirmLabel: "Eliminar",
+        danger: true,
+      });
+      if (confirmed) {
         saveOrders(loadOrders().filter((o) => o.id !== order.id));
         renderOrders();
+        showToast("Pedido eliminado");
       }
     });
     actionsCell.appendChild(delBtn);

@@ -110,16 +110,17 @@ function initCsvActions() {
     a.download = `pedidos-altitude-watch-co-${today}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast(`CSV descargado (${orders.length} pedido${orders.length === 1 ? "" : "s"}) ✓`);
   });
 
   document.getElementById("import-csv").addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const rows = parseCsv(String(reader.result));
       if (rows.length < 2) {
-        alert("El archivo no tiene filas de datos para importar.");
+        showToast("El archivo no tiene filas de datos para importar.", "error");
         e.target.value = "";
         return;
       }
@@ -143,12 +144,17 @@ function initCsvActions() {
         createdAt: new Date().toISOString(),
       }));
 
-      const replace = confirm(
-        `Se encontraron ${imported.length} pedido(s) en el archivo.\n\nAceptar = reemplazar todos los pedidos actuales por estos.\nCancelar = agregarlos a la lista actual (sin borrar nada).`
-      );
+      const replace = await confirmDialog({
+        title: "Importar CSV",
+        message: `Se encontraron ${imported.length} pedido(s) en el archivo. ¿Reemplazar todos los pedidos actuales por estos, o agregarlos a la lista sin borrar nada?`,
+        confirmLabel: "Reemplazar todo",
+        cancelLabel: "Agregar a la lista",
+        danger: true,
+      });
       const current = loadOrders();
       saveOrders(replace ? imported : [...current, ...imported]);
       renderOrders();
+      showToast(`${imported.length} pedido(s) importado(s) ✓`);
       e.target.value = "";
     };
     reader.readAsText(file, "UTF-8");
