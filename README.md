@@ -8,12 +8,16 @@ editarla con cualquier editor de texto y publicarla en minutos.
 ## Estructura del proyecto
 
 ```
-index.html            → estructura de la página
-css/styles.css         → todos los estilos (colores, tipografía, layout)
-js/data.js              → tu información de negocio y el catálogo de relojes (edita aquí)
-js/main.js              → lógica del sitio (no necesitas tocarlo)
-images/watches/         → aquí van las fotos de tus relojes
-favicon.svg              → ícono de la pestaña del navegador
+index.html               → estructura de la página pública
+admin.html                → panel privado de pedidos/contabilidad (ver abajo)
+css/styles.css             → estilos de la página pública
+css/admin.css               → estilos del panel privado
+js/data.js                    → tu información de negocio y el catálogo de relojes (edita aquí)
+js/main.js                     → lógica de la página pública (no necesitas tocarlo)
+js/admin-config.js              → código de acceso del panel privado (edítalo aquí)
+js/admin.js                      → lógica del panel privado (no necesitas tocarlo)
+images/watches/                   → aquí van las fotos de tus relojes
+favicon.svg                        → ícono de la pestaña del navegador
 ```
 
 ## Cómo personalizar tu información
@@ -64,6 +68,35 @@ por ese código.
 
 Recomendación: fotos cuadradas (1:1) y con buena luz se ven mejor en las tarjetas
 del catálogo, pero el sitio funciona con cualquier proporción.
+
+### Vista 360° (opcional)
+
+El detalle de cada reloj ya soporta una vista 360°: arrastras la foto y el
+reloj "gira". Para activarla en un reloj específico, agrega el campo
+`imagenes360` con varias fotos tomadas girando el reloj (por ejemplo, una
+foto cada 15°, unas 16-24 fotos en total, con el reloj centrado y la cámara
+fija):
+
+```js
+{
+  id: 1,
+  referencia: "REF-01",
+  // ...el resto de los campos igual...
+  imagen: "images/watches/reloj-01.jpg",       // foto principal (se usa en el catálogo)
+  imagenes360: [                                  // opcional: secuencia para girar
+    "images/watches/reloj-01-01.jpg",
+    "images/watches/reloj-01-02.jpg",
+    "images/watches/reloj-01-03.jpg",
+    // ...hasta completar la vuelta
+  ],
+},
+```
+
+Si no agregas `imagenes360` (o dejas el arreglo vacío), el reloj se ve
+normal, con zoom, como siempre. En cuanto agregues 2 o más fotos ahí, la
+vista 360° se activa sola en el modal (aparece la etiqueta "Arrastra para
+girar"). Si prefieres mandarme un video girando el reloj en vez de tomar las
+fotos por separado, también puedo ayudarte a sacar los cuadros del video.
 
 ### Importante: solo describe características reales
 
@@ -117,3 +150,65 @@ los valores de `marca` y `genero` que uses en `js/data.js`. Si agregas una
 marca o un género nuevo en algún reloj, el filtro aparece solo, sin que
 tengas que tocar el HTML. Los dos filtros se combinan (por ejemplo, "Fossil"
 + "Hombre" muestra solo los relojes Fossil para hombre).
+
+## Panel privado de pedidos y contabilidad (`admin.html`)
+
+Además de la página pública, el sitio incluye un panel privado en
+`admin.html` para que registres tus pedidos: nombre del cliente, cédula,
+teléfono, correo, lugar de entrega, reloj, medio de pago, precio y estado.
+Desde ahí puedes:
+
+- Ver estadísticas rápidas (pedidos totales, vendido, pendientes).
+- Registrar un pedido nuevo con un formulario.
+- Ver el detalle de cualquier pedido o eliminarlo.
+- **Exportar todo a un archivo CSV** que abre directo en Excel (botón
+  "Exportar a Excel (CSV)") — así llevas tu contabilidad fuera del navegador.
+- **Importar un CSV** para restaurar datos o pasarlos a otro computador.
+
+### Cómo entrar
+
+Abre `admin.html` (por ejemplo `https://tu-usuario.github.io/relojesaaa/admin.html`)
+y escribe el código de acceso. El código por defecto está en
+`js/admin-config.js` — ábrelo y cámbialo por el que tú quieras, es solo
+texto plano en ese archivo.
+
+### Muy importante: esto NO es un sistema con seguridad real
+
+`admin.html` es una página estática más de este mismo sitio (no hay un
+servidor tuyo ni una base de datos real detrás). Eso significa:
+
+1. **El código de acceso no es seguridad de verdad.** Cualquiera con
+   conocimientos básicos puede ver el código de la página (clic derecho →
+   "Ver código fuente") y leer el código de acceso tal cual está escrito en
+   `js/admin-config.js`. El candado solo evita que alguien entre por
+   accidente si llega a encontrar el link — no protege datos de alguien que
+   de verdad se lo proponga.
+2. **No compartas el link de `admin.html` públicamente.** No lo pongas en
+   Instagram, en el link de WhatsApp que le das a tus clientes, ni en
+   ninguna parte visible. Solo tú (y quien tú autorices) debería tener ese
+   link.
+3. **Los datos viven solo en el navegador donde los escribiste**, guardados
+   con una tecnología llamada `localStorage`. Si entras desde el celular,
+   esos pedidos NO aparecen automáticamente si luego entras desde el
+   computador — son navegadores distintos. Por eso:
+   - Exporta a CSV seguido y guarda una copia en Google Drive, tu correo, o
+     donde prefieras.
+   - Si quieres mover los datos de un dispositivo a otro, expórtalos en uno
+     e impórtalos en el otro con el botón "Importar CSV".
+   - Si borras los datos del navegador (caché/cookies) o cambias de
+     computador sin haber exportado, pierdes lo que no hayas respaldado.
+4. **Estás guardando datos personales de tus clientes** (nombre, cédula,
+   teléfono, correo, dirección). En Colombia esto lo cubre la Ley de
+   Protección de Datos (Habeas Data, Ley 1581 de 2012): en términos
+   simples, usa esos datos solo para procesar el pedido, no los compartas
+   con terceros sin avisar a tus clientes, y bórralos si un cliente te lo
+   pide. Si tu negocio crece mucho, en algún momento vale la pena migrar
+   esto a una herramienta con una base de datos y seguridad real (por
+   ejemplo, una app con backend, o incluso una hoja de Google Sheets
+   compartida solo contigo) — este panel es un punto de partida simple y
+   gratuito, no la solución definitiva.
+
+Si en algún momento quieres algo con seguridad real (usuarios con
+contraseña de verdad, base de datos en la nube, copias de seguridad
+automáticas), avísame y armamos ese siguiente paso — requiere un servicio
+adicional (no alcanza con GitHub Pages solo), pero es totalmente posible.

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel privado — Altitude Watch Co.</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div id="lock-screen" class="lock-screen">
+    <form id="lock-form" class="lock-card">
+      <svg class="brand__icon lock-card__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
+        <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
+      </svg>
+      <h1>Panel privado</h1>
+      <p>Solo para uso interno de Altitude Watch Co.</p>
+      <input type="password" id="lock-input" placeholder="Código de acceso" autocomplete="off" />
+      <button type="submit" class="btn btn--primary">Entrar</button>
+      <p id="lock-error" class="lock-error" hidden>Código incorrecto.</p>
+      <p class="lock-note">
+        Este código es solo un filtro básico, no seguridad real (ver
+        <code>js/admin-config.js</code>). No es un reemplazo de mantener este
+        link privado.
+      </p>
+    </form>
+  </div>
+
+  <div id="admin-app" class="admin-app" hidden>
+    <header class="site-header admin-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand">
+          <svg class="brand__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
+          </svg>
+          <span class="brand__name">Panel privado</span>
+        </a>
+        <button id="logout-btn" class="btn btn--ghost btn--small" type="button">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <main class="container admin-main">
+      <section class="admin-stats">
+        <div class="stat-card">
+          <span class="stat-card__label">Pedidos totales</span>
+          <span id="stat-total" class="stat-card__value">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">Vendido (sin cancelados)</span>
+          <span id="stat-revenue" class="stat-card__value">$0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">Pendientes</span>
+          <span id="stat-pending" class="stat-card__value">0</span>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <h2>Nuevo pedido</h2>
+        <form id="order-form" class="order-form">
+          <div class="order-form__grid">
+            <label>
+              Fecha
+              <input type="date" id="order-fecha" required />
+            </label>
+            <label>
+              Nombre del cliente
+              <input type="text" id="order-nombre" placeholder="Nombre completo" required />
+            </label>
+            <label>
+              Cédula
+              <input type="text" id="order-cedula" placeholder="Número de cédula" required />
+            </label>
+            <label>
+              Teléfono
+              <input type="tel" id="order-telefono" placeholder="3001234567" required />
+            </label>
+            <label>
+              Correo (opcional)
+              <input type="email" id="order-correo" placeholder="correo@ejemplo.com" />
+            </label>
+            <label>
+              Lugar de entrega
+              <input type="text" id="order-lugar" placeholder="Ciudad y dirección" required />
+            </label>
+            <label class="order-form__wide">
+              Reloj
+              <input list="reloj-options" id="order-reloj" placeholder="Escribe o elige de la lista" required />
+              <datalist id="reloj-options"></datalist>
+            </label>
+            <label>
+              Medio de pago
+              <select id="order-pago" required>
+                <option value="">Selecciona...</option>
+                <option>Efectivo</option>
+                <option>Transferencia bancaria</option>
+                <option>Nequi</option>
+                <option>Daviplata</option>
+                <option>Otro</option>
+              </select>
+            </label>
+            <label>
+              Precio (COP)
+              <input type="number" id="order-precio" placeholder="60000" min="0" step="1000" required />
+            </label>
+            <label>
+              Estado
+              <select id="order-estado">
+                <option>Pendiente</option>
+                <option>Confirmado</option>
+                <option>Enviado</option>
+                <option>Entregado</option>
+                <option>Cancelado</option>
+              </select>
+            </label>
+            <label class="order-form__wide">
+              Notas (opcional)
+              <textarea id="order-notas" rows="2" placeholder="Cualquier detalle adicional del pedido"></textarea>
+            </label>
+          </div>
+          <button type="submit" class="btn btn--primary">Guardar pedido</button>
+        </form>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel__toolbar">
+          <h2>Pedidos registrados</h2>
+          <div class="admin-panel__actions">
+            <button id="export-csv" class="btn btn--ghost btn--small" type="button">Exportar a Excel (CSV)</button>
+            <label class="btn btn--ghost btn--small file-btn">
+              Importar CSV
+              <input type="file" id="import-csv" accept=".csv" hidden />
+            </label>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table id="orders-table" class="orders-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Reloj</th>
+                <th>Medio de pago</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+        </div>
+        <p id="orders-empty" class="orders-empty" hidden>Aún no has registrado pedidos.</p>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="order-detail" class="modal admin-detail-modal">
+    <button id="detail-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <div id="detail-body" class="admin-detail-body"></div>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/admin-config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
