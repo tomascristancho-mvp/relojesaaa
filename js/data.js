@@ -51,7 +51,7 @@ const WATCHES = [
     genero: "Mujer",
     nombre: "Mesh Plata Minimalista",
     precio: 60000,
-    descripcion: "Caja pequeña en acero plateado con esfera negra y correa de malla milanesa. Resistente al agua, ideal para uso diario.",
+    descripcion: "Caja pequeña en acero plateado con esfera negra y correa de malla milanesa. Un diseño minimalista ideal para uso diario.",
     imagen: "images/watches/reloj-02.jpg",
   },
   {
@@ -92,7 +92,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Deportivo Esfera Negra",
     precio: 60000,
-    descripcion: "Caja y esfera en negro total con numeración blanca y correa de caucho. Resistente al agua, liviano y fácil de combinar.",
+    descripcion: "Caja y esfera en negro total con numeración blanca y correa de caucho. Liviano y fácil de combinar con cualquier outfit.",
     imagen: "images/watches/reloj-06.jpg",
   },
   {
