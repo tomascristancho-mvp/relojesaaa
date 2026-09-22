@@ -167,6 +167,17 @@ function renderOrders() {
     `;
     const actionsCell = tr.querySelector(".orders-table__actions");
 
+    if (order.telefono) {
+      const waBtn = document.createElement("a");
+      waBtn.className = "icon-btn";
+      waBtn.title = "Escribir por WhatsApp";
+      waBtn.textContent = "💬";
+      waBtn.href = toWhatsAppLink(order.telefono);
+      waBtn.target = "_blank";
+      waBtn.rel = "noopener";
+      actionsCell.appendChild(waBtn);
+    }
+
     const viewBtn = document.createElement("button");
     viewBtn.type = "button";
     viewBtn.className = "icon-btn";
@@ -198,6 +209,12 @@ function renderOrders() {
   const revenue = orders.filter((o) => o.estado !== "Cancelado").reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
   document.getElementById("stat-revenue").textContent = formatCOP(revenue);
   document.getElementById("stat-pending").textContent = orders.filter((o) => o.estado === "Pendiente").length;
+}
+
+function toWhatsAppLink(telefono) {
+  const digits = String(telefono || "").replace(/\D/g, "");
+  const withCountry = digits.startsWith("57") ? digits : `57${digits}`;
+  return `https://wa.me/${withCountry}`;
 }
 
 function slug(text) {

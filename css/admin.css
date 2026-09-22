@@ -223,6 +223,9 @@
 }
 
 .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -230,6 +233,7 @@
   height: 32px;
   cursor: pointer;
   font-size: 0.9rem;
+  text-decoration: none;
 }
 
 .icon-btn:hover {
