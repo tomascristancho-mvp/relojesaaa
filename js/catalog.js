@@ -72,11 +72,9 @@ function initFadeImg(img) {
 
 const filterState = { marca: "Todas", genero: "Todos", busqueda: "" };
 
-function renderCatalog() {
-  const grid = document.getElementById("catalog-grid");
-  grid.innerHTML = "";
+function getFilteredWatches() {
   const query = filterState.busqueda.trim().toLowerCase();
-  const items = WATCHES.filter(
+  return WATCHES.filter(
     (w) =>
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
       (filterState.genero === "Todos" || w.genero === filterState.genero) &&
@@ -85,6 +83,12 @@ function renderCatalog() {
         w.marca.toLowerCase().includes(query) ||
         w.nombre.toLowerCase().includes(query))
   );
+}
+
+function renderCatalog() {
+  const grid = document.getElementById("catalog-grid");
+  grid.innerHTML = "";
+  const items = getFilteredWatches();
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
   const emptyEl = document.getElementById("catalog-empty");
   emptyEl.hidden = items.length !== 0;

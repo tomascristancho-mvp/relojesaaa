@@ -209,6 +209,20 @@ página general:
 No requiere configuración: el enlace se arma solo con la referencia del
 reloj (por ejemplo `...?reloj=REF-01`).
 
+## Flechas para pasar de un reloj a otro
+
+Dentro de la ventana de detalle hay dos flechas (izquierda/derecha, a los
+lados de la foto) para pasar al reloj anterior o siguiente sin cerrar la
+ventana y volver a buscarlo en el catálogo. También funciona con las
+flechas ← → del teclado en computador.
+
+- Respeta los filtros que tengas activos: si filtraste por "Fossil", las
+  flechas solo se mueven entre los relojes Fossil, no entre los 14.
+- Da toda la vuelta: desde el último reloj, "siguiente" te lleva de nuevo
+  al primero (y viceversa), así nunca hay un callejón sin salida.
+- Si solo hay un reloj visible (por ejemplo, una búsqueda muy específica),
+  las flechas se ocultan solas porque no habría a dónde ir.
+
 ## Panel privado de pedidos y contabilidad (`admin.html`)
 
 Además de la página pública, el sitio incluye un panel privado en

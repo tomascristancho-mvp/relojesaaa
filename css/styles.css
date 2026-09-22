@@ -974,6 +974,47 @@ section[id] {
   display: block;
 }
 
+.modal__nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.modal__nav-btn[hidden] {
+  display: none;
+}
+
+.modal__nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal__nav-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: var(--accent);
+  color: var(--accent-soft);
+}
+
+.modal__nav-btn--prev {
+  left: 10px;
+}
+
+.modal__nav-btn--next {
+  right: 10px;
+}
+
 .modal__body {
   padding: 28px;
   display: flex;

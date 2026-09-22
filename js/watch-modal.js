@@ -1,8 +1,10 @@
 /**
  * Modal de detalle de un reloj: abrir/cerrar, la lupa de zoom que sigue
  * el mouse, el botón de compartir (enlace directo a ese reloj vía
- * ?reloj=REF-01), y el visor 360° (arrastrar para girar cuando el reloj
- * tiene varias fotos en `imagenes360`). Ver README para cómo activar el 360°.
+ * ?reloj=REF-01), las flechas para pasar al reloj anterior/siguiente
+ * dentro de los filtros actuales (también con las flechas ← → del
+ * teclado), y el visor 360° (arrastrar para girar cuando el reloj tiene
+ * varias fotos en `imagenes360`). Ver README para cómo activar el 360°.
  */
 
 let modal360;
@@ -36,7 +38,24 @@ function openModal(watch) {
   shareBtn.classList.remove("is-copied");
   shareBtn.onclick = () => shareWatch(watch, shareBtn);
 
+  updateModalNav(watch);
+
   modal.showModal();
+}
+
+function updateModalNav(watch) {
+  const items = getFilteredWatches();
+  const prevBtn = document.getElementById("modal-prev");
+  const nextBtn = document.getElementById("modal-next");
+  const idx = items.findIndex((w) => w.referencia === watch.referencia);
+  const hasMultiple = idx !== -1 && items.length > 1;
+  prevBtn.hidden = !hasMultiple;
+  nextBtn.hidden = !hasMultiple;
+  if (!hasMultiple) return;
+  const prevWatch = items[(idx - 1 + items.length) % items.length];
+  const nextWatch = items[(idx + 1) % items.length];
+  prevBtn.onclick = () => openModal(prevWatch);
+  nextBtn.onclick = () => openModal(nextWatch);
 }
 
 async function shareWatch(watch, btn) {
@@ -73,6 +92,15 @@ function initModal() {
     if (e.target === modal) modal.close();
   });
   document.getElementById("modal-close").addEventListener("click", () => modal.close());
+  modal.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") {
+      const btn = document.getElementById("modal-prev");
+      if (!btn.hidden) btn.click();
+    } else if (e.key === "ArrowRight") {
+      const btn = document.getElementById("modal-next");
+      if (!btn.hidden) btn.click();
+    }
+  });
 }
 
 function initImageZoom() {
@@ -139,10 +167,20 @@ function initModal360() {
     wrap.classList.remove("is-dragging");
   }
 
-  wrap.addEventListener("mousedown", (e) => onDown(e.clientX));
+  wrap.addEventListener("mousedown", (e) => {
+    if (e.target.closest("a, button")) return;
+    onDown(e.clientX);
+  });
   window.addEventListener("mousemove", (e) => onMove(e.clientX));
   window.addEventListener("mouseup", onUp);
-  wrap.addEventListener("touchstart", (e) => onDown(e.touches[0].clientX), { passive: true });
+  wrap.addEventListener(
+    "touchstart",
+    (e) => {
+      if (e.target.closest("a, button")) return;
+      onDown(e.touches[0].clientX);
+    },
+    { passive: true }
+  );
   wrap.addEventListener("touchmove", (e) => onMove(e.touches[0].clientX), { passive: true });
   wrap.addEventListener("touchend", onUp);
 
