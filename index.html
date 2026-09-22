@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de relojes</title>
+  <meta name="description" content="Catálogo de relojes con entrega en Bogotá y envíos a toda Colombia. Pide tu reloj directo por WhatsApp." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="setup-banner" class="setup-banner" hidden></div>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a href="#top" class="brand">
+        <svg class="brand__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 12v8l6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 4h8M16 36h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="brand__name" data-business-name>Tu Marca de Relojes</span>
+      </a>
+      <nav class="site-nav">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#como-comprar">Cómo comprar</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <a class="btn btn--whatsapp btn--small" data-whatsapp-link href="#" target="_blank" rel="noopener">Escríbenos</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero__inner">
+        <p class="eyebrow reveal">Envíos a toda Colombia · Ubicados en <span data-city>Bogotá</span></p>
+        <h1 class="hero__title reveal">
+          Encuentra el reloj<br />que va contigo
+        </h1>
+        <p class="hero__subtitle reveal" data-tagline>Relojes para cada estilo</p>
+        <div class="hero__actions reveal">
+          <a href="#catalogo" class="btn btn--primary">Ver catálogo</a>
+          <a href="#como-comprar" class="btn btn--ghost">Cómo comprar</a>
+        </div>
+        <ul class="hero__badges reveal">
+          <li>Atención personalizada</li>
+          <li>Entrega en toda Colombia</li>
+          <li>Pedido directo por WhatsApp</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="catalogo" class="catalog">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Catálogo</h2>
+          <p>Elige tu referencia y pídela directo por WhatsApp.</p>
+        </div>
+        <div id="catalog-filters" class="catalog-filters reveal"></div>
+        <div id="catalog-grid" class="catalog-grid"></div>
+        <p id="catalog-empty" class="catalog-empty" hidden>No hay relojes en esta categoría todavía.</p>
+      </div>
+    </section>
+
+    <section id="como-comprar" class="steps">
+      <div class="container">
+        <div class="section-heading reveal">
+          <h2>Cómo comprar</h2>
+          <p>Un proceso simple, directo y sin vueltas.</p>
+        </div>
+        <ol class="steps__list">
+          <li class="steps__item reveal">
+            <span class="steps__number">01</span>
+            <h3>Elige tu reloj</h3>
+            <p>Recorre el catálogo y encuentra la referencia que más te guste.</p>
+          </li>
+          <li class="steps__item reveal">
+            <span class="steps__number">02</span>
+            <h3>Escríbenos por WhatsApp</h3>
+            <p>El botón de cada reloj abre un mensaje ya listo con la referencia elegida.</p>
+          </li>
+          <li class="steps__item reveal">
+            <span class="steps__number">03</span>
+            <h3>Coordinamos entrega</h3>
+            <p>Confirmamos disponibilidad, forma de pago y envío a tu ciudad.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="contacto" class="contact">
+      <div class="container contact__inner">
+        <div class="reveal">
+          <h2>¿Tienes dudas antes de pedir?</h2>
+          <p>Escríbenos directamente y con gusto te ayudamos a elegir.</p>
+          <a class="btn btn--primary" data-whatsapp-link href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div>
+        <span class="brand__name" data-business-name>Tu Marca de Relojes</span>
+        <p>Ubicados en <span data-city>Bogotá</span> · Envíos a toda Colombia</p>
+      </div>
+      <div class="site-footer__links">
+        <a data-whatsapp-link href="#" target="_blank" rel="noopener">WhatsApp</a>
+        <a id="footer-instagram" href="#" target="_blank" rel="noopener" hidden></a>
+        <a id="footer-email" href="#" hidden></a>
+      </div>
+      <p class="site-footer__copy">© <span id="year"></span> <span data-business-name>Tu Marca de Relojes</span></p>
+    </div>
+  </footer>
+
+  <dialog id="watch-modal" class="modal">
+    <button id="modal-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <div class="modal__content">
+      <img id="modal-img" class="modal__img" src="" alt="" />
+      <div class="modal__body">
+        <span id="modal-ref" class="watch-card__ref"></span>
+        <h3 id="modal-title"></h3>
+        <p id="modal-price" class="watch-card__price"></p>
+        <p id="modal-desc" class="modal__desc"></p>
+        <a id="modal-whatsapp" class="btn btn--whatsapp" href="#" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

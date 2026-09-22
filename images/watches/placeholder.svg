@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#19161d"/>
+  <circle cx="200" cy="185" r="90" stroke="#3a3440" stroke-width="3" fill="none"/>
+  <path d="M200 130v55l40 25" stroke="#3a3440" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M180 60h40M180 310h40" stroke="#3a3440" stroke-width="3" stroke-linecap="round"/>
+  <text x="200" y="345" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" fill="#665f6b">Foto próximamente</text>
+</svg>
