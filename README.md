@@ -43,7 +43,7 @@ reloj con tus datos reales:
   marca: "Fossil",               // marca real del reloj, se usa en el filtro "Marca"
   genero: "Hombre",              // "Hombre", "Mujer" o "Unisex", se usa en el filtro "Género"
   nombre: "Clásico Esfera Blanca", // nombre descriptivo del reloj
-  precio: 70000,                  // número en pesos, o null para "Escríbenos por el precio"
+  precio: 60000,                  // número en pesos, o null para "Escríbenos por el precio"
   descripcion: "Descripción corta y atractiva del reloj.",
   imagen: "images/watches/reloj-01.jpg", // ruta a tu foto
 },
@@ -64,6 +64,15 @@ por ese código.
 
 Recomendación: fotos cuadradas (1:1) y con buena luz se ven mejor en las tarjetas
 del catálogo, pero el sitio funciona con cualquier proporción.
+
+### Importante: solo describe características reales
+
+En `descripcion`, escribe únicamente características que el reloj realmente
+tiene (por ejemplo, no pongas "resistente al agua" si no estás seguro de que
+lo sea, aunque el reloj tenga texto tipo "WATER RESIST" impreso en la esfera
+de fábrica). Anunciar una característica falsa puede generar reclamos de
+clientes y es publicidad engañosa. Ante la duda, describe solo lo que ves
+(material, color, tamaño, estilo) y evita promesas de funcionalidad.
 
 ## Cómo se arma el mensaje de WhatsApp
 

@@ -11,6 +11,8 @@
   <meta property="og:image" content="images/watches/reloj-01.jpg" />
   <meta name="theme-color" content="#121016" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -65,6 +67,7 @@
         <div class="section-heading reveal">
           <h2>Catálogo</h2>
           <p>Elige tu referencia y pídela directo por WhatsApp.</p>
+          <p id="catalog-count" class="catalog-count"></p>
         </div>
         <div class="filter-group reveal">
           <span class="filter-group__label">Marca</span>
@@ -156,6 +159,10 @@
       </div>
     </div>
   </dialog>
+
+  <a class="whatsapp-float" data-whatsapp-link href="#" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>
+  </a>
 
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>

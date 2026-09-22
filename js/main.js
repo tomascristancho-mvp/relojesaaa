@@ -76,6 +76,12 @@ function renderCatalog() {
   );
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
   document.getElementById("catalog-empty").hidden = items.length !== 0;
+
+  const countEl = document.getElementById("catalog-count");
+  countEl.textContent =
+    items.length === WATCHES.length
+      ? `${WATCHES.length} relojes disponibles`
+      : `Mostrando ${items.length} de ${WATCHES.length} relojes`;
 }
 
 function renderFilterGroup(containerId, key, allLabel, values) {
@@ -194,6 +200,34 @@ function initYear() {
   document.getElementById("year").textContent = new Date().getFullYear();
 }
 
+function injectStructuredData() {
+  const siteUrl = window.location.href.split("#")[0];
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: WATCHES.map((watch, i) => ({
+      "@type": "Product",
+      position: i + 1,
+      name: `${watch.marca} ${watch.nombre}`,
+      brand: watch.marca,
+      sku: watch.referencia,
+      description: watch.descripcion,
+      image: siteUrl + watch.imagen,
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "COP",
+        price: watch.precio ?? undefined,
+        availability: "https://schema.org/InStock",
+        url: siteUrl,
+      },
+    })),
+  };
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(data);
+  document.head.appendChild(script);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   applyBranding();
   checkSetupWarnings();
@@ -203,4 +237,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initImageZoom();
   initReveal();
   initYear();
+  injectStructuredData();
 });
