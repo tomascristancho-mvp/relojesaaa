@@ -120,6 +120,100 @@
   display: none;
 }
 
+.stat-card--clickable {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.stat-card--clickable:hover {
+  border-color: var(--accent);
+}
+
+.stat-card__hint {
+  font-size: 0.72rem;
+  color: var(--accent-soft);
+  margin-top: 2px;
+}
+
+/* ============ SALES DETAIL MODAL ============ */
+.sales-detail-modal {
+  padding: 28px;
+  max-width: 560px;
+  width: 92vw;
+  max-height: 80vh;
+}
+
+.sales-detail-modal h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.sales-detail-summary {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 18px;
+}
+
+.sales-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.sales-list__empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 0;
+}
+
+.sale-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.sale-row__img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.sale-row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sale-row__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.sale-row__meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.sale-row__profit {
+  text-align: right;
+  font-family: var(--font-display);
+  color: var(--accent-soft);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 .admin-panel {
   background: var(--bg-card);
   border: 1px solid var(--border);

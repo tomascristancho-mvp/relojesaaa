@@ -56,11 +56,12 @@
           <span class="stat-card__label">Vendido (sin cancelados)</span>
           <span id="stat-revenue" class="stat-card__value">$0</span>
         </div>
-        <div class="stat-card">
+        <button type="button" id="stat-profit-card" class="stat-card stat-card--clickable">
           <span class="stat-card__label">Ganancia total</span>
           <span id="stat-profit" class="stat-card__value">$0</span>
           <span id="stat-profit-note" class="stat-card__note"></span>
-        </div>
+          <span class="stat-card__hint">Ver detalle de ventas ›</span>
+        </button>
         <div class="stat-card">
           <span class="stat-card__label">Pendientes</span>
           <span id="stat-pending" class="stat-card__value">0</span>
@@ -120,6 +121,15 @@
               <input type="number" id="order-costo" placeholder="Lo que te costó a ti" min="0" step="1000" />
             </label>
             <label>
+              Encargado de venta
+              <select id="order-vendedor" required>
+                <option value="">Selecciona...</option>
+                <option>Tomás</option>
+                <option>Falck</option>
+                <option>Condia</option>
+              </select>
+            </label>
+            <label>
               Estado
               <select id="order-estado">
                 <option>Pendiente</option>
@@ -155,6 +165,7 @@
               <tr>
                 <th>Fecha</th>
                 <th>Cliente</th>
+                <th>Encargado</th>
                 <th>Reloj</th>
                 <th>Medio de pago</th>
                 <th>Precio</th>
@@ -174,6 +185,13 @@
   <dialog id="order-detail" class="modal admin-detail-modal">
     <button id="detail-close" class="modal__close" aria-label="Cerrar">✕</button>
     <div id="detail-body" class="admin-detail-body"></div>
+  </dialog>
+
+  <dialog id="sales-detail" class="modal sales-detail-modal">
+    <button id="sales-detail-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <h3>Ventas con ganancia registrada</h3>
+    <p id="sales-detail-summary" class="sales-detail-summary"></p>
+    <div id="sales-list" class="sales-list"></div>
   </dialog>
 
   <script src="js/data.js"></script>

@@ -155,7 +155,8 @@ tengas que tocar el HTML. Los dos filtros se combinan (por ejemplo, "Fossil"
 
 Además de la página pública, el sitio incluye un panel privado en
 `admin.html` para que registres tus pedidos: nombre del cliente, cédula,
-teléfono, correo, lugar de entrega, reloj, medio de pago, precio de venta,
+teléfono, correo, lugar de entrega, reloj, **encargado de venta** (Tomás,
+Falck o Condia — obligatorio elegir uno), medio de pago, precio de venta,
 costo del reloj y estado. Desde ahí puedes:
 
 - Ver estadísticas rápidas (pedidos totales, vendido, **ganancia total**,
@@ -165,6 +166,9 @@ costo del reloj y estado. Desde ahí puedes:
   pedido (precio de venta − costo) y la suma al total. Si vendes la misma
   referencia otra vez, el costo se autocompleta con el que usaste la última
   vez (lo puedes cambiar si varió).
+- **Hacer clic en la tarjeta "Ganancia total"** para ver la lista de cada
+  venta con costo registrado: foto del reloj, precio, lugar de entrega,
+  fecha y la ganancia de esa venta puntual.
 - Ver el detalle de cualquier pedido (incluye costo y ganancia) o eliminarlo.
 - **Exportar todo a un archivo CSV** que abre directo en Excel (botón
   "Exportar a Excel (CSV)") — así llevas tu contabilidad fuera del navegador.

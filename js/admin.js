@@ -9,6 +9,7 @@
 
 const STORAGE_KEY = "altitude_orders_v1";
 const UNLOCK_KEY = "altitude_admin_unlocked";
+const PLACEHOLDER_IMAGE = "images/watches/placeholder.svg";
 
 const CSV_HEADERS = [
   "Fecha",
@@ -18,6 +19,7 @@ const CSV_HEADERS = [
   "Correo",
   "Lugar de entrega",
   "Reloj",
+  "Encargado",
   "Medio de pago",
   "Precio",
   "Costo",
@@ -93,6 +95,7 @@ function initAdminApp() {
   initOrderForm();
   initCsvActions();
   initDetailModal();
+  initSalesDetailModal();
   renderOrders();
 
   document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
@@ -149,6 +152,7 @@ function initOrderForm() {
       medioPago: document.getElementById("order-pago").value,
       precio: Number(document.getElementById("order-precio").value) || 0,
       costo: document.getElementById("order-costo").value === "" ? null : Number(document.getElementById("order-costo").value),
+      vendedor: document.getElementById("order-vendedor").value,
       estado: document.getElementById("order-estado").value,
       notas: document.getElementById("order-notas").value.trim(),
       createdAt: new Date().toISOString(),
@@ -179,6 +183,7 @@ function renderOrders() {
     tr.innerHTML = `
       <td>${order.fecha || ""}</td>
       <td>${escapeHtml(order.nombre)}</td>
+      <td>${escapeHtml(order.vendedor)}</td>
       <td>${escapeHtml(order.reloj)}</td>
       <td>${escapeHtml(order.medioPago)}</td>
       <td>${formatCOP(order.precio)}</td>
@@ -277,6 +282,7 @@ function openDetail(order) {
     ["Correo", order.correo || "—"],
     ["Lugar de entrega", order.lugar],
     ["Reloj", order.reloj],
+    ["Encargado de venta", order.vendedor],
     ["Medio de pago", order.medioPago],
     ["Precio de venta", formatCOP(order.precio)],
     ["Costo", order.costo != null ? formatCOP(order.costo) : "—"],
@@ -289,6 +295,57 @@ function openDetail(order) {
     rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("") +
     `</dl>`;
   document.getElementById("order-detail").showModal();
+}
+
+/* ============ DETALLE DE VENTAS (al hacer clic en "Ganancia total") ============ */
+function findWatchForOrder(order) {
+  return (typeof WATCHES !== "undefined" ? WATCHES : []).find((w) => order.reloj && order.reloj.startsWith(w.referencia));
+}
+
+function initSalesDetailModal() {
+  const modal = document.getElementById("sales-detail");
+  document.getElementById("stat-profit-card").addEventListener("click", openSalesDetail);
+  document.getElementById("sales-detail-close").addEventListener("click", () => modal.close());
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.close();
+  });
+}
+
+function openSalesDetail() {
+  const sales = loadOrders()
+    .filter((o) => o.estado !== "Cancelado" && calcGanancia(o) != null)
+    .sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+
+  const totalGanancia = sales.reduce((sum, o) => sum + calcGanancia(o), 0);
+  document.getElementById("sales-detail-summary").textContent =
+    sales.length === 0
+      ? "Aún no hay ventas con costo registrado."
+      : `${sales.length} venta(s) · ganancia total ${formatCOP(totalGanancia)}`;
+
+  const list = document.getElementById("sales-list");
+  list.innerHTML = "";
+
+  if (sales.length === 0) {
+    list.innerHTML = `<p class="sales-list__empty">Registra el costo en un pedido para que aparezca aquí.</p>`;
+  }
+
+  sales.forEach((order) => {
+    const watch = findWatchForOrder(order);
+    const img = watch?.imagen || PLACEHOLDER_IMAGE;
+    const row = document.createElement("div");
+    row.className = "sale-row";
+    row.innerHTML = `
+      <img class="sale-row__img" src="${img}" alt="${escapeHtml(order.reloj)}" />
+      <div class="sale-row__info">
+        <div class="sale-row__title">${escapeHtml(order.reloj)}</div>
+        <div class="sale-row__meta">${formatCOP(order.precio)} · ${escapeHtml(order.lugar) || "—"} · ${order.fecha || "—"}</div>
+      </div>
+      <div class="sale-row__profit">${formatCOP(calcGanancia(order))}</div>
+    `;
+    list.appendChild(row);
+  });
+
+  document.getElementById("sales-detail").showModal();
 }
 
 /* ============ CSV: EXPORTAR / IMPORTAR ============ */
@@ -312,6 +369,7 @@ function ordersToCsv(orders) {
         o.correo,
         o.lugar,
         o.reloj,
+        o.vendedor,
         o.medioPago,
         o.precio,
         o.costo ?? "",
@@ -402,12 +460,13 @@ function initCsvActions() {
         correo: r[4] || "",
         lugar: r[5] || "",
         reloj: r[6] || "",
-        medioPago: r[7] || "",
-        precio: Number(r[8]) || 0,
-        costo: r[9] === "" || r[9] == null ? null : Number(r[9]),
-        // r[10] es "Ganancia", una columna calculada — no se importa, se recalcula sola.
-        estado: r[11] || "Pendiente",
-        notas: r[12] || "",
+        vendedor: r[7] || "",
+        medioPago: r[8] || "",
+        precio: Number(r[9]) || 0,
+        costo: r[10] === "" || r[10] == null ? null : Number(r[10]),
+        // r[11] es "Ganancia", una columna calculada — no se importa, se recalcula sola.
+        estado: r[12] || "Pendiente",
+        notas: r[13] || "",
         createdAt: new Date().toISOString(),
       }));
 
