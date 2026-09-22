@@ -172,6 +172,14 @@ marca o un género nuevo en algún reloj, el filtro aparece solo, sin que
 tengas que tocar el HTML. Los dos filtros se combinan (por ejemplo, "Fossil"
 + "Hombre" muestra solo los relojes Fossil para hombre).
 
+## Favoritos
+
+Cada reloj tiene un corazón (en la tarjeta y en el detalle) para que quien
+visite la página guarde los que le gustan y los revise después con el botón
+"Favoritos" que aparece arriba del catálogo. Se guarda con `localStorage`
+en el navegador de esa persona — es solo una comodidad para que compare
+antes de escribirte, no necesitas hacer nada para que funcione.
+
 ## Panel privado de pedidos y contabilidad (`admin.html`)
 
 Además de la página pública, el sitio incluye un panel privado en

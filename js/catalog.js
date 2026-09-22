@@ -5,20 +5,57 @@
  */
 
 const WHATSAPP_ICON = '<svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>';
+const HEART_ICON =
+  '<svg class="watch-card__fav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
 
 const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+/* ============ FAVORITOS (guardados en este navegador) ============ */
+const FAVORITES_KEY = "altitude_favorites";
+
+function getFavorites() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function isFavorite(referencia) {
+  return getFavorites().has(referencia);
+}
+
+function toggleFavorite(referencia) {
+  const favs = getFavorites();
+  if (favs.has(referencia)) favs.delete(referencia);
+  else favs.add(referencia);
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favs]));
+  updateFavoritesToggleLabel();
+  return favs.has(referencia);
+}
+
+function setFavButtonState(btn, active) {
+  btn.setAttribute("aria-pressed", String(active));
+  btn.classList.toggle("is-active", active);
+}
+
 function watchCard(watch) {
   const img = watch.imagen || PLACEHOLDER_IMAGE;
+  const favActive = isFavorite(watch.referencia);
   const card = document.createElement("article");
   card.className = "watch-card";
   card.dataset.marca = watch.marca;
   card.dataset.genero = watch.genero;
   card.innerHTML = `
-    <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
-      <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
-      <span class="watch-card__view">Ver detalle</span>
-    </button>
+    <div class="watch-card__media">
+      <button class="watch-card__media-trigger" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
+        <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
+        <span class="watch-card__view">Ver detalle</span>
+      </button>
+      <button class="watch-card__fav${favActive ? " is-active" : ""}" type="button" aria-pressed="${favActive}" aria-label="Agregar a favoritos" data-ref="${watch.referencia}">
+        ${HEART_ICON}
+      </button>
+    </div>
     <div class="watch-card__body">
       <span class="watch-card__ref">${watch.referencia}</span>
       <span class="watch-card__brand">${watch.marca}</span>
@@ -30,7 +67,13 @@ function watchCard(watch) {
       </a>
     </div>
   `;
-  card.querySelector(".watch-card__media").addEventListener("click", () => openModal(watch));
+  card.querySelector(".watch-card__media-trigger").addEventListener("click", () => openModal(watch));
+  card.querySelector(".watch-card__fav").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const active = toggleFavorite(watch.referencia);
+    setFavButtonState(e.currentTarget, active);
+    if (filterState.favoritos && !active) renderCatalog();
+  });
   initFadeImg(card.querySelector(".fade-img"));
   initCardTilt(card);
   return card;
@@ -57,29 +100,52 @@ function initFadeImg(img) {
   }
 }
 
-const filterState = { marca: "Todas", genero: "Todos", busqueda: "" };
+const filterState = { marca: "Todas", genero: "Todos", busqueda: "", favoritos: false };
 
 function renderCatalog() {
   const grid = document.getElementById("catalog-grid");
   grid.innerHTML = "";
   const query = filterState.busqueda.trim().toLowerCase();
+  const favs = filterState.favoritos ? getFavorites() : null;
   const items = WATCHES.filter(
     (w) =>
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
       (filterState.genero === "Todos" || w.genero === filterState.genero) &&
+      (!favs || favs.has(w.referencia)) &&
       (!query ||
         w.referencia.toLowerCase().includes(query) ||
         w.marca.toLowerCase().includes(query) ||
         w.nombre.toLowerCase().includes(query))
   );
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
-  document.getElementById("catalog-empty").hidden = items.length !== 0;
+  const emptyEl = document.getElementById("catalog-empty");
+  emptyEl.hidden = items.length !== 0;
+  emptyEl.textContent = filterState.favoritos
+    ? "Aún no has marcado relojes como favoritos. Toca el corazón en la foto de un reloj para guardarlo aquí."
+    : "No hay relojes con esos filtros todavía.";
 
   const countEl = document.getElementById("catalog-count");
   countEl.textContent =
     items.length === WATCHES.length
       ? `${WATCHES.length} relojes disponibles`
       : `Mostrando ${items.length} de ${WATCHES.length} relojes`;
+}
+
+function updateFavoritesToggleLabel() {
+  const count = getFavorites().size;
+  document.getElementById("favorites-toggle-label").textContent =
+    count > 0 ? `Favoritos (${count})` : "Favoritos";
+}
+
+function initFavoritesToggle() {
+  const btn = document.getElementById("favorites-toggle");
+  updateFavoritesToggleLabel();
+  btn.addEventListener("click", () => {
+    filterState.favoritos = !filterState.favoritos;
+    setFavButtonState(btn, filterState.favoritos);
+    updateFavoritesToggleLabel();
+    renderCatalog();
+  });
 }
 
 function renderFilterGroup(containerId, key, allLabel, values) {

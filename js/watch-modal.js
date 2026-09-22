@@ -20,6 +20,17 @@ function openModal(watch) {
   document.getElementById("modal-zoom").href = img;
   const frames = Array.isArray(watch.imagenes360) && watch.imagenes360.length > 1 ? watch.imagenes360 : [img];
   modal360.setFrames(frames);
+
+  const favBtn = document.getElementById("modal-fav");
+  setFavButtonState(favBtn, isFavorite(watch.referencia));
+  favBtn.onclick = () => {
+    const active = toggleFavorite(watch.referencia);
+    setFavButtonState(favBtn, active);
+    const cardFav = document.querySelector(`.watch-card__fav[data-ref="${watch.referencia}"]`);
+    if (cardFav) setFavButtonState(cardFav, active);
+    if (filterState.favoritos && !active) renderCatalog();
+  };
+
   modal.showModal();
 }
 
