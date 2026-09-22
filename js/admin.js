@@ -20,9 +20,15 @@ const CSV_HEADERS = [
   "Reloj",
   "Medio de pago",
   "Precio",
+  "Costo",
+  "Ganancia",
   "Estado",
   "Notas",
 ];
+
+function calcGanancia(order) {
+  return order.costo != null && order.costo !== "" ? Number(order.precio) - Number(order.costo) : null;
+}
 
 function loadOrders() {
   try {
@@ -103,14 +109,26 @@ function populateRelojOptions() {
     datalist.appendChild(opt);
   });
 
+  const costoInput = document.getElementById("order-costo");
+
   relojInput.addEventListener("change", () => {
     const match = (typeof WATCHES !== "undefined" ? WATCHES : []).find((w) => relojInput.value.startsWith(w.referencia));
     if (match && precioInput.dataset.touched !== "true" && match.precio != null) {
       precioInput.value = match.precio;
     }
+
+    if (costoInput.dataset.touched !== "true") {
+      const previous = loadOrders()
+        .filter((o) => o.reloj === relojInput.value && o.costo != null)
+        .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))[0];
+      if (previous) costoInput.value = previous.costo;
+    }
   });
   precioInput.addEventListener("input", () => {
     precioInput.dataset.touched = "true";
+  });
+  costoInput.addEventListener("input", () => {
+    costoInput.dataset.touched = "true";
   });
 }
 
@@ -130,6 +148,7 @@ function initOrderForm() {
       reloj: document.getElementById("order-reloj").value.trim(),
       medioPago: document.getElementById("order-pago").value,
       precio: Number(document.getElementById("order-precio").value) || 0,
+      costo: document.getElementById("order-costo").value === "" ? null : Number(document.getElementById("order-costo").value),
       estado: document.getElementById("order-estado").value,
       notas: document.getElementById("order-notas").value.trim(),
       createdAt: new Date().toISOString(),
@@ -144,6 +163,7 @@ function initOrderForm() {
     document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
     document.getElementById("order-estado").value = "Pendiente";
     document.getElementById("order-precio").dataset.touched = "false";
+    document.getElementById("order-costo").dataset.touched = "false";
     document.getElementById("order-nombre").focus();
   });
 }
@@ -162,6 +182,7 @@ function renderOrders() {
       <td>${escapeHtml(order.reloj)}</td>
       <td>${escapeHtml(order.medioPago)}</td>
       <td>${formatCOP(order.precio)}</td>
+      <td>${calcGanancia(order) != null ? formatCOP(calcGanancia(order)) : "—"}</td>
       <td><span class="status-badge status-badge--${slug(order.estado)}">${escapeHtml(order.estado)}</span></td>
       <td class="orders-table__actions"></td>
     `;
@@ -206,8 +227,18 @@ function renderOrders() {
   document.getElementById("orders-table").hidden = orders.length === 0;
 
   document.getElementById("stat-total").textContent = orders.length;
-  const revenue = orders.filter((o) => o.estado !== "Cancelado").reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
+  const soldOrders = orders.filter((o) => o.estado !== "Cancelado");
+  const revenue = soldOrders.reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
   document.getElementById("stat-revenue").textContent = formatCOP(revenue);
+  const profit = soldOrders.reduce((sum, o) => {
+    const g = calcGanancia(o);
+    return g != null ? sum + g : sum;
+  }, 0);
+  const ordersWithoutCosto = soldOrders.filter((o) => calcGanancia(o) == null).length;
+  document.getElementById("stat-profit").textContent = formatCOP(profit);
+  document.getElementById("stat-profit-note").textContent = ordersWithoutCosto
+    ? `No incluye ${ordersWithoutCosto} pedido(s) sin costo registrado`
+    : "";
   document.getElementById("stat-pending").textContent = orders.filter((o) => o.estado === "Pendiente").length;
 }
 
@@ -247,7 +278,9 @@ function openDetail(order) {
     ["Lugar de entrega", order.lugar],
     ["Reloj", order.reloj],
     ["Medio de pago", order.medioPago],
-    ["Precio", formatCOP(order.precio)],
+    ["Precio de venta", formatCOP(order.precio)],
+    ["Costo", order.costo != null ? formatCOP(order.costo) : "—"],
+    ["Ganancia", calcGanancia(order) != null ? formatCOP(calcGanancia(order)) : "—"],
     ["Estado", order.estado],
     ["Notas", order.notas || "—"],
   ];
@@ -271,7 +304,21 @@ function ordersToCsv(orders) {
   const lines = [CSV_HEADERS.map(csvEscape).join(",")];
   orders.forEach((o) => {
     lines.push(
-      [o.fecha, o.nombre, o.cedula, o.telefono, o.correo, o.lugar, o.reloj, o.medioPago, o.precio, o.estado, o.notas]
+      [
+        o.fecha,
+        o.nombre,
+        o.cedula,
+        o.telefono,
+        o.correo,
+        o.lugar,
+        o.reloj,
+        o.medioPago,
+        o.precio,
+        o.costo ?? "",
+        calcGanancia(o) ?? "",
+        o.estado,
+        o.notas,
+      ]
         .map(csvEscape)
         .join(",")
     );
@@ -357,8 +404,10 @@ function initCsvActions() {
         reloj: r[6] || "",
         medioPago: r[7] || "",
         precio: Number(r[8]) || 0,
-        estado: r[9] || "Pendiente",
-        notas: r[10] || "",
+        costo: r[9] === "" || r[9] == null ? null : Number(r[9]),
+        // r[10] es "Ganancia", una columna calculada — no se importa, se recalcula sola.
+        estado: r[11] || "Pendiente",
+        notas: r[12] || "",
         createdAt: new Date().toISOString(),
       }));
 

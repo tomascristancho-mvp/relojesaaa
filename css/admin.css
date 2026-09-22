@@ -111,6 +111,15 @@
   color: var(--accent-soft);
 }
 
+.stat-card__note {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.stat-card__note:empty {
+  display: none;
+}
+
 .admin-panel {
   background: var(--bg-card);
   border: 1px solid var(--border);

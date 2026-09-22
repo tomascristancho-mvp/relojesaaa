@@ -57,6 +57,11 @@
           <span id="stat-revenue" class="stat-card__value">$0</span>
         </div>
         <div class="stat-card">
+          <span class="stat-card__label">Ganancia total</span>
+          <span id="stat-profit" class="stat-card__value">$0</span>
+          <span id="stat-profit-note" class="stat-card__note"></span>
+        </div>
+        <div class="stat-card">
           <span class="stat-card__label">Pendientes</span>
           <span id="stat-pending" class="stat-card__value">0</span>
         </div>
@@ -107,8 +112,12 @@
               </select>
             </label>
             <label>
-              Precio (COP)
+              Precio de venta (COP)
               <input type="number" id="order-precio" placeholder="60000" min="0" step="1000" required />
+            </label>
+            <label>
+              Costo del reloj (COP)
+              <input type="number" id="order-costo" placeholder="Lo que te costó a ti" min="0" step="1000" />
             </label>
             <label>
               Estado
@@ -149,6 +158,7 @@
                 <th>Reloj</th>
                 <th>Medio de pago</th>
                 <th>Precio</th>
+                <th>Ganancia</th>
                 <th>Estado</th>
                 <th></th>
               </tr>
