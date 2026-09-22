@@ -180,6 +180,27 @@ visite la página guarde los que le gustan y los revise después con el botón
 en el navegador de esa persona — es solo una comodidad para que compare
 antes de escribirte, no necesitas hacer nada para que funcione.
 
+## Carrito de compra
+
+Además de pedir un reloj individual por WhatsApp, quien visite la página
+puede armar un carrito con varios relojes y pedirlos todos juntos:
+
+- En cada reloj (tarjeta del catálogo y ventana de detalle) hay dos botones
+  independientes: **"Pedir por WhatsApp"** (pide ese reloj solo, como antes)
+  y **"Agregar al carrito"** (lo suma al carrito sin salir de la página).
+- El ícono del carrito está arriba a la izquierda, junto al nombre de la
+  marca, con un número pequeño que muestra cuántos relojes hay agregados.
+- Al tocar el ícono se abre el carrito con la lista de relojes elegidos, el
+  total sumado, y un botón **"Pedir todo por WhatsApp"** que arma un solo
+  mensaje predeterminado con la lista completa (marca, modelo, referencia,
+  precio de cada uno) y el total, listo para enviarte.
+- Se puede quitar un reloj del carrito con la ✕ de cada fila.
+
+Igual que "Favoritos", el carrito se guarda con `localStorage` en el
+navegador de quien visita — es solo para armar el pedido antes de
+escribirte, no necesitas hacer nada para que funcione y no se comparte
+entre dispositivos.
+
 ## Panel privado de pedidos y contabilidad (`admin.html`)
 
 Además de la página pública, el sitio incluye un panel privado en

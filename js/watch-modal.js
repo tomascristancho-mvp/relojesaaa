@@ -31,6 +31,16 @@ function openModal(watch) {
     if (filterState.favoritos && !active) renderCatalog();
   };
 
+  const cartBtn = document.getElementById("modal-cart");
+  cartBtn.dataset.ref = watch.referencia;
+  updateCartButton(cartBtn);
+  cartBtn.onclick = () => {
+    toggleCartItem(watch.referencia);
+    updateCartButton(cartBtn);
+    const cardCartBtn = document.querySelector(`#catalog-grid .cart-add-btn[data-ref="${watch.referencia}"]`);
+    if (cardCartBtn) updateCartButton(cardCartBtn);
+  };
+
   modal.showModal();
 }
 

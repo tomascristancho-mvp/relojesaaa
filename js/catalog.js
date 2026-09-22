@@ -7,6 +7,8 @@
 const WHATSAPP_ICON = '<svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>';
 const HEART_ICON =
   '<svg class="watch-card__fav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>';
+const CART_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
 
 const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
@@ -61,10 +63,16 @@ function watchCard(watch) {
       <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>
       <p class="watch-card__price">${formatPrice(watch.precio)}</p>
-      <a class="btn btn--whatsapp" href="${buildWhatsAppLink(watch)}" target="_blank" rel="noopener">
-        ${WHATSAPP_ICON}
-        Pedir por WhatsApp
-      </a>
+      <div class="watch-card__actions">
+        <a class="btn btn--whatsapp" href="${buildWhatsAppLink(watch)}" target="_blank" rel="noopener">
+          ${WHATSAPP_ICON}
+          Pedir por WhatsApp
+        </a>
+        <button class="btn btn--cart cart-add-btn${isInCart(watch.referencia) ? " is-active" : ""}" type="button" data-ref="${watch.referencia}" aria-pressed="${isInCart(watch.referencia)}">
+          ${CART_ICON}
+          <span class="cart-btn__label">${isInCart(watch.referencia) ? "En el carrito ✓" : "Agregar al carrito"}</span>
+        </button>
+      </div>
     </div>
   `;
   card.querySelector(".watch-card__media-trigger").addEventListener("click", () => openModal(watch));
@@ -73,6 +81,11 @@ function watchCard(watch) {
     const active = toggleFavorite(watch.referencia);
     setFavButtonState(e.currentTarget, active);
     if (filterState.favoritos && !active) renderCatalog();
+  });
+  card.querySelector(".cart-add-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleCartItem(watch.referencia);
+    updateCartButton(e.currentTarget);
   });
   initFadeImg(card.querySelector(".fade-img"));
   initCardTilt(card);
