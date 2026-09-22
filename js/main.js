@@ -64,15 +64,20 @@ function initFadeImg(img) {
   }
 }
 
-const filterState = { marca: "Todas", genero: "Todos" };
+const filterState = { marca: "Todas", genero: "Todos", busqueda: "" };
 
 function renderCatalog() {
   const grid = document.getElementById("catalog-grid");
   grid.innerHTML = "";
+  const query = filterState.busqueda.trim().toLowerCase();
   const items = WATCHES.filter(
     (w) =>
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
-      (filterState.genero === "Todos" || w.genero === filterState.genero)
+      (filterState.genero === "Todos" || w.genero === filterState.genero) &&
+      (!query ||
+        w.referencia.toLowerCase().includes(query) ||
+        w.marca.toLowerCase().includes(query) ||
+        w.nombre.toLowerCase().includes(query))
   );
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
   document.getElementById("catalog-empty").hidden = items.length !== 0;
@@ -120,6 +125,30 @@ function openModal(watch) {
   document.getElementById("modal-whatsapp").href = buildWhatsAppLink(watch);
   document.getElementById("modal-zoom").href = img;
   modal.showModal();
+}
+
+function initSearch() {
+  const input = document.getElementById("catalog-search");
+  input.addEventListener("input", () => {
+    filterState.busqueda = input.value;
+    renderCatalog();
+  });
+}
+
+function initMobileNav() {
+  const toggle = document.getElementById("nav-toggle");
+  const nav = document.getElementById("mobile-nav");
+  toggle.addEventListener("click", () => {
+    const isOpen = !nav.hidden;
+    nav.hidden = isOpen;
+    toggle.setAttribute("aria-expanded", String(!isOpen));
+  });
+  nav.querySelectorAll("a").forEach((link) =>
+    link.addEventListener("click", () => {
+      nav.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+    })
+  );
 }
 
 function initModal() {
@@ -233,6 +262,8 @@ document.addEventListener("DOMContentLoaded", () => {
   checkSetupWarnings();
   renderFilters();
   renderCatalog();
+  initSearch();
+  initMobileNav();
   initModal();
   initImageZoom();
   initReveal();

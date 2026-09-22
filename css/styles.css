@@ -250,6 +250,77 @@ section[id] {
   }
 }
 
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-header__actions .btn--whatsapp {
+  display: none;
+}
+
+@media (min-width: 560px) {
+  .site-header__actions .btn--whatsapp {
+    display: inline-flex;
+  }
+}
+
+.nav-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.nav-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent-soft);
+}
+
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  padding: 8px 24px 16px;
+}
+
+.mobile-nav:not([hidden]) {
+  display: flex;
+}
+
+.mobile-nav a {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.mobile-nav a:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav a:hover {
+  color: var(--text);
+}
+
+@media (min-width: 780px) {
+  .nav-toggle {
+    display: none;
+  }
+}
+
 /* ============ HERO ============ */
 .hero {
   position: relative;
@@ -345,6 +416,46 @@ section[id] {
   font-size: 0.82rem;
   color: var(--accent-soft);
   margin-top: 6px;
+}
+
+.catalog-search {
+  position: relative;
+  max-width: 380px;
+  margin: 0 auto 32px;
+}
+
+.catalog-search svg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.catalog-search input {
+  width: 100%;
+  padding: 11px 16px 11px 42px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.catalog-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.catalog-search input:focus {
+  border-color: var(--accent);
+}
+
+.catalog-search input::-webkit-search-cancel-button {
+  filter: invert(0.7);
 }
 
 /* ============ CATALOG ============ */

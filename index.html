@@ -8,7 +8,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Altitude Watch Co. — Catálogo de relojes" />
   <meta property="og:description" content="Relojes con altura. Entrega en Bogotá y envíos a toda Colombia. Pide el tuyo directo por WhatsApp." />
-  <meta property="og:image" content="images/watches/reloj-01.jpg" />
+  <meta property="og:image" content="https://tomascristancho-mvp.github.io/relojesaaa/images/watches/reloj-01.jpg" />
+  <meta property="og:url" content="https://tomascristancho-mvp.github.io/relojesaaa/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Altitude Watch Co. — Catálogo de relojes" />
+  <meta name="twitter:description" content="Relojes con altura. Entrega en Bogotá y envíos a toda Colombia. Pide el tuyo directo por WhatsApp." />
+  <meta name="twitter:image" content="https://tomascristancho-mvp.github.io/relojesaaa/images/watches/reloj-01.jpg" />
+  <link rel="canonical" href="https://tomascristancho-mvp.github.io/relojesaaa/" />
   <meta name="theme-color" content="#121016" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -36,11 +42,21 @@
         <a href="#como-comprar">Cómo comprar</a>
         <a href="#contacto">Contacto</a>
       </nav>
-      <a class="btn btn--whatsapp btn--small" data-whatsapp-link href="#" target="_blank" rel="noopener">
-        <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>
-        Escríbenos
-      </a>
+      <div class="site-header__actions">
+        <a class="btn btn--whatsapp btn--small" data-whatsapp-link href="#" target="_blank" rel="noopener">
+          <svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>
+          Escríbenos
+        </a>
+        <button id="nav-toggle" class="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-nav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
     </div>
+    <nav id="mobile-nav" class="mobile-nav" hidden>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#como-comprar">Cómo comprar</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
   </header>
 
   <main id="top">
@@ -68,6 +84,10 @@
           <h2>Catálogo</h2>
           <p>Elige tu referencia y pídela directo por WhatsApp.</p>
           <p id="catalog-count" class="catalog-count"></p>
+        </div>
+        <div class="catalog-search reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="catalog-search" type="search" placeholder="Buscar por referencia, marca o nombre..." aria-label="Buscar reloj" />
         </div>
         <div class="filter-group reveal">
           <span class="filter-group__label">Marca</span>
