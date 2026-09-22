@@ -37,7 +37,7 @@ function watchCard(watch) {
   card.dataset.genero = watch.genero;
   card.innerHTML = `
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
-      <img src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
+      <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
       <span class="watch-card__view">Ver detalle</span>
     </button>
     <div class="watch-card__body">
@@ -52,7 +52,16 @@ function watchCard(watch) {
     </div>
   `;
   card.querySelector(".watch-card__media").addEventListener("click", () => openModal(watch));
+  initFadeImg(card.querySelector(".fade-img"));
   return card;
+}
+
+function initFadeImg(img) {
+  if (img.complete) {
+    img.classList.add("is-loaded");
+  } else {
+    img.addEventListener("load", () => img.classList.add("is-loaded"));
+  }
 }
 
 const filterState = { marca: "Todas", genero: "Todos" };
@@ -103,6 +112,7 @@ function openModal(watch) {
   document.getElementById("modal-price").textContent = formatPrice(watch.precio);
   document.getElementById("modal-desc").textContent = watch.descripcion;
   document.getElementById("modal-whatsapp").href = buildWhatsAppLink(watch);
+  document.getElementById("modal-zoom").href = img;
   modal.showModal();
 }
 
@@ -112,6 +122,20 @@ function initModal() {
     if (e.target === modal) modal.close();
   });
   document.getElementById("modal-close").addEventListener("click", () => modal.close());
+}
+
+function initImageZoom() {
+  const wrap = document.querySelector(".modal__img-wrap");
+  const img = document.getElementById("modal-img");
+  wrap.addEventListener("mousemove", (e) => {
+    const rect = wrap.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    img.style.transformOrigin = `${x}% ${y}%`;
+  });
+  wrap.addEventListener("mouseleave", () => {
+    img.style.transformOrigin = "center";
+  });
 }
 
 function applyBranding() {
@@ -176,6 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFilters();
   renderCatalog();
   initModal();
+  initImageZoom();
   initReveal();
   initYear();
 });
