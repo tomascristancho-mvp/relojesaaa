@@ -32,6 +32,7 @@ const CONFIG = {
  * - genero: "Hombre", "Mujer" o "Unisex". Se usa para el filtro "Género".
  * - precio: número en pesos colombianos (ej: 70000) o null si prefieres "Escríbenos por el precio".
  * - imagen: ruta al archivo de la foto (ej: "images/watches/reloj-01.jpg").
+ * - imagenes360 (opcional): arreglo de fotos para la vista 360° (ver README).
  */
 const WATCHES = [
   {

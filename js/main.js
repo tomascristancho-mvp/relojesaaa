@@ -6,6 +6,7 @@
 
 const PLACEHOLDER_IMAGE = "images/watches/placeholder.svg";
 const WHATSAPP_ICON = '<svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>';
+let modal360;
 
 function formatPrice(price) {
   if (price === null || price === undefined) return "Escríbenos por el precio";
@@ -53,7 +54,23 @@ function watchCard(watch) {
   `;
   card.querySelector(".watch-card__media").addEventListener("click", () => openModal(watch));
   initFadeImg(card.querySelector(".fade-img"));
+  initCardTilt(card);
   return card;
+}
+
+const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+function initCardTilt(card) {
+  if (!supportsHoverTilt) return;
+  card.addEventListener("mousemove", (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(700px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`;
+  });
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "";
+  });
 }
 
 function initFadeImg(img) {
@@ -124,7 +141,74 @@ function openModal(watch) {
   document.getElementById("modal-desc").textContent = watch.descripcion;
   document.getElementById("modal-whatsapp").href = buildWhatsAppLink(watch);
   document.getElementById("modal-zoom").href = img;
+  const frames = Array.isArray(watch.imagenes360) && watch.imagenes360.length > 1 ? watch.imagenes360 : [img];
+  modal360.setFrames(frames);
   modal.showModal();
+}
+
+/**
+ * Visor 360°: si un reloj trae varias fotos en `imagenes360` (tomadas
+ * girándolo, por ejemplo cada 15°), esto permite arrastrar la imagen del
+ * modal para "girarlo". Si solo hay una foto, no hace nada especial y se
+ * comporta como una foto normal. Ver README para cómo activarlo.
+ */
+function initModal360() {
+  const wrap = document.querySelector(".modal__img-wrap");
+  const img = document.getElementById("modal-img");
+  const zoomLink = document.getElementById("modal-zoom");
+  const SENSITIVITY = 10; // px de arrastre por cuadro
+  let frames = [];
+  let frameIndex = 0;
+  let dragging = false;
+  let startX = 0;
+  let startFrame = 0;
+
+  function showFrame(i) {
+    frameIndex = ((i % frames.length) + frames.length) % frames.length;
+    img.src = frames[frameIndex];
+    zoomLink.href = frames[frameIndex];
+  }
+
+  function setFrames(newFrames) {
+    frames = newFrames;
+    frameIndex = 0;
+    const is360 = frames.length > 1;
+    wrap.classList.toggle("is-360", is360);
+    if (is360) {
+      frames.forEach((src) => {
+        const preload = new Image();
+        preload.src = src;
+      });
+    }
+  }
+
+  function onDown(clientX) {
+    if (frames.length <= 1) return;
+    dragging = true;
+    startX = clientX;
+    startFrame = frameIndex;
+    wrap.classList.add("is-dragging");
+  }
+
+  function onMove(clientX) {
+    if (!dragging) return;
+    const steps = Math.round((clientX - startX) / SENSITIVITY);
+    showFrame(startFrame - steps);
+  }
+
+  function onUp() {
+    dragging = false;
+    wrap.classList.remove("is-dragging");
+  }
+
+  wrap.addEventListener("mousedown", (e) => onDown(e.clientX));
+  window.addEventListener("mousemove", (e) => onMove(e.clientX));
+  window.addEventListener("mouseup", onUp);
+  wrap.addEventListener("touchstart", (e) => onDown(e.touches[0].clientX), { passive: true });
+  wrap.addEventListener("touchmove", (e) => onMove(e.touches[0].clientX), { passive: true });
+  wrap.addEventListener("touchend", onUp);
+
+  return { setFrames };
 }
 
 function initSearch() {
@@ -163,6 +247,7 @@ function initImageZoom() {
   const wrap = document.querySelector(".modal__img-wrap");
   const img = document.getElementById("modal-img");
   wrap.addEventListener("mousemove", (e) => {
+    if (wrap.classList.contains("is-360")) return;
     const rect = wrap.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -258,6 +343,7 @@ function injectStructuredData() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  modal360 = initModal360();
   applyBranding();
   checkSetupWarnings();
   renderFilters();

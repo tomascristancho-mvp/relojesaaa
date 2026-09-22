@@ -527,7 +527,8 @@ section[id] {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.25s ease, transform 0.15s ease-out;
+  will-change: transform;
 }
 
 .watch-card:hover {
@@ -767,8 +768,45 @@ section[id] {
   transition: transform 0.3s ease;
 }
 
-.modal__img-wrap:hover .modal__img {
+.modal__img-wrap:not(.is-360):hover .modal__img {
   transform: scale(2.1);
+}
+
+.modal__img-wrap.is-360 .modal__img {
+  cursor: grab;
+  transition: none;
+  user-select: none;
+}
+
+.modal__img-wrap.is-360.is-dragging .modal__img {
+  cursor: grabbing;
+}
+
+.modal__badge-360 {
+  display: none;
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  z-index: 2;
+}
+
+.modal__badge-360 svg {
+  width: 14px;
+  height: 14px;
+}
+
+.modal__img-wrap.is-360 .modal__badge-360 {
+  display: flex;
 }
 
 .modal__zoom-btn {
