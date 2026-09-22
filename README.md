@@ -8,17 +8,38 @@ editarla con cualquier editor de texto y publicarla en minutos.
 ## Estructura del proyecto
 
 ```
-index.html               → estructura de la página pública
-admin.html                → panel privado de pedidos/contabilidad (ver abajo)
-css/styles.css             → estilos de la página pública
-css/admin.css               → estilos del panel privado
-js/data.js                    → tu información de negocio y el catálogo de relojes (edita aquí)
-js/main.js                     → lógica de la página pública (no necesitas tocarlo)
-js/admin-config.js              → código de acceso del panel privado (edítalo aquí)
-js/admin.js                      → lógica del panel privado (no necesitas tocarlo)
-images/watches/                   → aquí van las fotos de tus relojes
-favicon.svg                        → ícono de la pestaña del navegador
+index.html                 → estructura de la página pública
+admin.html                 → panel privado de pedidos/contabilidad (ver abajo)
+css/styles.css              → estilos de la página pública
+css/admin.css                → estilos del panel privado
+js/data.js                      → tu información de negocio y el catálogo de relojes (edita aquí)
+js/admin-config.js               → código de acceso del panel privado (edítalo aquí)
+images/watches/                    → aquí van las fotos de tus relojes
+favicon.svg                         → ícono de la pestaña del navegador
 ```
+
+El resto de los archivos en `js/` son la lógica del sitio — no necesitas
+tocarlos para actualizar tu catálogo o tu negocio, eso se edita en
+`js/data.js` y `js/admin-config.js`. Están divididos en piezas chicas en
+vez de un solo archivo gigante, cada una con una sola responsabilidad:
+
+**Compartido por ambas páginas**
+- `js/utils.js` — formato de moneda/precio, texto seguro, enlaces de WhatsApp.
+
+**Página pública** (cargados por `index.html`)
+- `js/catalog.js` — tarjetas, filtros, búsqueda, inclinación 3D al pasar el mouse.
+- `js/watch-modal.js` — el modal de detalle, la lupa de zoom y el visor 360°.
+- `js/site.js` — tu marca, menú móvil, SEO, y el arranque general de la página.
+
+**Panel privado** (cargados por `admin.html`)
+- `js/admin-orders.js` — guardar/leer pedidos, el formulario, la tabla y sus estadísticas.
+- `js/admin-csv.js` — exportar/importar CSV (Excel).
+- `js/admin-sales-detail.js` — la lista que se abre al hacer clic en "Ganancia total".
+- `js/admin-auth.js` — el candado de acceso y el arranque del panel.
+
+Cada archivo HTML carga sus scripts en orden con etiquetas `<script>`
+normales (sin `import`/`export`, sin paso de compilación), así que sigues
+pudiendo abrir `index.html` con doble clic sin instalar nada.
 
 ## Cómo personalizar tu información
 
