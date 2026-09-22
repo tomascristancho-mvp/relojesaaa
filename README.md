@@ -39,14 +39,21 @@ reloj con tus datos reales:
 ```js
 {
   id: 1,
-  referencia: "REF-01",       // tu código de referencia
-  nombre: "Modelo Onix",       // nombre comercial del reloj
-  categoria: "Clásico",         // úsalo para los filtros del catálogo
-  precio: 120000,                // número en pesos, o null para "Escríbenos por el precio"
+  referencia: "REF-01",         // código interno para identificar el reloj (no es el código de fábrica)
+  marca: "Fossil",               // marca real del reloj, se usa en el filtro "Marca"
+  genero: "Hombre",              // "Hombre", "Mujer" o "Unisex", se usa en el filtro "Género"
+  nombre: "Clásico Esfera Blanca", // nombre descriptivo del reloj
+  precio: 70000,                  // número en pesos, o null para "Escríbenos por el precio"
   descripcion: "Descripción corta y atractiva del reloj.",
   imagen: "images/watches/reloj-01.jpg", // ruta a tu foto
 },
 ```
+
+`referencia` es un código interno (REF-01, REF-02...) que tú controlas, no el
+número de modelo de fábrica — así siempre es correcto, sin depender de
+adivinar el código exacto del fabricante. Si tu proveedor te da un código de
+referencia real para cada reloj, puedes reemplazar el valor de `referencia`
+por ese código.
 
 ### Sobre las fotos
 
@@ -94,8 +101,10 @@ por Instagram, WhatsApp, etc.
 2. Arrastra la carpeta del proyecto a la página de Netlify.
 3. Netlify te da un enlace público al instante.
 
-## Filtros por categoría
+## Filtros por marca y género
 
-Los botones de filtro ("Clásico", "Deportivo", etc.) se generan automáticamente
-según las categorías que uses en `js/data.js`. Si agregas una categoría nueva
-en algún reloj, el filtro aparece solo, sin que tengas que tocar el HTML.
+Los botones de filtro ("Marca" y "Género") se generan automáticamente según
+los valores de `marca` y `genero` que uses en `js/data.js`. Si agregas una
+marca o un género nuevo en algún reloj, el filtro aparece solo, sin que
+tengas que tocar el HTML. Los dos filtros se combinan (por ejemplo, "Fossil"
++ "Hombre" muestra solo los relojes Fossil para hombre).

@@ -32,13 +32,15 @@ function watchCard(watch) {
   const img = watch.imagen || PLACEHOLDER_IMAGE;
   const card = document.createElement("article");
   card.className = "watch-card";
-  card.dataset.categoria = watch.categoria;
+  card.dataset.marca = watch.marca;
+  card.dataset.genero = watch.genero;
   card.innerHTML = `
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
-      <img src="${img}" alt="${watch.nombre} - ${watch.referencia}" loading="lazy" />
+      <img src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
     </button>
     <div class="watch-card__body">
       <span class="watch-card__ref">${watch.referencia}</span>
+      <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>
       <p class="watch-card__price">${formatPrice(watch.precio)}</p>
       <a class="btn btn--whatsapp" href="${buildWhatsAppLink(watch)}" target="_blank" rel="noopener">
@@ -50,30 +52,41 @@ function watchCard(watch) {
   return card;
 }
 
-function renderCatalog(filter = "Todos") {
+const filterState = { marca: "Todas", genero: "Todos" };
+
+function renderCatalog() {
   const grid = document.getElementById("catalog-grid");
   grid.innerHTML = "";
-  const items = filter === "Todos" ? WATCHES : WATCHES.filter((w) => w.categoria === filter);
+  const items = WATCHES.filter(
+    (w) =>
+      (filterState.marca === "Todas" || w.marca === filterState.marca) &&
+      (filterState.genero === "Todos" || w.genero === filterState.genero)
+  );
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
   document.getElementById("catalog-empty").hidden = items.length !== 0;
 }
 
-function renderFilters() {
-  const categories = ["Todos", ...new Set(WATCHES.map((w) => w.categoria))];
-  const container = document.getElementById("catalog-filters");
+function renderFilterGroup(containerId, key, allLabel, values) {
+  const container = document.getElementById(containerId);
   container.innerHTML = "";
-  categories.forEach((cat, i) => {
+  [allLabel, ...values].forEach((value, i) => {
     const btn = document.createElement("button");
     btn.className = "chip" + (i === 0 ? " chip--active" : "");
-    btn.textContent = cat;
+    btn.textContent = value;
     btn.type = "button";
     btn.addEventListener("click", () => {
       container.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
       btn.classList.add("chip--active");
-      renderCatalog(cat);
+      filterState[key] = value;
+      renderCatalog();
     });
     container.appendChild(btn);
   });
+}
+
+function renderFilters() {
+  renderFilterGroup("filter-brand", "marca", "Todas", [...new Set(WATCHES.map((w) => w.marca))]);
+  renderFilterGroup("filter-gender", "genero", "Todos", [...new Set(WATCHES.map((w) => w.genero))]);
 }
 
 function openModal(watch) {
@@ -82,6 +95,7 @@ function openModal(watch) {
   document.getElementById("modal-img").src = img;
   document.getElementById("modal-img").alt = `${watch.nombre} - ${watch.referencia}`;
   document.getElementById("modal-ref").textContent = watch.referencia;
+  document.getElementById("modal-brand").textContent = watch.marca;
   document.getElementById("modal-title").textContent = watch.nombre;
   document.getElementById("modal-price").textContent = formatPrice(watch.precio);
   document.getElementById("modal-desc").textContent = watch.descripcion;

@@ -277,12 +277,25 @@ ul, ol {
   padding: 90px 0;
 }
 
+.filter-group {
+  margin-bottom: 28px;
+}
+
+.filter-group__label {
+  display: block;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
 .catalog-filters {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-bottom: 44px;
 }
 
 .chip {
@@ -369,6 +382,12 @@ ul, ol {
   text-transform: uppercase;
   color: var(--accent-soft);
   font-weight: 600;
+}
+
+.watch-card__brand {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .watch-card__title {
