@@ -85,6 +85,57 @@ const WATCHES = [
     imagen: "images/watches/reloj-05.jpg",
   },
 
-  // Aún faltan 9 relojes por agregar. Cuando Tomás mande las fotos y los
+  {
+    id: 6,
+    referencia: "REF-06",
+    marca: "Q&Q",
+    genero: "Hombre",
+    nombre: "Deportivo Esfera Negra",
+    precio: 70000,
+    descripcion: "Caja y esfera en negro total con numeración blanca y correa de caucho. Resistente al agua, liviano y fácil de combinar.",
+    imagen: "images/watches/reloj-06.jpg",
+  },
+  {
+    id: 7,
+    referencia: "REF-07",
+    marca: "Q&Q",
+    genero: "Mujer",
+    nombre: "Bracelet Perlado",
+    precio: 70000,
+    descripcion: "Esfera blanca nacarada con índices minimalistas y brazalete metálico delgado en tono plata. Un diseño delicado para el día a día.",
+    imagen: "images/watches/reloj-07.jpg",
+  },
+  {
+    id: 8,
+    referencia: "REF-08",
+    marca: "Q&Q",
+    genero: "Hombre",
+    nombre: "Clásico Calendario",
+    precio: 70000,
+    descripcion: "Caja plateada con esfera negra, calendario y brazalete metálico robusto. Un diseño clásico y versátil.",
+    imagen: "images/watches/reloj-08.jpg",
+  },
+  {
+    id: 9,
+    referencia: "REF-09",
+    marca: "Fossil",
+    genero: "Hombre",
+    nombre: "Diver Negro Total",
+    precio: 70000,
+    descripcion: "Caja negra con bisel giratorio numerado, esfera texturizada y correa de caucho negro. Estilo deportivo tipo buceo, todo en negro.",
+    imagen: "images/watches/reloj-09.jpg",
+  },
+  {
+    id: 10,
+    referencia: "REF-10",
+    marca: "Casio",
+    genero: "Unisex",
+    nombre: "Digital Retro Acero",
+    precio: 70000,
+    descripcion: "Diseño digital clásico con pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono atemporal que nunca pasa de moda.",
+    imagen: "images/watches/reloj-10.jpg",
+  },
+
+  // Aún faltan 4 relojes por agregar. Cuando Tomás mande las fotos y los
   // datos restantes, se agregan aquí con la misma estructura de arriba.
 ];
