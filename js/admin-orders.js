@@ -225,12 +225,57 @@ function initOrdersFilter() {
   });
 }
 
+/* ============ ORDEN DE LA TABLA ============ */
+const ordersSortState = { key: null, dir: "desc" };
+
+function sortOrders(orders) {
+  if (!ordersSortState.key) {
+    return [...orders].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  }
+  const { key, dir } = ordersSortState;
+  const mult = dir === "asc" ? 1 : -1;
+  return [...orders].sort((a, b) => {
+    const av = key === "ganancia" ? calcGanancia(a) : a[key];
+    const bv = key === "ganancia" ? calcGanancia(b) : b[key];
+    const aEmpty = av == null || av === "";
+    const bEmpty = bv == null || bv === "";
+    if (aEmpty || bEmpty) return aEmpty === bEmpty ? 0 : aEmpty ? 1 : -1; // vacíos siempre al final
+    if (typeof av === "number" && typeof bv === "number") return (av - bv) * mult;
+    return String(av).localeCompare(String(bv)) * mult;
+  });
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll("#orders-thead-row th[data-sort]").forEach((th) => {
+    th.classList.remove("is-sorted-asc", "is-sorted-desc");
+    if (th.dataset.sort === ordersSortState.key) {
+      th.classList.add(ordersSortState.dir === "asc" ? "is-sorted-asc" : "is-sorted-desc");
+    }
+  });
+}
+
+function initOrdersSort() {
+  document.querySelectorAll("#orders-thead-row th[data-sort]").forEach((th) => {
+    th.classList.add("sortable-th");
+    th.addEventListener("click", () => {
+      if (ordersSortState.key === th.dataset.sort) {
+        ordersSortState.dir = ordersSortState.dir === "asc" ? "desc" : "asc";
+      } else {
+        ordersSortState.key = th.dataset.sort;
+        ordersSortState.dir = th.dataset.sort === "nombre" || th.dataset.sort === "estado" ? "asc" : "desc";
+      }
+      renderOrders();
+    });
+  });
+}
+
 /* ============ TABLA Y ESTADÍSTICAS ============ */
 function renderOrders() {
   const allOrders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-  const orders = getFilteredOrders(allOrders);
+  const orders = sortOrders(getFilteredOrders(allOrders));
   const tbody = document.getElementById("orders-tbody");
   tbody.innerHTML = "";
+  updateSortIndicators();
 
   orders.forEach((order) => {
     const tr = document.createElement("tr");
