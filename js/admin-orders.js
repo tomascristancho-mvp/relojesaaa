@@ -69,12 +69,58 @@ function populateRelojOptions() {
   });
 }
 
+let editingOrderId = null;
+
+function fillOrderForm(order) {
+  document.getElementById("order-fecha").value = order.fecha || "";
+  document.getElementById("order-nombre").value = order.nombre || "";
+  document.getElementById("order-cedula").value = order.cedula || "";
+  document.getElementById("order-telefono").value = order.telefono || "";
+  document.getElementById("order-correo").value = order.correo || "";
+  document.getElementById("order-lugar").value = order.lugar || "";
+  document.getElementById("order-reloj").value = order.reloj || "";
+  document.getElementById("order-pago").value = order.medioPago || "";
+  document.getElementById("order-precio").value = order.precio ?? "";
+  document.getElementById("order-costo").value = order.costo ?? "";
+  document.getElementById("order-vendedor").value = order.vendedor || "";
+  document.getElementById("order-estado").value = order.estado || "Pendiente";
+  document.getElementById("order-notas").value = order.notas || "";
+  document.getElementById("order-precio").dataset.touched = "true";
+  document.getElementById("order-costo").dataset.touched = "true";
+}
+
+function startEditOrder(order) {
+  editingOrderId = order.id;
+  fillOrderForm(order);
+  document.getElementById("order-form-title").textContent = `Editando pedido de ${order.nombre || "este cliente"}`;
+  document.getElementById("order-form-submit").textContent = "Guardar cambios";
+  document.getElementById("order-form-cancel").hidden = false;
+  document.getElementById("order-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("order-nombre").focus();
+}
+
+function exitEditMode() {
+  editingOrderId = null;
+  document.getElementById("order-form-title").textContent = "Nuevo pedido";
+  document.getElementById("order-form-submit").textContent = "Guardar pedido";
+  document.getElementById("order-form-cancel").hidden = true;
+  document.getElementById("order-form").reset();
+  document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("order-estado").value = "Pendiente";
+  document.getElementById("order-precio").dataset.touched = "false";
+  document.getElementById("order-costo").dataset.touched = "false";
+}
+
 function initOrderForm() {
   const form = document.getElementById("order-form");
+
+  document.getElementById("order-form-cancel").addEventListener("click", () => {
+    exitEditMode();
+  });
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const order = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    const values = {
       fecha: document.getElementById("order-fecha").value,
       nombre: document.getElementById("order-nombre").value.trim(),
       cedula: document.getElementById("order-cedula").value.trim(),
@@ -88,21 +134,29 @@ function initOrderForm() {
       vendedor: document.getElementById("order-vendedor").value,
       estado: document.getElementById("order-estado").value,
       notas: document.getElementById("order-notas").value.trim(),
-      createdAt: new Date().toISOString(),
     };
 
     const orders = loadOrders();
-    orders.push(order);
-    saveOrders(orders);
-    renderOrders();
-    showToast(`Pedido de ${order.nombre || "cliente"} guardado ✓`);
 
-    form.reset();
-    document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
-    document.getElementById("order-estado").value = "Pendiente";
-    document.getElementById("order-precio").dataset.touched = "false";
-    document.getElementById("order-costo").dataset.touched = "false";
-    document.getElementById("order-nombre").focus();
+    if (editingOrderId) {
+      const idx = orders.findIndex((o) => o.id === editingOrderId);
+      if (idx !== -1) {
+        orders[idx] = { ...orders[idx], ...values };
+        saveOrders(orders);
+        showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
+      }
+    } else {
+      orders.push({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        ...values,
+        createdAt: new Date().toISOString(),
+      });
+      saveOrders(orders);
+      showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
+    }
+
+    renderOrders();
+    exitEditMode();
   });
 }
 
@@ -189,6 +243,14 @@ function renderOrders() {
     viewBtn.addEventListener("click", () => openDetail(order));
     actionsCell.appendChild(viewBtn);
 
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "icon-btn";
+    editBtn.title = "Editar pedido";
+    editBtn.textContent = "✏️";
+    editBtn.addEventListener("click", () => startEditOrder(order));
+    actionsCell.appendChild(editBtn);
+
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.className = "icon-btn";
@@ -268,6 +330,10 @@ function openDetail(order) {
   body.innerHTML =
     `<h3>Detalle del pedido</h3><dl class="admin-detail-list">` +
     rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("") +
-    `</dl>`;
+    `</dl><button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>`;
+  document.getElementById("detail-edit-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    startEditOrder(order);
+  });
   document.getElementById("order-detail").showModal();
 }

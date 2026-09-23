@@ -109,7 +109,7 @@
       </section>
 
       <section class="admin-panel">
-        <h2>Nuevo pedido</h2>
+        <h2 id="order-form-title">Nuevo pedido</h2>
         <form id="order-form" class="order-form">
           <div class="order-form__grid">
             <span class="order-form__section">Datos del cliente</span>
@@ -189,7 +189,10 @@
               <textarea id="order-notas" rows="2" placeholder="Cualquier detalle adicional del pedido"></textarea>
             </label>
           </div>
-          <button type="submit" class="btn btn--primary">Guardar pedido</button>
+          <div class="order-form__buttons">
+            <button type="submit" id="order-form-submit" class="btn btn--primary">Guardar pedido</button>
+            <button type="button" id="order-form-cancel" class="btn btn--ghost" hidden>Cancelar edición</button>
+          </div>
         </form>
       </section>
 
