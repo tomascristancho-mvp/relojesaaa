@@ -98,6 +98,43 @@ function parseCsv(text) {
   return rows.filter((r) => r.some((cell) => cell !== ""));
 }
 
+/**
+ * Los pedidos solo viven en el localStorage de este navegador -- sin
+ * backup, un caché borrado o un cambio de equipo los pierde para
+ * siempre. Este indicador recuerda cuándo fue el último CSV exportado.
+ */
+const BACKUP_KEY = "altitude_last_backup";
+const BACKUP_WARN_DAYS = 7;
+
+function updateBackupStatus() {
+  const el = document.getElementById("backup-status");
+  if (!el) return;
+  let last = null;
+  try {
+    last = localStorage.getItem(BACKUP_KEY);
+  } catch (e) {
+    return;
+  }
+
+  if (!last) {
+    el.textContent = "Nunca has exportado un backup";
+    el.className = "backup-status backup-status--warn";
+    return;
+  }
+
+  const days = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+  if (days <= 0) {
+    el.textContent = "Backup de hoy ✓";
+    el.className = "backup-status backup-status--ok";
+  } else if (days < BACKUP_WARN_DAYS) {
+    el.textContent = `Backup hace ${days} día${days === 1 ? "" : "s"}`;
+    el.className = "backup-status backup-status--ok";
+  } else {
+    el.textContent = `Backup hace ${days} días -- exporta de nuevo`;
+    el.className = "backup-status backup-status--warn";
+  }
+}
+
 function initCsvActions() {
   document.getElementById("export-csv").addEventListener("click", () => {
     const orders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
@@ -111,7 +148,15 @@ function initCsvActions() {
     a.click();
     URL.revokeObjectURL(url);
     showToast(`CSV descargado (${orders.length} pedido${orders.length === 1 ? "" : "s"}) ✓`);
+    try {
+      localStorage.setItem(BACKUP_KEY, new Date().toISOString());
+    } catch (e) {
+      // El backup ya se descargó igual; solo no queda registrado el indicador.
+    }
+    updateBackupStatus();
   });
+
+  updateBackupStatus();
 
   document.getElementById("import-csv").addEventListener("change", (e) => {
     const file = e.target.files[0];

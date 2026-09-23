@@ -490,8 +490,18 @@
 
 .admin-panel__actions {
   display: flex;
+  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.backup-status {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.backup-status--warn {
+  color: #e0b34d;
 }
 
 .file-btn {
@@ -723,6 +733,33 @@
 .status-badge--cancelado {
   color: #e5876c;
   border-color: #6b3324;
+}
+
+select.status-badge {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding-right: 22px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 11px center, right 7px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border-color 0.15s ease;
+}
+
+select.status-badge:hover,
+select.status-badge:focus-visible {
+  border-color: currentColor;
+}
+
+select.status-badge option {
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-weight: 500;
 }
 
 /* ============ DETAIL MODAL ============ */

@@ -5,6 +5,7 @@
  */
 
 const STORAGE_KEY = "altitude_orders_v1";
+const ORDER_STATUSES = ["Pendiente", "Confirmado", "Enviado", "Entregado", "Cancelado"];
 
 function calcGanancia(order) {
   return order.costo != null && order.costo !== "" ? Number(order.precio) - Number(order.costo) : null;
@@ -202,7 +203,7 @@ function getFilteredOrders(orders) {
 function initOrdersFilter() {
   const input = document.getElementById("orders-search");
   const chipsContainer = document.getElementById("orders-status-filter");
-  const statuses = ["Todos", "Pendiente", "Confirmado", "Enviado", "Entregado", "Cancelado"];
+  const statuses = ["Todos", ...ORDER_STATUSES];
 
   input.addEventListener("input", () => {
     ordersFilterState.busqueda = input.value;
@@ -287,9 +288,43 @@ function renderOrders() {
       <td>${escapeHtml(order.medioPago)}</td>
       <td>${formatCOP(order.precio)}</td>
       <td>${calcGanancia(order) != null ? formatCOP(calcGanancia(order)) : "—"}</td>
-      <td><span class="status-badge status-badge--${slug(order.estado)}">${escapeHtml(order.estado)}</span></td>
+      <td class="orders-table__estado"></td>
       <td class="orders-table__actions"></td>
     `;
+
+    const estadoCell = tr.querySelector(".orders-table__estado");
+    const estadoSelect = document.createElement("select");
+    estadoSelect.className = `status-badge status-badge--${slug(order.estado)}`;
+    estadoSelect.setAttribute("aria-label", `Cambiar estado del pedido de ${order.nombre || "cliente"}`);
+    ORDER_STATUSES.forEach((status) => {
+      const opt = document.createElement("option");
+      opt.value = status;
+      opt.textContent = status;
+      if (status === order.estado) opt.selected = true;
+      estadoSelect.appendChild(opt);
+    });
+    estadoSelect.addEventListener("change", () => {
+      const nuevoEstado = estadoSelect.value;
+      const orders = loadOrders();
+      const idx = orders.findIndex((o) => o.id === order.id);
+      if (idx === -1) return;
+      const wasEntregado = orders[idx].estado === "Entregado";
+      orders[idx] = { ...orders[idx], estado: nuevoEstado };
+      if (!saveOrders(orders)) {
+        estadoSelect.value = order.estado;
+        return;
+      }
+      const updatedOrder = orders[idx];
+      showToast(`Estado de ${order.nombre || "el pedido"} actualizado a "${nuevoEstado}" ✓`);
+      renderOrders();
+      // Misma regla que en el formulario: solo dispara el comprobante
+      // automático en el momento exacto en que pasa a Entregado.
+      if (!wasEntregado && nuevoEstado === "Entregado" && typeof triggerAutoReceipt === "function") {
+        triggerAutoReceipt(updatedOrder);
+      }
+    });
+    estadoCell.appendChild(estadoSelect);
+
     const actionsCell = tr.querySelector(".orders-table__actions");
 
     if (order.telefono) {
