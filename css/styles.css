@@ -762,6 +762,73 @@ section[id] {
   gap: 10px;
 }
 
+.modal__related {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.modal__related[hidden] {
+  display: none;
+}
+
+.modal__related-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.modal__related-list {
+  display: flex;
+  gap: 10px;
+}
+
+.modal__related-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.modal__related-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.modal__related-item img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--bg-elevated);
+}
+
+.modal__related-name {
+  font-size: 0.76rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal__related-price {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-soft);
+}
+
 /* ============ STEPS ============ */
 .steps {
   position: relative;
@@ -1066,6 +1133,7 @@ section[id] {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0; /* si no, el texto "white-space:nowrap" de .modal__related-name empuja este item del grid y aplasta la columna de la foto */
 }
 
 .modal__body h3 {

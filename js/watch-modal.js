@@ -35,8 +35,50 @@ function openModal(watch) {
   shareBtn.onclick = () => shareWatch(watch, shareBtn);
 
   updateModalNav(watch);
+  renderRelatedWatches(watch);
 
   modal.showModal();
+}
+
+/**
+ * "También te puede interesar": 3 relojes disponibles distintos al que se
+ * está viendo, priorizando la misma marca y después el mismo género. Se
+ * calcula solo con lo que ya hay en WATCHES (js/data.js) -- no hace falta
+ * curarlo a mano, y se actualiza solo si cambia el catálogo.
+ */
+function getRelatedWatches(watch, limit = 3) {
+  const pool = WATCHES.filter((w) => w.disponible !== false && w.referencia !== watch.referencia);
+  const sameBrand = pool.filter((w) => w.marca === watch.marca);
+  const sameGenero = pool.filter((w) => w.genero === watch.genero && w.marca !== watch.marca);
+  const rest = pool.filter((w) => w.marca !== watch.marca && w.genero !== watch.genero);
+  return [...sameBrand, ...sameGenero, ...rest].slice(0, limit);
+}
+
+function renderRelatedWatches(watch) {
+  const section = document.getElementById("modal-related");
+  const list = document.getElementById("modal-related-list");
+  const related = getRelatedWatches(watch);
+
+  section.hidden = related.length === 0;
+  if (related.length === 0) return;
+
+  list.innerHTML = related
+    .map(
+      (w) => `
+        <button class="modal__related-item" type="button" data-ref="${w.referencia}">
+          <img src="${w.imagen || PLACEHOLDER_IMAGE}" alt="${w.marca} ${w.nombre}" loading="lazy" />
+          <span class="modal__related-name">${w.marca} ${w.nombre}</span>
+          <span class="modal__related-price">${formatPrice(w.precio)}</span>
+        </button>`
+    )
+    .join("");
+
+  list.querySelectorAll(".modal__related-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const relatedWatch = WATCHES.find((w) => w.referencia === btn.dataset.ref);
+      if (relatedWatch) openModal(relatedWatch);
+    });
+  });
 }
 
 function updateModalNav(watch) {
