@@ -28,7 +28,7 @@ vez de un solo archivo gigante, cada una con una sola responsabilidad:
 
 **Página pública** (cargados por `index.html`)
 - `js/catalog.js` — tarjetas, filtros, búsqueda, inclinación 3D al pasar el mouse.
-- `js/watch-modal.js` — el modal de detalle, la lupa de zoom y el visor 360°.
+- `js/watch-modal.js` — el modal de detalle y la lupa de zoom.
 - `js/site.js` — tu marca, menú móvil, SEO, y el arranque general de la página.
 
 **Panel privado** (cargados por `admin.html`)
@@ -89,35 +89,6 @@ por ese código.
 
 Recomendación: fotos cuadradas (1:1) y con buena luz se ven mejor en las tarjetas
 del catálogo, pero el sitio funciona con cualquier proporción.
-
-### Vista 360° (opcional)
-
-El detalle de cada reloj ya soporta una vista 360°: arrastras la foto y el
-reloj "gira". Para activarla en un reloj específico, agrega el campo
-`imagenes360` con varias fotos tomadas girando el reloj (por ejemplo, una
-foto cada 15°, unas 16-24 fotos en total, con el reloj centrado y la cámara
-fija):
-
-```js
-{
-  id: 1,
-  referencia: "REF-01",
-  // ...el resto de los campos igual...
-  imagen: "images/watches/reloj-01.jpg",       // foto principal (se usa en el catálogo)
-  imagenes360: [                                  // opcional: secuencia para girar
-    "images/watches/reloj-01-01.jpg",
-    "images/watches/reloj-01-02.jpg",
-    "images/watches/reloj-01-03.jpg",
-    // ...hasta completar la vuelta
-  ],
-},
-```
-
-Si no agregas `imagenes360` (o dejas el arreglo vacío), el reloj se ve
-normal, con zoom, como siempre. En cuanto agregues 2 o más fotos ahí, la
-vista 360° se activa sola en el modal (aparece la etiqueta "Arrastra para
-girar"). Si prefieres mandarme un video girando el reloj en vez de tomar las
-fotos por separado, también puedo ayudarte a sacar los cuadros del video.
 
 ### Importante: solo describe características reales
 

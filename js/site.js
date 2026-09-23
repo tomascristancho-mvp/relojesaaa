@@ -115,7 +115,6 @@ function injectStructuredData() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  modal360 = initModal360();
   applyBranding();
   checkSetupWarnings();
   renderFilters();
