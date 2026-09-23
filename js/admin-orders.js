@@ -216,6 +216,14 @@ function initOrderForm() {
     exitEditMode();
   });
 
+  // Misma protección que el botón "Cancelar", pero para cuando el
+  // navegador se cierra/recarga por accidente con cambios sin guardar.
+  window.addEventListener("beforeunload", (e) => {
+    if (!isFormDirty()) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const submitBtn = document.getElementById("order-form-submit");

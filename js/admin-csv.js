@@ -169,6 +169,21 @@ function initCsvActions() {
         e.target.value = "";
         return;
       }
+
+      // Las columnas se leen por posición (r[0], r[1]...), así que si el
+      // archivo tiene las columnas movidas, borradas o en otro orden -- por
+      // ejemplo, editado en Excel -- cada dato caería en el campo
+      // equivocado sin avisar. Antes de importar nada, se exige que el
+      // encabezado coincida exactamente con el de un CSV exportado desde
+      // aquí mismo.
+      const headerRow = rows[0].map((h) => h.trim());
+      const headersMatch = CSV_HEADERS.length === headerRow.length && CSV_HEADERS.every((expected, i) => headerRow[i] === expected);
+      if (!headersMatch) {
+        showToast("El archivo no tiene las columnas esperadas (¿se movieron, borraron o renombraron columnas?). Usa un CSV exportado desde aquí, sin cambiar el orden de las columnas.", "error");
+        e.target.value = "";
+        return;
+      }
+
       const [, ...dataRows] = rows;
       const imported = dataRows.map((r) => ({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
