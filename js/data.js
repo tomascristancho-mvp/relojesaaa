@@ -181,9 +181,9 @@ const WATCHES = [
     referencia: "REF-09",
     marca: "Fossil",
     genero: "Hombre",
-    nombre: "Diver Negro Total",
+    nombre: "Diver Azul Medianoche",
     precio: 60000,
-    descripcion: "Caja negra con bisel giratorio numerado, esfera texturizada y correa de caucho negro. Estilo deportivo tipo buceo, todo en negro.",
+    descripcion: "Caja negra con bisel giratorio numerado, esfera texturizada azul medianoche (se ve casi negra con poca luz y revela su tono azul bajo luz directa) y correa de caucho negro. Estilo deportivo tipo buceo.",
     imagen: "images/watches/reloj-09.jpg",
   },
   {
