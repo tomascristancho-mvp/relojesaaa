@@ -499,6 +499,64 @@ section[id] {
   flex-shrink: 0;
 }
 
+.hero__visual {
+  position: relative;
+  width: clamp(200px, 45vw, 300px);
+  margin: 56px auto 0;
+}
+
+.hero__visual img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 24px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65);
+  animation: hero-float 5s ease-in-out infinite;
+}
+
+.hero__visual::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: -18px;
+  left: 50%;
+  width: 70%;
+  height: 24px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent 75%);
+  border-radius: 50%;
+  animation: hero-shadow 5s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(1.5deg);
+  }
+}
+
+@keyframes hero-shadow {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.72);
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__visual img,
+  .hero__visual::after {
+    animation: none;
+  }
+}
+
 /* ============ SECTION HEADING ============ */
 .section-heading {
   text-align: center;
