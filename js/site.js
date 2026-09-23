@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
   checkSetupWarnings();
   renderFilters();
   renderCatalog();
+  renderRecentlyViewed();
   initSearch();
   initCart();
   initMobileNav();

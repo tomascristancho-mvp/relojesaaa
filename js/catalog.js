@@ -174,3 +174,63 @@ function initSearch() {
     renderCatalog();
   });
 }
+
+/* ============ VISTOS RECIENTEMENTE ============ */
+// Se guarda solo en este navegador (localStorage) -- cada visitante ve su
+// propio historial, no hay nada que configurar ni mantener desde el panel.
+const RECENTLY_VIEWED_KEY = "altitude_recently_viewed";
+const RECENTLY_VIEWED_MAX = 6;
+
+function getRecentlyViewedRefs() {
+  try {
+    const raw = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    const refs = raw ? JSON.parse(raw) : [];
+    return Array.isArray(refs) ? refs : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/** Se llama cada vez que se abre el detalle de un reloj (ver watch-modal.js). */
+function trackRecentlyViewed(referencia) {
+  try {
+    const refs = getRecentlyViewedRefs().filter((r) => r !== referencia);
+    refs.unshift(referencia);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(refs.slice(0, RECENTLY_VIEWED_MAX)));
+  } catch (e) {
+    // localStorage no disponible (modo privado, cuota llena) -- no es grave,
+    // simplemente no queda historial para esta visita.
+  }
+  renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+  const section = document.getElementById("recently-viewed");
+  const list = document.getElementById("recently-viewed-list");
+  if (!section || !list) return;
+
+  const watches = getRecentlyViewedRefs()
+    .map((ref) => WATCHES.find((w) => w.referencia === ref && w.disponible !== false))
+    .filter(Boolean);
+
+  section.hidden = watches.length === 0;
+  if (watches.length === 0) return;
+
+  list.innerHTML = watches
+    .map(
+      (w) => `
+        <button class="recently-viewed__item" type="button" data-ref="${w.referencia}">
+          <img src="${w.imagen || PLACEHOLDER_IMAGE}" alt="${w.marca} ${w.nombre}" loading="lazy" />
+          <span class="recently-viewed__name">${w.marca} ${w.nombre}</span>
+          <span class="recently-viewed__price">${formatPrice(w.precio)}</span>
+        </button>`
+    )
+    .join("");
+
+  list.querySelectorAll(".recently-viewed__item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const w = WATCHES.find((x) => x.referencia === btn.dataset.ref);
+      if (w) openModal(w);
+    });
+  });
+}
