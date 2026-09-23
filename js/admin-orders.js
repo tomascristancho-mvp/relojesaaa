@@ -558,6 +558,14 @@ function renderOrders() {
     dupBtn.addEventListener("click", () => duplicateOrder(order));
     actionsCell.appendChild(dupBtn);
 
+    const historyBtn = document.createElement("button");
+    historyBtn.type = "button";
+    historyBtn.className = "icon-btn";
+    historyBtn.title = "Ver historial de este cliente";
+    historyBtn.textContent = "🕘";
+    historyBtn.addEventListener("click", () => openClientHistory(order));
+    actionsCell.appendChild(historyBtn);
+
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.className = "icon-btn";
@@ -648,6 +656,7 @@ function openDetail(order) {
     `</dl><div class="admin-detail-actions">
       <button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>
       <button type="button" id="detail-dup-btn" class="btn btn--ghost btn--small">Duplicar pedido</button>
+      <button type="button" id="detail-history-btn" class="btn btn--ghost btn--small">Historial del cliente</button>
       <button type="button" id="detail-receipt-btn" class="btn btn--ghost btn--small">Generar comprobante</button>
     </div>`;
   document.getElementById("detail-edit-btn").addEventListener("click", () => {
@@ -657,6 +666,10 @@ function openDetail(order) {
   document.getElementById("detail-dup-btn").addEventListener("click", () => {
     document.getElementById("order-detail").close();
     duplicateOrder(order);
+  });
+  document.getElementById("detail-history-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    openClientHistory(order);
   });
   document.getElementById("detail-receipt-btn").addEventListener("click", () => {
     document.getElementById("order-detail").close();

@@ -51,6 +51,7 @@ function initAdminApp() {
   initCsvActions();
   initDetailModal();
   initSalesDetailModal();
+  initClientHistory();
   initReceiptModal();
   initConfirmDialog();
   renderOrders();

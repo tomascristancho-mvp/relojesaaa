@@ -443,6 +443,11 @@
   border-radius: 10px;
 }
 
+.sale-row--current {
+  border-color: var(--accent);
+  background: rgba(201, 162, 74, 0.08);
+}
+
 .sale-row__img {
   width: 52px;
   height: 52px;
