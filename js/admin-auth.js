@@ -50,6 +50,7 @@ function initAdminApp() {
   initCsvActions();
   initDetailModal();
   initSalesDetailModal();
+  initReceiptModal();
   initConfirmDialog();
   renderOrders();
 

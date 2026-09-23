@@ -458,20 +458,33 @@ section[id] {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px 28px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
+  gap: 10px 14px;
+  list-style: none;
+  padding: 0;
 }
 
-.hero__badges li::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  margin-right: 8px;
-  vertical-align: middle;
+.hero__badges li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.hero__badges li:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.hero__badges svg {
+  width: 15px;
+  height: 15px;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 /* ============ SECTION HEADING ============ */
@@ -638,9 +651,25 @@ section[id] {
   transform: scale(1.06);
 }
 
+.watch-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(115deg, transparent 45%, rgba(255, 255, 255, 0.16) 50%, transparent 55%);
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+
+.watch-card__media:hover::after {
+  transform: translateX(120%);
+}
+
 .watch-card__view {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;

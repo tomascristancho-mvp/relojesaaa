@@ -330,10 +330,17 @@ function openDetail(order) {
   body.innerHTML =
     `<h3>Detalle del pedido</h3><dl class="admin-detail-list">` +
     rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("") +
-    `</dl><button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>`;
+    `</dl><div class="admin-detail-actions">
+      <button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>
+      <button type="button" id="detail-receipt-btn" class="btn btn--ghost btn--small">Generar comprobante</button>
+    </div>`;
   document.getElementById("detail-edit-btn").addEventListener("click", () => {
     document.getElementById("order-detail").close();
     startEditOrder(order);
+  });
+  document.getElementById("detail-receipt-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    if (typeof openReceipt === "function") openReceipt(order);
   });
   document.getElementById("order-detail").showModal();
 }

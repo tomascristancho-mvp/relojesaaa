@@ -240,6 +240,12 @@
     <div id="detail-body" class="admin-detail-body"></div>
   </dialog>
 
+  <dialog id="receipt-modal" class="modal receipt-modal">
+    <button id="receipt-close" class="modal__close no-print" aria-label="Cerrar">✕</button>
+    <div id="receipt-body" class="receipt-body"></div>
+    <button id="receipt-print-btn" class="btn btn--primary no-print" type="button">Imprimir / Guardar como PDF</button>
+  </dialog>
+
   <dialog id="sales-detail" class="modal sales-detail-modal">
     <button id="sales-detail-close" class="modal__close" aria-label="Cerrar">✕</button>
     <h3>Ventas con ganancia registrada</h3>
@@ -265,6 +271,7 @@
   <script src="js/admin-orders.js"></script>
   <script src="js/admin-charts.js"></script>
   <script src="js/admin-availability.js"></script>
+  <script src="js/admin-receipt.js"></script>
   <script src="js/admin-csv.js"></script>
   <script src="js/admin-sales-detail.js"></script>
   <script src="js/admin-auth.js"></script>
