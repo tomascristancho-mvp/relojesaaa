@@ -12,11 +12,6 @@
  * pedírmelo directamente).
  */
 
-function extractRefCode(reloj) {
-  const match = String(reloj || "").match(/^(REF-\d+)/i);
-  return match ? match[1].toUpperCase() : null;
-}
-
 function computeUnmarkedSoldWatches(orders) {
   const deliveredRefs = new Map();
   orders
@@ -28,9 +23,8 @@ function computeUnmarkedSoldWatches(orders) {
       deliveredRefs.get(ref).clientes.push(o.nombre || "cliente sin nombre");
     });
 
-  const watches = typeof WATCHES !== "undefined" ? WATCHES : [];
   return Array.from(deliveredRefs.values()).filter(({ ref }) => {
-    const watch = watches.find((w) => w.referencia.toUpperCase() === ref);
+    const watch = findWatchByRef(ref);
     return watch && watch.disponible !== false;
   });
 }

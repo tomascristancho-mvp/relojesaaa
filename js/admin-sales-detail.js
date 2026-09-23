@@ -4,10 +4,6 @@
  * catálogo real por referencia), precio, lugar, fecha y ganancia.
  */
 
-function findWatchForOrder(order) {
-  return (typeof WATCHES !== "undefined" ? WATCHES : []).find((w) => order.reloj && order.reloj.startsWith(w.referencia));
-}
-
 function initSalesDetailModal() {
   const modal = document.getElementById("sales-detail");
   document.getElementById("stat-profit-card").addEventListener("click", openSalesDetail);
@@ -36,7 +32,7 @@ function openSalesDetail() {
   }
 
   sales.forEach((order) => {
-    const watch = findWatchForOrder(order);
+    const watch = findWatchByRef(extractRefCode(order.reloj));
     const img = watch?.imagen || PLACEHOLDER_IMAGE;
     const row = document.createElement("div");
     row.className = "sale-row";

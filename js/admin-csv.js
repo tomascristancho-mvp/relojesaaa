@@ -152,7 +152,7 @@ function initCsvActions() {
         danger: true,
       });
       const current = loadOrders();
-      saveOrders(replace ? imported : [...current, ...imported]);
+      if (!saveOrders(replace ? imported : [...current, ...imported])) return;
       renderOrders();
       showToast(`${imported.length} pedido(s) importado(s) ✓`);
       e.target.value = "";

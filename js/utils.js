@@ -56,6 +56,24 @@ function buildWatchShareUrl(watch) {
   return `${window.location.origin}${window.location.pathname}?reloj=${encodeURIComponent(watch.referencia)}`;
 }
 
+/**
+ * Extrae el código "REF-01" del texto libre que guarda el panel de
+ * pedidos en order.reloj (por ejemplo "REF-01 — Fossil Clásico Esfera
+ * Blanca"). Devuelve null si el texto no empieza con ese patrón (el
+ * campo es de texto libre, un pedido viejo o escrito a mano puede no
+ * tenerlo).
+ */
+function extractRefCode(reloj) {
+  const match = String(reloj || "").match(/^(REF-\d+)/i);
+  return match ? match[1].toUpperCase() : null;
+}
+
+/** Busca en WATCHES (js/data.js) el reloj cuya referencia coincide con refCode. */
+function findWatchByRef(refCode) {
+  if (!refCode || typeof WATCHES === "undefined") return null;
+  return WATCHES.find((w) => w.referencia.toUpperCase() === refCode.toUpperCase()) || null;
+}
+
 function showToast(message, type = "success") {
   const container = document.getElementById("toast-container");
   const toast = document.createElement("div");

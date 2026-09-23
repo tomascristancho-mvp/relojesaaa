@@ -244,19 +244,23 @@ function computeStatusCounts(orders) {
   return counts;
 }
 
-function shortWatchLabel(reloj) {
-  const match = reloj.match(/^(REF-\d+)\s*—\s*(\S+)/);
-  return match ? `${match[1]} ${match[2]}` : reloj;
-}
-
-function computeTopWatches(orders, limit) {
+/**
+ * Agrupa las ventas por marca (Fossil, Casio, etc.), no por referencia
+ * individual. La marca se saca de WATCHES (js/data.js) a partir del
+ * código REF-XX al inicio de order.reloj -- si un pedido no tiene un
+ * código reconocible (texto escrito a mano distinto al formato
+ * "REF-01 — ...") se agrupa aparte como "Otro".
+ */
+function computeTopBrands(orders, limit) {
   const soldOrders = orders.filter((o) => o.estado !== "Cancelado" && o.reloj);
   const map = new Map();
   soldOrders.forEach((o) => {
-    map.set(o.reloj, (map.get(o.reloj) || 0) + 1);
+    const watch = findWatchByRef(extractRefCode(o.reloj));
+    const marca = watch ? watch.marca : "Otro";
+    map.set(marca, (map.get(marca) || 0) + 1);
   });
   return Array.from(map.entries())
-    .map(([reloj, value]) => ({ label: shortWatchLabel(reloj), full: reloj, value }))
+    .map(([label, value]) => ({ label, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, limit);
 }
@@ -301,9 +305,9 @@ function renderCharts() {
   renderMonthlySummary(document.getElementById("chart-monthly-summary"), monthlyData);
   renderMonthlyChart(document.getElementById("chart-monthly"), monthlyData);
   renderStatusDonut(document.getElementById("chart-status"), computeStatusCounts(orders));
-  renderHorizontalBars(document.getElementById("chart-top-watches"), computeTopWatches(orders, 5), {
+  renderHorizontalBars(document.getElementById("chart-top-brands"), computeTopBrands(orders, 5), {
     color: CHART_COLOR_VENTA,
-    emptyMessage: "Aún no hay relojes vendidos para mostrar.",
+    emptyMessage: "Aún no hay ventas para mostrar.",
     formatValue: (v) => `${v} ${v === 1 ? "venta" : "ventas"}`,
   });
   renderHorizontalBars(document.getElementById("chart-vendedores"), computeSalesByVendedor(orders), {

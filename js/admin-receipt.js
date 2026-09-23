@@ -5,11 +5,33 @@
  * las reglas @media print en css/admin.css ocultan todo lo demás y
  * dejan solo el comprobante, con estilos en blanco y negro pensados
  * para papel.
+ *
+ * SOBRE EL ENVÍO AUTOMÁTICO: una página estática (sin servidor propio)
+ * no puede enviar en silencio un correo o mensaje de WhatsApp con un
+ * PDF adjunto -- ningún navegador lo permite, por seguridad, y no hay
+ * backend aquí que lo haga por detrás. Lo que sí se automatiza: en
+ * cuanto un pedido pasa a "Entregado" (venta 100% concretada), se abre
+ * solo el comprobante y el diálogo de guardar/imprimir como PDF
+ * (triggerAutoReceipt). El envío a tu WhatsApp o correo queda a un
+ * clic de distancia con los botones de abajo, ya con todo el texto
+ * armado -- ese último paso sí requiere que lo confirmes vos.
  */
 
 function receiptOrderCode(order) {
   const digits = String(order.id || "").replace(/[^0-9]/g, "");
   return digits ? digits.slice(-6) : "000000";
+}
+
+function receiptSummaryText(order) {
+  const fecha = order.fecha || "—";
+  return (
+    `Comprobante de venta ${CONFIG.businessName} (N.º ${receiptOrderCode(order)})\n` +
+    `Fecha: ${fecha}\n` +
+    `Cliente: ${order.nombre} · Cédula ${order.cedula} · ${order.telefono}\n` +
+    `Reloj: ${order.reloj}\n` +
+    `Total: ${formatCOP(order.precio)} (${order.medioPago})\n` +
+    `Estado: ${order.estado}`
+  );
 }
 
 function openReceipt(order) {
@@ -63,9 +85,31 @@ function openReceipt(order) {
         <p class="receipt__muted">${escapeHtml(CONFIG.businessName)} · ${escapeHtml(CONFIG.city)} · WhatsApp ${escapeHtml(CONFIG.whatsappNumber)}</p>
       </div>
     </div>
+
+    <div class="receipt__send-actions no-print">
+      <a class="btn btn--ghost btn--small" target="_blank" rel="noopener"
+         href="${buildWhatsAppUrl(normalizePhoneCO(CONFIG.whatsappNumber), receiptSummaryText(order))}">
+        Enviarme por WhatsApp
+      </a>
+      <a class="btn btn--ghost btn--small"
+         href="mailto:${encodeURIComponent(CONFIG.email)}?subject=${encodeURIComponent(`Comprobante de venta N.º ${receiptOrderCode(order)}`)}&body=${encodeURIComponent(receiptSummaryText(order))}">
+        Enviarme por correo
+      </a>
+    </div>
   `;
 
   document.getElementById("receipt-modal").showModal();
+}
+
+/**
+ * Se llama justo cuando un pedido pasa a "Entregado" (venta 100%
+ * concretada). Abre el comprobante y, de inmediato, el diálogo de
+ * imprimir/guardar como PDF del navegador -- ver la nota sobre envío
+ * automático arriba para los límites reales de esto.
+ */
+function triggerAutoReceipt(order) {
+  openReceipt(order);
+  window.print();
 }
 
 function initReceiptModal() {

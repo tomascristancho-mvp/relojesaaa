@@ -891,9 +891,19 @@
   margin-bottom: 4px;
 }
 
+.receipt__send-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.receipt__send-actions .btn {
+  flex: 1;
+}
+
 #receipt-print-btn {
   width: 100%;
-  margin-top: 22px;
+  margin-top: 12px;
 }
 
 @media print {

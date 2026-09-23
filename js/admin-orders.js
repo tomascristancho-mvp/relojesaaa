@@ -21,7 +21,14 @@ function loadOrders() {
 }
 
 function saveOrders(orders) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    return true;
+  } catch (e) {
+    console.error("No se pudo guardar el pedido", e);
+    showToast("No se pudo guardar: el navegador rechazó el cambio (¿modo privado o espacio lleno?)", "error");
+    return false;
+  }
 }
 
 function toWhatsAppLink(telefono) {
@@ -49,7 +56,7 @@ function populateRelojOptions() {
   });
 
   relojInput.addEventListener("change", () => {
-    const match = (typeof WATCHES !== "undefined" ? WATCHES : []).find((w) => relojInput.value.startsWith(w.referencia));
+    const match = findWatchByRef(extractRefCode(relojInput.value));
     if (match && precioInput.dataset.touched !== "true" && match.precio != null) {
       precioInput.value = match.precio;
     }
@@ -137,26 +144,42 @@ function initOrderForm() {
     };
 
     const orders = loadOrders();
+    let savedOrder = null;
+    let justBecameEntregado = false;
 
     if (editingOrderId) {
       const idx = orders.findIndex((o) => o.id === editingOrderId);
       if (idx !== -1) {
+        const wasEntregado = orders[idx].estado === "Entregado";
         orders[idx] = { ...orders[idx], ...values };
-        saveOrders(orders);
+        if (!saveOrders(orders)) return;
+        savedOrder = orders[idx];
         showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
+        justBecameEntregado = !wasEntregado && values.estado === "Entregado";
       }
     } else {
-      orders.push({
+      const newOrder = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         ...values,
         createdAt: new Date().toISOString(),
-      });
-      saveOrders(orders);
+      };
+      orders.push(newOrder);
+      if (!saveOrders(orders)) return;
+      savedOrder = newOrder;
       showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
+      justBecameEntregado = values.estado === "Entregado";
     }
 
     renderOrders();
     exitEditMode();
+
+    // Venta 100% concretada (Entregado): genera el comprobante y abre el
+    // diálogo de impresión/PDF automáticamente. Solo en esta transición,
+    // no cada vez que se edite un pedido que ya estaba Entregado (por
+    // ejemplo, para corregir una nota), para no repetir la interrupción.
+    if (justBecameEntregado && savedOrder && typeof triggerAutoReceipt === "function") {
+      triggerAutoReceipt(savedOrder);
+    }
   });
 }
 
@@ -264,7 +287,7 @@ function renderOrders() {
         danger: true,
       });
       if (confirmed) {
-        saveOrders(loadOrders().filter((o) => o.id !== order.id));
+        if (!saveOrders(loadOrders().filter((o) => o.id !== order.id))) return;
         renderOrders();
         showToast("Pedido eliminado");
       }
