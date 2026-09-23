@@ -49,7 +49,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Clásico Esfera Blanca",
     precio: 60000,
-    descripcion: "Caja en acero negro con esfera blanca y numeración árabe, correa de silicona negra. Un diseño atemporal para uso diario.",
+    descripcion: "Caja en acero negro, esfera blanca con numeración árabe y correa de silicona bien cómoda para todo el día. Un clásico que nunca falla, para la oficina o la calle.",
     imagen: "images/watches/reloj-01.jpg",
   },
   {
@@ -59,7 +59,7 @@ const WATCHES = [
     genero: "Mujer",
     nombre: "Mesh Plata Minimalista",
     precio: 60000,
-    descripcion: "Caja pequeña en acero plateado con esfera negra y correa de malla milanesa. Un diseño minimalista ideal para uso diario.",
+    descripcion: "Caja pequeña en acero plateado, esfera negra y correa de malla milanesa que se ajusta solita a la muñeca. Minimalista y fácil de combinar, para el día a día.",
     imagen: "images/watches/reloj-02.jpg",
   },
   {
@@ -69,7 +69,7 @@ const WATCHES = [
     genero: "Mujer",
     nombre: "Mesh Plata Cristales",
     precio: 60000,
-    descripcion: "Esfera blanca con detalles en cristal y correa de malla milanesa plateada. Un toque elegante y femenino para el día a día.",
+    descripcion: "Esfera blanca con detalles en cristal y correa de malla milanesa plateada. Ese toque elegante y femenino que no se ve forzado en el día a día.",
     imagen: "images/watches/reloj-03.jpg",
   },
   {
@@ -79,7 +79,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Diver Esfera Crema",
     precio: 65000,
-    descripcion: "Caja robusta con bisel giratorio negro, esfera crema con manecillas azules y correa de caucho negro. Estilo deportivo tipo buceo.",
+    descripcion: "Caja robusta con bisel giratorio negro, esfera crema y manecillas azules que le dan personalidad. Correa de caucho negro, con ese estilo deportivo tipo buceo.",
     imagen: "images/watches/reloj-04.jpg",
   },
   {
@@ -89,7 +89,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Bisel Dorado Octagonal",
     precio: 60000,
-    descripcion: "Caja negra con bisel octagonal dorado y esfera texturizada, incluye calendario. Un diseño llamativo que combina lo deportivo con lo elegante.",
+    descripcion: "Caja negra con bisel octagonal dorado y esfera texturizada, con calendario incluido. Llamativo sin pasarse -- mezcla lo deportivo con un toque elegante.",
     imagen: "images/watches/reloj-05.jpg",
   },
 
@@ -100,7 +100,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Deportivo Esfera Negra",
     precio: 55000,
-    descripcion: "Caja y esfera en negro total con numeración blanca y correa de caucho. Liviano y fácil de combinar con cualquier outfit.",
+    descripcion: "Caja y esfera en negro total, con numeración blanca y correa de caucho. Liviano y fácil de combinar, el reloj que te pones sin pensarlo mucho.",
     imagen: "images/watches/reloj-06.jpg",
   },
   {
@@ -110,7 +110,7 @@ const WATCHES = [
     genero: "Mujer",
     nombre: "Bracelet Perlado",
     precio: 55000,
-    descripcion: "Esfera blanca nacarada con índices minimalistas y brazalete metálico delgado en tono plata. Un diseño delicado para el día a día.",
+    descripcion: "Esfera blanca nacarada con índices minimalistas y un brazalete metálico bien delgado en plata. Delicado sin ser exagerado, para cualquier día.",
     imagen: "images/watches/reloj-07.jpg",
   },
   {
@@ -120,7 +120,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Clásico Calendario",
     precio: 60000,
-    descripcion: "Caja plateada con esfera negra, calendario y brazalete metálico robusto. Un diseño clásico y versátil.",
+    descripcion: "Caja plateada, esfera negra y un calendario que de verdad se usa. Brazalete metálico resistente -- clásico y versátil, sirve para todo.",
     imagen: "images/watches/reloj-08.jpg",
   },
   {
@@ -130,7 +130,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Diver Azul Medianoche",
     precio: 65000,
-    descripcion: "Caja negra con bisel giratorio numerado, esfera texturizada azul medianoche (se ve casi negra con poca luz y revela su tono azul bajo luz directa) y correa de caucho negro. Estilo deportivo tipo buceo.",
+    descripcion: "Bisel giratorio numerado y esfera azul medianoche -- casi se ve negra hasta que le pega la luz y ahí sí se nota el azul. Correa de caucho negro, con ese toque deportivo tipo buceo.",
     imagen: "images/watches/reloj-09.jpg",
   },
   {
@@ -140,7 +140,7 @@ const WATCHES = [
     genero: "Unisex",
     nombre: "Digital Retro Acero",
     precio: 55000,
-    descripcion: "Diseño digital clásico con pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono atemporal que nunca pasa de moda.",
+    descripcion: "El digital de toda la vida: pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono que nunca pasa de moda.",
     imagen: "images/watches/reloj-10.jpg",
   },
 
@@ -151,7 +151,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Clásico Esfera Crema",
     precio: 65000,
-    descripcion: "Caja negra con esfera crema y numeración árabe, correa de caucho negro. Un diseño clásico con un toque cálido.",
+    descripcion: "Caja negra con esfera crema, numeración árabe y correa de caucho. Un clásico con un toque cálido que se ve bien sin esforzarse.",
     imagen: "images/watches/reloj-11.jpg",
   },
   {
@@ -161,7 +161,7 @@ const WATCHES = [
     genero: "Hombre",
     nombre: "Cronógrafo Rosa y Azul",
     precio: 65000,
-    descripcion: "Cronógrafo con esfera rosa, subesferas azules y bisel taquímetro, brazalete metálico y calendario. Un diseño llamativo entre lo deportivo y lo elegante.",
+    descripcion: "Cronógrafo con esfera rosa, subesferas azules y bisel taquímetro -- para el que quiere un reloj que llame la atención. Brazalete metálico y calendario incluidos.",
     imagen: "images/watches/reloj-12.jpg",
   },
   {
@@ -171,7 +171,7 @@ const WATCHES = [
     genero: "Unisex",
     nombre: "Digital Retro Dorado",
     precio: 55000,
-    descripcion: "Diseño digital clásico en tono dorado, con pantalla LCD, alarma, cronómetro y brazalete de acero. Un ícono atemporal en versión dorada.",
+    descripcion: "El mismo digital de siempre pero en dorado, con pantalla LCD, alarma y cronómetro. Ese brillito extra que le sube el nivel a cualquier look.",
     imagen: "images/watches/reloj-13.jpg",
   },
   {
@@ -181,7 +181,7 @@ const WATCHES = [
     genero: "Mujer",
     nombre: "Cristales Nácar",
     precio: 65000,
-    descripcion: "Esfera blanca nacarada con detalles en cristal y brazalete metálico plateado. Un diseño femenino y elegante para looks especiales.",
+    descripcion: "Esfera blanca nacarada con detalles en cristal y brazalete plateado. Para esos días en que quieres verte arreglada sin complicarte.",
     imagen: "images/watches/reloj-14.jpg",
   },
 ];
