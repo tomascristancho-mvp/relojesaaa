@@ -68,6 +68,27 @@ async function confirmPriceSanity(reason) {
   });
 }
 
+/**
+ * El teléfono es el único canal de contacto real con el cliente (el botón
+ * de WhatsApp de la tabla y el comprobante lo usan tal cual) -- un celular
+ * colombiano mal digitado (dígito de más/de menos) hace que ese botón le
+ * escriba a la persona equivocada o a nadie, sin ningún aviso.
+ */
+function isSuspiciousPhone(telefono) {
+  const digits = String(telefono || "").replace(/\D/g, "").replace(/^57(?=\d{10}$)/, "");
+  return digits.length !== 10 || !digits.startsWith("3");
+}
+
+async function confirmPhoneSanity() {
+  return confirmDialog({
+    title: "Revisa el teléfono antes de guardar",
+    message: "Este número no parece un celular colombiano válido (10 dígitos, empieza en 3) -- el botón de WhatsApp del pedido podría no funcionar. Si es un error de digitación, corrígelo antes de continuar. ¿Seguro que quieres guardar igual?",
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
+
 function loadOrders() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -253,14 +274,17 @@ function initOrderForm() {
       const orders = loadOrders();
       const original = editingOrderId ? orders.find((o) => o.id === editingOrderId) : null;
 
-      // Solo se revisa el precio si de verdad se tocó en este guardado --
-      // así no se vuelve a preguntar cada vez que se edita un pedido
-      // histórico cuyo precio/costo ya se aceptó tal como está.
+      // Solo se revisa el precio/teléfono si de verdad se tocaron en este
+      // guardado -- así no se vuelve a preguntar cada vez que se edita un
+      // pedido histórico cuyos datos ya se aceptaron tal como están.
       const priceTouched = !original || original.precio !== values.precio || original.costo !== values.costo;
       if (priceTouched) {
         const priceIssue = checkPriceSanity(values);
         if (priceIssue && !(await confirmPriceSanity(priceIssue))) return;
       }
+
+      const phoneTouched = !original || original.telefono !== values.telefono;
+      if (phoneTouched && isSuspiciousPhone(values.telefono) && !(await confirmPhoneSanity())) return;
 
       const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
       if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
