@@ -28,7 +28,10 @@ function watchCard(watch) {
       <span class="watch-card__view">Ver detalle</span>
     </button>
     <div class="watch-card__body">
-      <span class="watch-card__ref">${watch.referencia}</span>
+      <div class="watch-card__ref-row">
+        <span class="watch-card__ref">${watch.referencia}</span>
+        <span class="unique-badge" title="Es la única unidad disponible de este reloj">Pieza única</span>
+      </div>
       <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>
       <p class="watch-card__price">${formatPrice(watch.precio)}</p>

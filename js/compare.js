@@ -79,6 +79,7 @@ function renderCompareModal() {
           <dl class="compare-col__specs">
             <dt>Referencia</dt><dd>${w.referencia}</dd>
             <dt>Género</dt><dd>${w.genero}</dd>
+            <dt>Disponibilidad</dt><dd>Pieza única</dd>
           </dl>
           <p class="compare-col__desc">${w.descripcion || ""}</p>
           <a class="btn btn--whatsapp btn--small" href="${buildWhatsAppLink(w)}" target="_blank" rel="noopener">

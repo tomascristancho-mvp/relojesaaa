@@ -881,12 +881,33 @@ section[id] {
   gap: 6px;
 }
 
+.watch-card__ref-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .watch-card__ref {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent-soft);
   font-weight: 600;
+}
+
+.unique-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
 }
 
 .watch-card__brand {
