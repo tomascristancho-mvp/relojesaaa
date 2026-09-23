@@ -70,11 +70,21 @@ function initFadeImg(img) {
   }
 }
 
-const filterState = { marca: "Todas", genero: "Todos", busqueda: "" };
+const filterState = { marca: "Todas", genero: "Todos", busqueda: "", orden: "Recomendados" };
+
+function sortWatches(list) {
+  if (filterState.orden === "Precio: menor a mayor") {
+    return [...list].sort((a, b) => (a.precio ?? Infinity) - (b.precio ?? Infinity));
+  }
+  if (filterState.orden === "Precio: mayor a menor") {
+    return [...list].sort((a, b) => (b.precio ?? -Infinity) - (a.precio ?? -Infinity));
+  }
+  return list; // "Recomendados": el orden del catálogo tal como está en js/data.js
+}
 
 function getFilteredWatches() {
   const query = filterState.busqueda.trim().toLowerCase();
-  return WATCHES.filter(
+  const filtered = WATCHES.filter(
     (w) =>
       w.disponible !== false &&
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
@@ -84,6 +94,7 @@ function getFilteredWatches() {
         w.marca.toLowerCase().includes(query) ||
         w.nombre.toLowerCase().includes(query))
   );
+  return sortWatches(filtered);
 }
 
 function renderCatalog() {
@@ -101,13 +112,13 @@ function renderCatalog() {
       : `Mostrando ${items.length} de ${availableCount} relojes`;
 }
 
-function renderFilterGroup(containerId, key, allLabel, values) {
+function renderFilterGroup(containerId, key, allLabel, values, getCount) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
   [allLabel, ...values].forEach((value, i) => {
     const btn = document.createElement("button");
     btn.className = "chip" + (i === 0 ? " chip--active" : "");
-    btn.textContent = value;
+    btn.textContent = getCount ? `${value} (${getCount(value)})` : value;
     btn.type = "button";
     btn.addEventListener("click", () => {
       container.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
@@ -121,8 +132,29 @@ function renderFilterGroup(containerId, key, allLabel, values) {
 
 function renderFilters() {
   const available = WATCHES.filter((w) => w.disponible !== false);
-  renderFilterGroup("filter-brand", "marca", "Todas", [...new Set(available.map((w) => w.marca))]);
-  renderFilterGroup("filter-gender", "genero", "Todos", [...new Set(available.map((w) => w.genero))]);
+
+  const marcaCounts = new Map();
+  const generoCounts = new Map();
+  available.forEach((w) => {
+    marcaCounts.set(w.marca, (marcaCounts.get(w.marca) || 0) + 1);
+    generoCounts.set(w.genero, (generoCounts.get(w.genero) || 0) + 1);
+  });
+
+  renderFilterGroup(
+    "filter-brand",
+    "marca",
+    "Todas",
+    [...new Set(available.map((w) => w.marca))],
+    (value) => (value === "Todas" ? available.length : marcaCounts.get(value))
+  );
+  renderFilterGroup(
+    "filter-gender",
+    "genero",
+    "Todos",
+    [...new Set(available.map((w) => w.genero))],
+    (value) => (value === "Todos" ? available.length : generoCounts.get(value))
+  );
+  renderFilterGroup("filter-sort", "orden", "Recomendados", ["Precio: menor a mayor", "Precio: mayor a menor"]);
 }
 
 function initSearch() {
@@ -136,6 +168,7 @@ function initSearch() {
     filterState.marca = "Todas";
     filterState.genero = "Todos";
     filterState.busqueda = "";
+    filterState.orden = "Recomendados";
     input.value = "";
     renderFilters();
     renderCatalog();
