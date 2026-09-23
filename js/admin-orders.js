@@ -367,13 +367,40 @@ function initOrderForm() {
 }
 
 /* ============ FILTRO DE LA TABLA ============ */
-const ordersFilterState = { busqueda: "", estado: "Todos" };
+const ordersFilterState = { busqueda: "", estado: "Todos", rango: "Todos" };
+const ORDER_DATE_RANGES = ["Todos", "Hoy", "Esta semana", "Este mes"];
+
+/**
+ * Compara `fecha` (AAAA-MM-DD, el mismo formato que usa el formulario)
+ * contra el rango elegido. "Esta semana" empieza el lunes -- coincide con
+ * como la mayoría cuenta la semana en Colombia.
+ */
+function matchesDateRange(fecha, rango) {
+  if (rango === "Todos") return true;
+  if (!fecha) return false;
+  const d = new Date(fecha + "T00:00:00");
+  if (isNaN(d)) return false;
+  const now = new Date();
+  if (rango === "Hoy") return fecha === now.toISOString().slice(0, 10);
+  if (rango === "Esta semana") {
+    const start = new Date(now);
+    const diffToMonday = (start.getDay() + 6) % 7;
+    start.setDate(start.getDate() - diffToMonday);
+    start.setHours(0, 0, 0, 0);
+    return d >= start && d <= now;
+  }
+  if (rango === "Este mes") {
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }
+  return true;
+}
 
 function getFilteredOrders(orders) {
   const query = ordersFilterState.busqueda.trim().toLowerCase();
   return orders.filter(
     (o) =>
       (ordersFilterState.estado === "Todos" || o.estado === ordersFilterState.estado) &&
+      matchesDateRange(o.fecha, ordersFilterState.rango) &&
       (!query ||
         (o.nombre || "").toLowerCase().includes(query) ||
         (o.reloj || "").toLowerCase().includes(query) ||
@@ -405,6 +432,22 @@ function initOrdersFilter() {
       renderOrders();
     });
     chipsContainer.appendChild(btn);
+  });
+
+  const dateChipsContainer = document.getElementById("orders-date-filter");
+  dateChipsContainer.innerHTML = "";
+  ORDER_DATE_RANGES.forEach((rango, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.textContent = rango;
+    btn.addEventListener("click", () => {
+      dateChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.rango = rango;
+      renderOrders();
+    });
+    dateChipsContainer.appendChild(btn);
   });
 }
 
@@ -597,7 +640,8 @@ function renderOrders() {
     tbody.appendChild(tr);
   });
 
-  const isFiltered = ordersFilterState.busqueda.trim() !== "" || ordersFilterState.estado !== "Todos";
+  const isFiltered =
+    ordersFilterState.busqueda.trim() !== "" || ordersFilterState.estado !== "Todos" || ordersFilterState.rango !== "Todos";
   document.getElementById("orders-empty").hidden = orders.length !== 0;
   document.getElementById("orders-empty").textContent =
     orders.length === 0 && allOrders.length > 0 ? "Ningún pedido coincide con ese filtro." : "Aún no has registrado pedidos.";
