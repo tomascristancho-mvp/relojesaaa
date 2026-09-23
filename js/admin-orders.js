@@ -159,62 +159,73 @@ function initOrderForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const values = {
-      fecha: document.getElementById("order-fecha").value,
-      nombre: document.getElementById("order-nombre").value.trim(),
-      cedula: document.getElementById("order-cedula").value.trim(),
-      telefono: document.getElementById("order-telefono").value.trim(),
-      correo: document.getElementById("order-correo").value.trim(),
-      lugar: document.getElementById("order-lugar").value.trim(),
-      reloj: document.getElementById("order-reloj").value.trim(),
-      medioPago: document.getElementById("order-pago").value,
-      precio: Number(document.getElementById("order-precio").value) || 0,
-      costo: document.getElementById("order-costo").value === "" ? null : Number(document.getElementById("order-costo").value),
-      vendedor: document.getElementById("order-vendedor").value,
-      estado: document.getElementById("order-estado").value,
-      notas: document.getElementById("order-notas").value.trim(),
-    };
+    const submitBtn = document.getElementById("order-form-submit");
+    // Evita que un doble clic (o un usuario impaciente mientras espera el
+    // diálogo de conflicto) dispare el guardado dos veces y cree un pedido
+    // duplicado.
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
 
-    const orders = loadOrders();
-
-    const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
-    if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
-
-    let savedOrder = null;
-    let justBecameEntregado = false;
-
-    if (editingOrderId) {
-      const idx = orders.findIndex((o) => o.id === editingOrderId);
-      if (idx !== -1) {
-        const wasEntregado = orders[idx].estado === "Entregado";
-        orders[idx] = { ...orders[idx], ...values };
-        if (!saveOrders(orders)) return;
-        savedOrder = orders[idx];
-        showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
-        justBecameEntregado = !wasEntregado && values.estado === "Entregado";
-      }
-    } else {
-      const newOrder = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        ...values,
-        createdAt: new Date().toISOString(),
+    try {
+      const values = {
+        fecha: document.getElementById("order-fecha").value,
+        nombre: document.getElementById("order-nombre").value.trim(),
+        cedula: document.getElementById("order-cedula").value.trim(),
+        telefono: document.getElementById("order-telefono").value.trim(),
+        correo: document.getElementById("order-correo").value.trim(),
+        lugar: document.getElementById("order-lugar").value.trim(),
+        reloj: document.getElementById("order-reloj").value.trim(),
+        medioPago: document.getElementById("order-pago").value,
+        precio: Number(document.getElementById("order-precio").value) || 0,
+        costo: document.getElementById("order-costo").value === "" ? null : Number(document.getElementById("order-costo").value),
+        vendedor: document.getElementById("order-vendedor").value,
+        estado: document.getElementById("order-estado").value,
+        notas: document.getElementById("order-notas").value.trim(),
       };
-      orders.push(newOrder);
-      if (!saveOrders(orders)) return;
-      savedOrder = newOrder;
-      showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
-      justBecameEntregado = values.estado === "Entregado";
-    }
 
-    renderOrders();
-    exitEditMode();
+      const orders = loadOrders();
 
-    // Venta 100% concretada (Entregado): genera el comprobante y abre el
-    // diálogo de impresión/PDF automáticamente. Solo en esta transición,
-    // no cada vez que se edite un pedido que ya estaba Entregado (por
-    // ejemplo, para corregir una nota), para no repetir la interrupción.
-    if (justBecameEntregado && savedOrder && typeof triggerAutoReceipt === "function") {
-      triggerAutoReceipt(savedOrder);
+      const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
+      if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
+
+      let savedOrder = null;
+      let justBecameEntregado = false;
+
+      if (editingOrderId) {
+        const idx = orders.findIndex((o) => o.id === editingOrderId);
+        if (idx !== -1) {
+          const wasEntregado = orders[idx].estado === "Entregado";
+          orders[idx] = { ...orders[idx], ...values };
+          if (!saveOrders(orders)) return;
+          savedOrder = orders[idx];
+          showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
+          justBecameEntregado = !wasEntregado && values.estado === "Entregado";
+        }
+      } else {
+        const newOrder = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          ...values,
+          createdAt: new Date().toISOString(),
+        };
+        orders.push(newOrder);
+        if (!saveOrders(orders)) return;
+        savedOrder = newOrder;
+        showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
+        justBecameEntregado = values.estado === "Entregado";
+      }
+
+      renderOrders();
+      exitEditMode();
+
+      // Venta 100% concretada (Entregado): genera el comprobante y abre el
+      // diálogo de impresión/PDF automáticamente. Solo en esta transición,
+      // no cada vez que se edite un pedido que ya estaba Entregado (por
+      // ejemplo, para corregir una nota), para no repetir la interrupción.
+      if (justBecameEntregado && savedOrder && typeof triggerAutoReceipt === "function") {
+        triggerAutoReceipt(savedOrder);
+      }
+    } finally {
+      submitBtn.disabled = false;
     }
   });
 }

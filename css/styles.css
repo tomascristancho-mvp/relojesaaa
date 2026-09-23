@@ -153,6 +153,12 @@ section[id] {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn__icon {
   width: 17px;
   height: 17px;
