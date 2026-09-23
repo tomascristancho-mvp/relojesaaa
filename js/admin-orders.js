@@ -42,6 +42,32 @@ function calcGanancia(order) {
   return order.costo != null && order.costo !== "" ? Number(order.precio) - Number(order.costo) : null;
 }
 
+/**
+ * Detecta el error de digitación más común al registrar una venta:
+ * un precio en $0, o un costo igual o mayor al precio (la venta no
+ * dejaría ganancia -- casi siempre es un cero de más/de menos, o el
+ * precio y el costo quedaron cambiados entre sí).
+ */
+function checkPriceSanity(values) {
+  if (!(values.precio > 0)) {
+    return "El precio de venta quedó en $0.";
+  }
+  if (values.costo != null && values.costo >= values.precio) {
+    return `El costo (${formatCOP(values.costo)}) es igual o mayor al precio de venta (${formatCOP(values.precio)}) -- esta venta no dejaría ganancia.`;
+  }
+  return null;
+}
+
+async function confirmPriceSanity(reason) {
+  return confirmDialog({
+    title: "Revisa el precio antes de guardar",
+    message: `${reason} Si es un error de digitación, corrígelo antes de continuar. ¿Seguro que quieres guardar igual?`,
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
+
 function loadOrders() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -217,6 +243,16 @@ function initOrderForm() {
       };
 
       const orders = loadOrders();
+      const original = editingOrderId ? orders.find((o) => o.id === editingOrderId) : null;
+
+      // Solo se revisa el precio si de verdad se tocó en este guardado --
+      // así no se vuelve a preguntar cada vez que se edita un pedido
+      // histórico cuyo precio/costo ya se aceptó tal como está.
+      const priceTouched = !original || original.precio !== values.precio || original.costo !== values.costo;
+      if (priceTouched) {
+        const priceIssue = checkPriceSanity(values);
+        if (priceIssue && !(await confirmPriceSanity(priceIssue))) return;
+      }
 
       const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
       if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
