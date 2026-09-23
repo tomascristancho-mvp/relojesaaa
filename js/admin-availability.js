@@ -55,6 +55,7 @@ function renderAvailabilityAlerts() {
   }
 
   renderConflictAlerts(orders);
+  renderStalePendingAlert(orders);
 }
 
 /**
@@ -107,4 +108,60 @@ function renderConflictAlerts(orders) {
         </li>`;
     })
     .join("");
+}
+
+/**
+ * Un pedido "Pendiente" que lleva varios días así fácilmente se pierde de
+ * vista entre los demás -- el cliente puede estar esperando una respuesta
+ * que nunca llega. Este aviso junta esos pedidos para darles seguimiento;
+ * hacer clic en uno abre su detalle directamente.
+ */
+const STALE_PENDING_DAYS = 2;
+
+function computeStalePendingOrders(orders, thresholdDays) {
+  const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00");
+  return orders
+    .filter((o) => o.estado === "Pendiente" && o.fecha)
+    .map((o) => {
+      const fechaDate = new Date(o.fecha + "T00:00:00");
+      const days = Math.round((today - fechaDate) / 86400000);
+      return { order: o, days };
+    })
+    .filter(({ days }) => Number.isFinite(days) && days >= thresholdDays)
+    .sort((a, b) => b.days - a.days);
+}
+
+function renderStalePendingAlert(orders) {
+  const section = document.getElementById("stale-pending-alert");
+  if (!section) return;
+
+  const stale = computeStalePendingOrders(orders, STALE_PENDING_DAYS);
+  if (stale.length === 0) {
+    section.hidden = true;
+    return;
+  }
+
+  section.hidden = false;
+  const list = document.getElementById("stale-pending-alert-list");
+  list.innerHTML = stale
+    .map(({ order, days }) => {
+      const reloj = order.reloj || "";
+      const match = reloj.match(/^(REF-\d+)\s*(?:—\s*)?(.*)$/i);
+      const display = match ? `<strong>${escapeHtml(match[1])}</strong> — ${escapeHtml(match[2])}` : escapeHtml(reloj) || "Sin reloj registrado";
+      return `
+        <li>
+          <button type="button" class="availability-alert__item-btn" data-order-id="${escapeHtml(order.id)}">
+            ${display}
+            <span class="availability-alert__meta">Cliente: ${escapeHtml(order.nombre) || "sin nombre"} · pendiente desde hace ${days} ${days === 1 ? "día" : "días"} (${escapeHtml(order.fecha)})</span>
+          </button>
+        </li>`;
+    })
+    .join("");
+
+  list.querySelectorAll(".availability-alert__item-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const match = orders.find((o) => o.id === btn.dataset.orderId);
+      if (match && typeof openDetail === "function") openDetail(match);
+    });
+  });
 }

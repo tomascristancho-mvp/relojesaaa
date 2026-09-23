@@ -80,6 +80,21 @@
         <ul id="availability-alert-list" class="availability-alert__list"></ul>
       </section>
 
+      <section id="stale-pending-alert" class="availability-alert" hidden>
+        <div class="availability-alert__header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div>
+            <h2>Pedidos pendientes hace varios días</h2>
+            <p>
+              Estos pedidos siguen en estado Pendiente desde hace tiempo -- puede
+              que el cliente esté esperando una respuesta. Haz clic en uno para
+              abrir su detalle y darle seguimiento.
+            </p>
+          </div>
+        </div>
+        <ul id="stale-pending-alert-list" class="availability-alert__list"></ul>
+      </section>
+
       <section class="admin-stats">
         <div class="stat-card">
           <span class="stat-card__label">Pedidos totales</span>
