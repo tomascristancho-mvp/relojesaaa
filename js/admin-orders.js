@@ -566,15 +566,23 @@ function renderOrders() {
     delBtn.addEventListener("click", async () => {
       const confirmed = await confirmDialog({
         title: "Eliminar pedido",
-        message: `¿Eliminar el pedido de ${order.nombre || "este cliente"}? Esta acción no se puede deshacer.`,
+        message: `¿Eliminar el pedido de ${order.nombre || "este cliente"}? Puedes deshacerlo justo después, pero no una vez que se cierre el aviso.`,
         confirmLabel: "Eliminar",
         danger: true,
       });
-      if (confirmed) {
-        if (!saveOrders(loadOrders().filter((o) => o.id !== order.id))) return;
-        renderOrders();
-        showToast("Pedido eliminado");
-      }
+      if (!confirmed) return;
+      if (!saveOrders(loadOrders().filter((o) => o.id !== order.id))) return;
+      renderOrders();
+      showToast(`Pedido de ${order.nombre || "cliente"} eliminado`, "success", {
+        actionLabel: "Deshacer",
+        onAction: () => {
+          // Vuelve a insertar el mismo pedido tal cual estaba -- si mientras
+          // tanto se borró desde otra pestaña, restaurarlo no pisa nada.
+          if (!saveOrders([...loadOrders(), order])) return;
+          renderOrders();
+          showToast(`Pedido de ${order.nombre || "cliente"} restaurado ✓`);
+        },
+      });
     });
     actionsCell.appendChild(delBtn);
 

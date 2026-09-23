@@ -74,15 +74,43 @@ function findWatchByRef(refCode) {
   return WATCHES.find((w) => w.referencia.toUpperCase() === refCode.toUpperCase()) || null;
 }
 
-function showToast(message, type = "success") {
+/**
+ * `options.actionLabel` + `options.onAction` agregan un botón (por ejemplo
+ * "Deshacer") al toast. Si se usa, el toast dura más para dar tiempo a
+ * verlo y tocarlo. Sin esas opciones se comporta exactamente igual que
+ * antes.
+ */
+function showToast(message, type = "success", options = {}) {
+  const { actionLabel, onAction, duration } = options;
   const container = document.getElementById("toast-container");
   const toast = document.createElement("div");
   toast.className = `toast toast--${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add("is-visible"));
-  setTimeout(() => {
+
+  const text = document.createElement("span");
+  text.textContent = message;
+  toast.appendChild(text);
+
+  let dismissed = false;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
     toast.classList.remove("is-visible");
     setTimeout(() => toast.remove(), 250);
-  }, 3000);
+  }
+
+  if (actionLabel && onAction) {
+    const actionBtn = document.createElement("button");
+    actionBtn.type = "button";
+    actionBtn.className = "toast__action";
+    actionBtn.textContent = actionLabel;
+    actionBtn.addEventListener("click", () => {
+      dismiss();
+      onAction();
+    });
+    toast.appendChild(actionBtn);
+  }
+
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
+  setTimeout(dismiss, duration ?? (actionLabel ? 6000 : 3000));
 }

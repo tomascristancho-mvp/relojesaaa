@@ -1445,6 +1445,9 @@ section[id] {
 }
 
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-left: 3px solid var(--whatsapp);
@@ -1457,6 +1460,7 @@ section[id] {
   transform: translateY(8px);
   transition: opacity 0.25s ease, transform 0.25s ease;
   max-width: min(90vw, 420px);
+  pointer-events: auto;
 }
 
 .toast--error {
@@ -1466,4 +1470,21 @@ section[id] {
 .toast.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.toast__action {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--accent-soft);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.toast__action:hover {
+  color: var(--accent);
 }
