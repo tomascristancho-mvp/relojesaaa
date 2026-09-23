@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderRecentlyViewed();
   initSearch();
   initCart();
+  initCompare();
   initMobileNav();
   initModal();
   initImageZoom();

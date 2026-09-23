@@ -765,6 +765,7 @@ section[id] {
 }
 
 .watch-card {
+  position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -773,6 +774,39 @@ section[id] {
   flex-direction: column;
   transition: border-color 0.25s ease, transform 0.15s ease-out;
   will-change: transform;
+}
+
+.watch-card__compare {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.watch-card__compare svg {
+  width: 15px;
+  height: 15px;
+}
+
+.watch-card__compare:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.watch-card__compare.is-active {
+  border-color: var(--accent);
+  color: var(--accent-soft);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .watch-card:hover {
@@ -1552,4 +1586,189 @@ section[id] {
 
 .toast__action:hover {
   color: var(--accent);
+}
+
+/* ============ COMPARADOR DE RELOJES ============ */
+.compare-tray {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 10px 8px 14px;
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.7);
+}
+
+.compare-tray[hidden] {
+  display: none;
+}
+
+.compare-tray__items {
+  display: flex;
+}
+
+.compare-tray__items img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--bg-elevated);
+  border: 2px solid var(--bg-card);
+  margin-left: -10px;
+}
+
+.compare-tray__items img:first-child {
+  margin-left: 0;
+}
+
+.compare-tray__open {
+  background: var(--accent);
+  color: #1a1508;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.compare-tray__open:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.compare-tray__open:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.compare-tray__clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.compare-tray__clear:hover {
+  color: var(--text);
+}
+
+.compare-modal {
+  max-width: 920px;
+  width: 94vw;
+}
+
+.compare-modal__inner {
+  padding: 26px;
+}
+
+.compare-modal__inner h3 {
+  margin-bottom: 18px;
+}
+
+.compare-table {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.compare-table__empty {
+  color: var(--text-muted);
+}
+
+.compare-col {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.compare-col__remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.compare-col__remove:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.compare-col img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--bg-elevated);
+}
+
+.compare-col__brand {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.compare-col__title {
+  font-size: 1.05rem;
+}
+
+.compare-col__price {
+  color: var(--accent-soft);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.compare-col__specs {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  font-size: 0.82rem;
+}
+
+.compare-col__specs dt {
+  color: var(--text-muted);
+}
+
+.compare-col__specs dd {
+  margin: 0;
+}
+
+.compare-col__desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .compare-tray {
+    left: 12px;
+    right: 84px; /* deja libre la columna de los botones flotantes de WhatsApp / volver arriba */
+    bottom: 16px;
+    justify-content: space-between;
+  }
 }

@@ -10,6 +10,9 @@ const CART_ICON =
 
 const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+const COMPARE_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>';
+
 function watchCard(watch) {
   const img = watch.imagen || PLACEHOLDER_IMAGE;
   const card = document.createElement("article");
@@ -17,6 +20,9 @@ function watchCard(watch) {
   card.dataset.marca = watch.marca;
   card.dataset.genero = watch.genero;
   card.innerHTML = `
+    <button class="watch-card__compare${isInCompare(watch.referencia) ? " is-active" : ""}" type="button" data-ref="${watch.referencia}" aria-pressed="${isInCompare(watch.referencia)}" aria-label="Agregar a comparar">
+      ${COMPARE_ICON}
+    </button>
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
       <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
       <span class="watch-card__view">Ver detalle</span>
@@ -44,6 +50,7 @@ function watchCard(watch) {
     toggleCartItem(watch.referencia);
     updateCartButton(e.currentTarget);
   });
+  card.querySelector(".watch-card__compare").addEventListener("click", () => toggleCompare(watch.referencia));
   initFadeImg(card.querySelector(".fade-img"));
   initCardTilt(card);
   return card;

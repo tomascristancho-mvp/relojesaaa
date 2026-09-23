@@ -261,11 +261,26 @@
     </div>
   </dialog>
 
+  <div id="compare-tray" class="compare-tray" hidden>
+    <div id="compare-tray-items" class="compare-tray__items"></div>
+    <button id="compare-tray-open" class="compare-tray__open" type="button" disabled>Elige 1 más</button>
+    <button id="compare-tray-clear" class="compare-tray__clear" type="button" aria-label="Vaciar comparación">Vaciar</button>
+  </div>
+
+  <dialog id="compare-modal" class="modal compare-modal">
+    <button id="compare-modal-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <div class="compare-modal__inner">
+      <h3>Comparar relojes</h3>
+      <div id="compare-table" class="compare-table"></div>
+    </div>
+  </dialog>
+
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <script src="js/data.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/cart.js"></script>
+  <script src="js/compare.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/watch-modal.js"></script>
   <script src="js/site.js"></script>
