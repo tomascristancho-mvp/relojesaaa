@@ -272,13 +272,34 @@ function computeSalesByVendedor(orders) {
     .sort((a, b) => b.value - a.value);
 }
 
+function renderMonthlySummary(container, monthlyData) {
+  const thisMonth = monthlyData[monthlyData.length - 1];
+  const lastMonth = monthlyData[monthlyData.length - 2];
+  if (!thisMonth || !lastMonth || (lastMonth.venta === 0 && thisMonth.venta === 0)) {
+    container.textContent = "";
+    return;
+  }
+  const parts = [`Este mes: ${formatCOP(thisMonth.venta)} en ventas`];
+  if (lastMonth.venta > 0) {
+    const change = ((thisMonth.venta - lastMonth.venta) / lastMonth.venta) * 100;
+    const sign = change >= 0 ? "+" : "";
+    const cls = change >= 0 ? "chart-summary__delta--up" : "chart-summary__delta--down";
+    parts.push(`<span class="${cls}">${sign}${change.toFixed(0)}% vs. mes anterior</span>`);
+  } else if (thisMonth.venta > 0) {
+    parts.push(`<span class="chart-summary__delta--up">primeras ventas del mes</span>`);
+  }
+  container.innerHTML = parts.join(" · ");
+}
+
 /* ============ ENTRADA PRINCIPAL ============ */
 function renderCharts() {
   const orders = loadOrders();
   const section = document.getElementById("admin-charts");
   if (!section) return;
 
-  renderMonthlyChart(document.getElementById("chart-monthly"), computeMonthlyData(orders));
+  const monthlyData = computeMonthlyData(orders);
+  renderMonthlySummary(document.getElementById("chart-monthly-summary"), monthlyData);
+  renderMonthlyChart(document.getElementById("chart-monthly"), monthlyData);
   renderStatusDonut(document.getElementById("chart-status"), computeStatusCounts(orders));
   renderHorizontalBars(document.getElementById("chart-top-watches"), computeTopWatches(orders, 5), {
     color: CHART_COLOR_VENTA,
