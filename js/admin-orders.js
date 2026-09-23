@@ -216,6 +216,33 @@ async function startEditOrder(order) {
   formRestSnapshot = getFormSnapshot();
 }
 
+/**
+ * Precarga el formulario con los datos de un pedido existente, pero como
+ * un pedido NUEVO (fecha de hoy, estado Pendiente, notas en blanco) -- útil
+ * para un cliente que repite compra, o para corregir un error copiando un
+ * pedido y ajustando el reloj/precio en vez de escribir todo de nuevo.
+ * `editingOrderId` queda en null a propósito: al guardar se crea un
+ * registro aparte, nunca se sobreescribe el pedido original.
+ */
+async function duplicateOrder(order) {
+  if (isFormDirty() && !(await confirmDiscardChanges())) return;
+  editingOrderId = null;
+  fillOrderForm({
+    ...order,
+    fecha: new Date().toISOString().slice(0, 10),
+    estado: "Pendiente",
+    notas: "",
+  });
+  document.getElementById("order-form-title").textContent = `Nuevo pedido (copiado de ${order.nombre || "este cliente"})`;
+  document.getElementById("order-form-submit").textContent = "Guardar pedido";
+  document.getElementById("order-form-cancel").hidden = false;
+  document.getElementById("order-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  const nombreInput = document.getElementById("order-nombre");
+  nombreInput.focus();
+  nombreInput.select();
+  formRestSnapshot = getFormSnapshot();
+}
+
 function exitEditMode() {
   editingOrderId = null;
   document.getElementById("order-form-title").textContent = "Nuevo pedido";
@@ -523,6 +550,14 @@ function renderOrders() {
     editBtn.addEventListener("click", () => startEditOrder(order));
     actionsCell.appendChild(editBtn);
 
+    const dupBtn = document.createElement("button");
+    dupBtn.type = "button";
+    dupBtn.className = "icon-btn";
+    dupBtn.title = "Duplicar pedido (para un cliente que repite, o para corregir sin escribir todo de nuevo)";
+    dupBtn.textContent = "📋";
+    dupBtn.addEventListener("click", () => duplicateOrder(order));
+    actionsCell.appendChild(dupBtn);
+
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.className = "icon-btn";
@@ -604,11 +639,16 @@ function openDetail(order) {
     rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("") +
     `</dl><div class="admin-detail-actions">
       <button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>
+      <button type="button" id="detail-dup-btn" class="btn btn--ghost btn--small">Duplicar pedido</button>
       <button type="button" id="detail-receipt-btn" class="btn btn--ghost btn--small">Generar comprobante</button>
     </div>`;
   document.getElementById("detail-edit-btn").addEventListener("click", () => {
     document.getElementById("order-detail").close();
     startEditOrder(order);
+  });
+  document.getElementById("detail-dup-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    duplicateOrder(order);
   });
   document.getElementById("detail-receipt-btn").addEventListener("click", () => {
     document.getElementById("order-detail").close();

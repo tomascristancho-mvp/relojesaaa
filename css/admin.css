@@ -805,12 +805,13 @@ select.status-badge option {
 
 .admin-detail-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 18px;
 }
 
 .admin-detail-actions .btn {
-  flex: 1;
+  flex: 1 1 140px;
 }
 
 /* ============ CONFIRM DIALOG ============ */
