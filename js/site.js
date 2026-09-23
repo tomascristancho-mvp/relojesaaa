@@ -79,6 +79,37 @@ function initYear() {
   document.getElementById("year").textContent = new Date().getFullYear();
 }
 
+/**
+ * Sombra del header y el botón "volver arriba" reaccionan al scroll --
+ * ambos en un solo listener con requestAnimationFrame para no recalcular
+ * en cada evento de scroll (puede disparar decenas de veces por segundo).
+ */
+function initScrollEffects() {
+  const header = document.querySelector(".site-header");
+  const scrollTopBtn = document.getElementById("scroll-top");
+  let ticking = false;
+
+  function update() {
+    const y = window.scrollY;
+    header.classList.toggle("is-scrolled", y > 8);
+    scrollTopBtn.hidden = y < 600;
+    ticking = false;
+  }
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    },
+    { passive: true }
+  );
+
+  scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+}
+
 function openWatchFromUrl() {
   const ref = new URLSearchParams(window.location.search).get("reloj");
   if (!ref) return;
@@ -126,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initImageZoom();
   initReveal();
   initYear();
+  initScrollEffects();
   injectStructuredData();
   openWatchFromUrl();
 });

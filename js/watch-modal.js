@@ -42,11 +42,14 @@ function updateModalNav(watch) {
   const items = getFilteredWatches();
   const prevBtn = document.getElementById("modal-prev");
   const nextBtn = document.getElementById("modal-next");
+  const positionEl = document.getElementById("modal-position");
   const idx = items.findIndex((w) => w.referencia === watch.referencia);
   const hasMultiple = idx !== -1 && items.length > 1;
   prevBtn.hidden = !hasMultiple;
   nextBtn.hidden = !hasMultiple;
+  positionEl.hidden = !hasMultiple;
   if (!hasMultiple) return;
+  positionEl.textContent = `${idx + 1} / ${items.length}`;
   const prevWatch = items[(idx - 1 + items.length) % items.length];
   const nextWatch = items[(idx + 1) % items.length];
   prevBtn.onclick = () => openModal(prevWatch);

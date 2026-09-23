@@ -113,7 +113,11 @@
           <div id="filter-gender" class="catalog-filters"></div>
         </div>
         <div id="catalog-grid" class="catalog-grid"></div>
-        <p id="catalog-empty" class="catalog-empty" hidden>No hay relojes con esos filtros todavía.</p>
+        <div id="catalog-empty" class="catalog-empty" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <p>No hay relojes con esos filtros todavía.</p>
+          <button id="catalog-clear-filters" class="btn btn--ghost btn--small" type="button">Quitar filtros</button>
+        </div>
       </div>
     </section>
 
@@ -190,6 +194,7 @@
         <button id="modal-next" class="modal__nav-btn modal__nav-btn--next" type="button" aria-label="Reloj siguiente" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        <span id="modal-position" class="modal__position" hidden></span>
       </div>
       <div class="modal__body">
         <span id="modal-ref" class="watch-card__ref"></span>
@@ -214,6 +219,10 @@
   <a class="whatsapp-float" data-whatsapp-link href="#" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>
   </a>
+
+  <button id="scroll-top" class="scroll-top" type="button" aria-label="Volver arriba" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+  </button>
 
   <dialog id="cart-modal" class="modal cart-modal">
     <button id="cart-close" class="modal__close" aria-label="Cerrar">✕</button>

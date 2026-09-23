@@ -91,9 +91,7 @@ function renderCatalog() {
   grid.innerHTML = "";
   const items = getFilteredWatches();
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
-  const emptyEl = document.getElementById("catalog-empty");
-  emptyEl.hidden = items.length !== 0;
-  emptyEl.textContent = "No hay relojes con esos filtros todavía.";
+  document.getElementById("catalog-empty").hidden = items.length !== 0;
 
   const availableCount = WATCHES.filter((w) => w.disponible !== false).length;
   const countEl = document.getElementById("catalog-count");
@@ -131,6 +129,15 @@ function initSearch() {
   const input = document.getElementById("catalog-search");
   input.addEventListener("input", () => {
     filterState.busqueda = input.value;
+    renderCatalog();
+  });
+
+  document.getElementById("catalog-clear-filters").addEventListener("click", () => {
+    filterState.marca = "Todas";
+    filterState.genero = "Todos";
+    filterState.busqueda = "";
+    input.value = "";
+    renderFilters();
     renderCatalog();
   });
 }
