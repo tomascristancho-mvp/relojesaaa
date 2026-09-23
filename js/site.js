@@ -148,6 +148,7 @@ function injectStructuredData() {
 document.addEventListener("DOMContentLoaded", () => {
   applyBranding();
   checkSetupWarnings();
+  parseFiltersFromUrl();
   renderFilters();
   renderCatalog();
   renderRecentlyViewed();

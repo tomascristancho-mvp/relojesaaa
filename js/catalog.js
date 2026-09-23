@@ -125,9 +125,9 @@ function renderCatalog() {
 function renderFilterGroup(containerId, key, allLabel, values, getCount) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
-  [allLabel, ...values].forEach((value, i) => {
+  [allLabel, ...values].forEach((value) => {
     const btn = document.createElement("button");
-    btn.className = "chip" + (i === 0 ? " chip--active" : "");
+    btn.className = "chip" + (value === filterState[key] ? " chip--active" : "");
     btn.textContent = getCount ? `${value} (${getCount(value)})` : value;
     btn.type = "button";
     btn.addEventListener("click", () => {
@@ -135,6 +135,7 @@ function renderFilterGroup(containerId, key, allLabel, values, getCount) {
       btn.classList.add("chip--active");
       filterState[key] = value;
       renderCatalog();
+      syncFiltersToUrl();
     });
     container.appendChild(btn);
   });
@@ -143,6 +144,16 @@ function renderFilterGroup(containerId, key, allLabel, values, getCount) {
 function renderFilters() {
   const available = WATCHES.filter((w) => w.disponible !== false);
 
+  const marcas = [...new Set(available.map((w) => w.marca))];
+  const generos = [...new Set(available.map((w) => w.genero))];
+  const ordenes = ["Precio: menor a mayor", "Precio: mayor a menor"];
+  // Un enlace con un valor que ya no existe (una marca renombrada, un filtro
+  // viejo guardado en favoritos) vuelve al valor por defecto en vez de dejar
+  // la sección de filtros sin ningún chip marcado como activo.
+  if (!marcas.includes(filterState.marca)) filterState.marca = "Todas";
+  if (!generos.includes(filterState.genero)) filterState.genero = "Todos";
+  if (!ordenes.includes(filterState.orden)) filterState.orden = "Recomendados";
+
   const marcaCounts = new Map();
   const generoCounts = new Map();
   available.forEach((w) => {
@@ -150,28 +161,46 @@ function renderFilters() {
     generoCounts.set(w.genero, (generoCounts.get(w.genero) || 0) + 1);
   });
 
-  renderFilterGroup(
-    "filter-brand",
-    "marca",
-    "Todas",
-    [...new Set(available.map((w) => w.marca))],
-    (value) => (value === "Todas" ? available.length : marcaCounts.get(value))
-  );
-  renderFilterGroup(
-    "filter-gender",
-    "genero",
-    "Todos",
-    [...new Set(available.map((w) => w.genero))],
-    (value) => (value === "Todos" ? available.length : generoCounts.get(value))
-  );
-  renderFilterGroup("filter-sort", "orden", "Recomendados", ["Precio: menor a mayor", "Precio: mayor a menor"]);
+  renderFilterGroup("filter-brand", "marca", "Todas", marcas, (value) => (value === "Todas" ? available.length : marcaCounts.get(value)));
+  renderFilterGroup("filter-gender", "genero", "Todos", generos, (value) => (value === "Todos" ? available.length : generoCounts.get(value)));
+  renderFilterGroup("filter-sort", "orden", "Recomendados", ordenes);
+}
+
+/**
+ * Guarda los filtros actuales en la URL (?marca=...&genero=...&q=...&orden=...)
+ * para que un catálogo filtrado se pueda compartir o recargar tal cual --
+ * usa replaceState (no pushState) para no llenar el historial del navegador
+ * con una entrada por cada letra escrita en el buscador.
+ */
+function syncFiltersToUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const setOrClear = (key, value, defaultValue) => {
+    if (value && value !== defaultValue) params.set(key, value);
+    else params.delete(key);
+  };
+  setOrClear("marca", filterState.marca, "Todas");
+  setOrClear("genero", filterState.genero, "Todos");
+  setOrClear("q", filterState.busqueda, "");
+  setOrClear("orden", filterState.orden, "Recomendados");
+  const query = params.toString();
+  history.replaceState(null, "", window.location.pathname + (query ? `?${query}` : "") + window.location.hash);
+}
+
+function parseFiltersFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("marca")) filterState.marca = params.get("marca");
+  if (params.has("genero")) filterState.genero = params.get("genero");
+  if (params.has("q")) filterState.busqueda = params.get("q");
+  if (params.has("orden")) filterState.orden = params.get("orden");
 }
 
 function initSearch() {
   const input = document.getElementById("catalog-search");
+  input.value = filterState.busqueda;
   input.addEventListener("input", () => {
     filterState.busqueda = input.value;
     renderCatalog();
+    syncFiltersToUrl();
   });
 
   document.getElementById("catalog-clear-filters").addEventListener("click", () => {
@@ -182,6 +211,7 @@ function initSearch() {
     input.value = "";
     renderFilters();
     renderCatalog();
+    syncFiltersToUrl();
   });
 }
 
