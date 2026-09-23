@@ -6,6 +6,37 @@
 
 const STORAGE_KEY = "altitude_orders_v1";
 const ORDER_STATUSES = ["Pendiente", "Confirmado", "Enviado", "Entregado", "Cancelado"];
+const ACTIVE_ESTADOS = ["Confirmado", "Enviado", "Entregado"];
+
+/**
+ * Cada reloj del catálogo es una pieza única (no hay stock por
+ * referencia) -- si dos pedidos distintos quedan "activos" (Confirmado,
+ * Enviado o Entregado) para la misma referencia al mismo tiempo, casi
+ * seguro uno de los dos está mal: vendido dos veces por error, o al otro
+ * pedido le falta cancelarse. `candidate` no necesita existir todavía en
+ * `orders` (se usa también para validar un pedido antes de guardarlo).
+ */
+function findConflictingOrder(orders, candidate) {
+  if (!ACTIVE_ESTADOS.includes(candidate.estado)) return null;
+  const ref = extractRefCode(candidate.reloj);
+  if (!ref) return null;
+  return (
+    orders.find(
+      (o) => o.id !== candidate.id && ACTIVE_ESTADOS.includes(o.estado) && extractRefCode(o.reloj) === ref
+    ) || null
+  );
+}
+
+async function confirmSaleConflict(conflict, reloj) {
+  const ref = extractRefCode(reloj) || "Este reloj";
+  return confirmDialog({
+    title: "Este reloj ya está en otro pedido activo",
+    message: `${ref} ya figura como ${conflict.estado} en el pedido de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Como cada reloj es una pieza única, esto suele significar una venta duplicada -- revisa si el otro pedido debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`,
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
 
 function calcGanancia(order) {
   return order.costo != null && order.costo !== "" ? Number(order.precio) - Number(order.costo) : null;
@@ -126,7 +157,7 @@ function initOrderForm() {
     exitEditMode();
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const values = {
       fecha: document.getElementById("order-fecha").value,
@@ -145,6 +176,10 @@ function initOrderForm() {
     };
 
     const orders = loadOrders();
+
+    const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
+    if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
+
     let savedOrder = null;
     let justBecameEntregado = false;
 
@@ -303,11 +338,18 @@ function renderOrders() {
       if (status === order.estado) opt.selected = true;
       estadoSelect.appendChild(opt);
     });
-    estadoSelect.addEventListener("change", () => {
+    estadoSelect.addEventListener("change", async () => {
       const nuevoEstado = estadoSelect.value;
       const orders = loadOrders();
       const idx = orders.findIndex((o) => o.id === order.id);
       if (idx === -1) return;
+
+      const conflict = findConflictingOrder(orders, { id: order.id, reloj: order.reloj, estado: nuevoEstado });
+      if (conflict && !(await confirmSaleConflict(conflict, order.reloj))) {
+        estadoSelect.value = order.estado;
+        return;
+      }
+
       const wasEntregado = orders[idx].estado === "Entregado";
       orders[idx] = { ...orders[idx], estado: nuevoEstado };
       if (!saveOrders(orders)) {

@@ -142,6 +142,20 @@
   margin-top: 2px;
 }
 
+.availability-alert--danger {
+  background: rgba(229, 114, 108, 0.08);
+  border-color: #6b2420;
+}
+
+.availability-alert--danger .availability-alert__header svg,
+.availability-alert--danger h2 {
+  color: #e5726c;
+}
+
+.availability-alert--danger .availability-alert__list {
+  border-top-color: #6b2420;
+}
+
 /* ============ ADMIN LAYOUT ============ */
 .admin-main {
   padding: 40px 24px 80px;
