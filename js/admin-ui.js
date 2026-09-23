@@ -1,21 +1,9 @@
 /**
- * Piezas de interfaz reutilizables del panel: notificaciones (toast) y
- * un diálogo de confirmación con el estilo del sitio, para no usar las
- * ventanas grises por defecto del navegador (alert/confirm).
+ * Piezas de interfaz reutilizables del panel: un diálogo de
+ * confirmación con el estilo del sitio, para no usar las ventanas
+ * grises por defecto del navegador (confirm). El toast (showToast)
+ * vive en js/utils.js porque también lo usa la página pública.
  */
-
-function showToast(message, type = "success") {
-  const container = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-  toast.className = `toast toast--${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add("is-visible"));
-  setTimeout(() => {
-    toast.classList.remove("is-visible");
-    setTimeout(() => toast.remove(), 250);
-  }, 3000);
-}
 
 function initConfirmDialog() {
   const modal = document.getElementById("confirm-dialog");

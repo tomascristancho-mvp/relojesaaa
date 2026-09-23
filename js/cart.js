@@ -3,6 +3,8 @@
  * detalle, y pedirlos todos juntos con un solo mensaje de WhatsApp que
  * lista cada reloj y el total. Se guarda con localStorage en el
  * navegador de quien visita, no se comparte entre dispositivos.
+ * Cada vez que se agrega o quita un reloj aparece un toast (js/utils.js)
+ * confirmándolo, sin interrumpir la navegación.
  */
 
 const CART_KEY = "altitude_cart";
@@ -26,10 +28,15 @@ function isInCart(referencia) {
 function toggleCartItem(referencia) {
   const cart = getCart();
   const idx = cart.indexOf(referencia);
-  if (idx === -1) cart.push(referencia);
+  const adding = idx === -1;
+  if (adding) cart.push(referencia);
   else cart.splice(idx, 1);
   saveCart(cart);
   updateCartBadge();
+  const watch = WATCHES.find((w) => w.referencia === referencia);
+  if (watch) {
+    showToast(adding ? `${watch.nombre} agregado al carrito` : `${watch.nombre} quitado del carrito`);
+  }
   return cart.includes(referencia);
 }
 

@@ -1,8 +1,10 @@
 /**
  * Utilidades compartidas entre la página pública (catalog.js, watch-modal.js,
  * site.js) y el panel privado (admin-*.js): formato de moneda y precio,
- * texto seguro para HTML, y construcción de enlaces de WhatsApp y de
- * enlaces para compartir un reloj puntual (?reloj=REF-01).
+ * texto seguro para HTML, construcción de enlaces de WhatsApp y de
+ * enlaces para compartir un reloj puntual (?reloj=REF-01), y las
+ * notificaciones tipo "toast" (requieren un <div id="toast-container">
+ * en la página, ver index.html/admin.html).
  * Se carga antes que cualquier otro script propio en ambas páginas.
  */
 
@@ -52,4 +54,17 @@ function buildGeneralWhatsAppLink() {
 
 function buildWatchShareUrl(watch) {
   return `${window.location.origin}${window.location.pathname}?reloj=${encodeURIComponent(watch.referencia)}`;
+}
+
+function showToast(message, type = "success") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `toast toast--${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
+  setTimeout(() => {
+    toast.classList.remove("is-visible");
+    setTimeout(() => toast.remove(), 250);
+  }, 3000);
 }
