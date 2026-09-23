@@ -186,6 +186,8 @@ function renderOrders() {
     ? `No incluye ${ordersWithoutCosto} pedido(s) sin costo registrado`
     : "";
   document.getElementById("stat-pending").textContent = orders.filter((o) => o.estado === "Pendiente").length;
+
+  if (typeof renderCharts === "function") renderCharts();
 }
 
 /* ============ DETALLE DE UN PEDIDO ============ */

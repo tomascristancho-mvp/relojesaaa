@@ -68,6 +68,28 @@
         </div>
       </section>
 
+      <section id="admin-charts" class="admin-panel admin-charts">
+        <h2>Analítica</h2>
+        <div class="charts-grid">
+          <div class="chart-card chart-card--wide">
+            <h3>Ventas y ganancia (últimos 6 meses)</h3>
+            <div id="chart-monthly" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Pedidos por estado</h3>
+            <div id="chart-status" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Relojes más vendidos</h3>
+            <div id="chart-top-watches" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Ventas por encargado</h3>
+            <div id="chart-vendedores" class="chart-body"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="admin-panel">
         <h2>Nuevo pedido</h2>
         <form id="order-form" class="order-form">
@@ -215,6 +237,7 @@
   <script src="js/utils.js"></script>
   <script src="js/admin-ui.js"></script>
   <script src="js/admin-orders.js"></script>
+  <script src="js/admin-charts.js"></script>
   <script src="js/admin-csv.js"></script>
   <script src="js/admin-sales-detail.js"></script>
   <script src="js/admin-auth.js"></script>
