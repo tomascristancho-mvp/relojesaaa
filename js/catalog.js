@@ -76,6 +76,7 @@ function getFilteredWatches() {
   const query = filterState.busqueda.trim().toLowerCase();
   return WATCHES.filter(
     (w) =>
+      w.disponible !== false &&
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
       (filterState.genero === "Todos" || w.genero === filterState.genero) &&
       (!query ||
@@ -94,11 +95,12 @@ function renderCatalog() {
   emptyEl.hidden = items.length !== 0;
   emptyEl.textContent = "No hay relojes con esos filtros todavía.";
 
+  const availableCount = WATCHES.filter((w) => w.disponible !== false).length;
   const countEl = document.getElementById("catalog-count");
   countEl.textContent =
-    items.length === WATCHES.length
-      ? `${WATCHES.length} relojes disponibles`
-      : `Mostrando ${items.length} de ${WATCHES.length} relojes`;
+    items.length === availableCount
+      ? `${availableCount} relojes disponibles`
+      : `Mostrando ${items.length} de ${availableCount} relojes`;
 }
 
 function renderFilterGroup(containerId, key, allLabel, values) {
@@ -120,8 +122,9 @@ function renderFilterGroup(containerId, key, allLabel, values) {
 }
 
 function renderFilters() {
-  renderFilterGroup("filter-brand", "marca", "Todas", [...new Set(WATCHES.map((w) => w.marca))]);
-  renderFilterGroup("filter-gender", "genero", "Todos", [...new Set(WATCHES.map((w) => w.genero))]);
+  const available = WATCHES.filter((w) => w.disponible !== false);
+  renderFilterGroup("filter-brand", "marca", "Todas", [...new Set(available.map((w) => w.marca))]);
+  renderFilterGroup("filter-gender", "genero", "Todos", [...new Set(available.map((w) => w.genero))]);
 }
 
 function initSearch() {

@@ -74,6 +74,74 @@
   color: var(--accent-soft);
 }
 
+/* ============ AVAILABILITY ALERT ============ */
+.availability-alert {
+  background: rgba(224, 179, 77, 0.08);
+  border: 1px solid #6b5420;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.availability-alert[hidden] {
+  display: none;
+}
+
+.availability-alert__header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.availability-alert__header svg {
+  width: 24px;
+  height: 24px;
+  color: #e0b34d;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.availability-alert h2 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: #e0b34d;
+  margin-bottom: 6px;
+}
+
+.availability-alert p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.availability-alert code {
+  color: var(--accent-soft);
+  background: var(--bg-elevated);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.82em;
+}
+
+.availability-alert__list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid #6b5420;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.availability-alert__list li {
+  font-size: 0.88rem;
+}
+
+.availability-alert__meta {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
 /* ============ ADMIN LAYOUT ============ */
 .admin-main {
   padding: 40px 24px 80px;

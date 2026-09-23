@@ -82,7 +82,7 @@ function initYear() {
 function openWatchFromUrl() {
   const ref = new URLSearchParams(window.location.search).get("reloj");
   if (!ref) return;
-  const watch = WATCHES.find((w) => w.referencia.toLowerCase() === ref.toLowerCase());
+  const watch = WATCHES.find((w) => w.referencia.toLowerCase() === ref.toLowerCase() && w.disponible !== false);
   if (watch) openModal(watch);
 }
 

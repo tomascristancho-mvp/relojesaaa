@@ -90,6 +90,39 @@ por ese código.
 Recomendación: fotos cuadradas (1:1) y con buena luz se ven mejor en las tarjetas
 del catálogo, pero el sitio funciona con cualquier proporción.
 
+### Marcar un reloj como agotado
+
+El panel de pedidos (`admin.html`) guarda todo en el navegador donde lo
+usas (`localStorage`) — **no está conectado con la página pública**. Eso
+significa que registrar un pedido ahí no puede, por sí solo, ocultar
+automáticamente ese reloj para el resto de tus clientes: la página pública
+es un archivo estático (`js/data.js`) que solo cambia cuando lo editas y
+vuelves a publicar el sitio.
+
+Cuando una venta ya esté **100% concretada** (el reloj entregado y no te
+queda más stock de esa referencia), agrega `disponible: false` a ese reloj
+en `js/data.js`:
+
+```js
+{
+  id: 1,
+  referencia: "REF-01",
+  // ...el resto de los campos igual...
+  disponible: false, // deja de aparecer en el catálogo público
+},
+```
+
+Al publicar el cambio, esa referencia deja de aparecer en el catálogo, en
+la búsqueda y en enlaces compartidos (aunque alguien ya tenga el link
+guardado). No borra sus datos: puedes quitar la línea (o ponerla en
+`true`) cuando vuelvas a tener stock.
+
+Para que no se te pase ninguna, el panel de pedidos avisa arriba de todo
+cuando detecta una referencia que ya marcaste como "Entregado" pero que el
+catálogo público todavía muestra como disponible. Si quieres, en vez de
+editar el archivo tú mismo, puedes simplemente pedirme (a Claude) que
+marque esa referencia como agotada la próxima vez que hablemos.
+
 ### Importante: solo describe características reales
 
 En `descripcion`, escribe únicamente características que el reloj realmente

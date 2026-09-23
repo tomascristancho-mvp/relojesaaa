@@ -235,6 +235,7 @@ function renderOrders() {
   document.getElementById("stat-pending").textContent = allOrders.filter((o) => o.estado === "Pendiente").length;
 
   if (typeof renderCharts === "function") renderCharts();
+  if (typeof renderAvailabilityAlerts === "function") renderAvailabilityAlerts();
 }
 
 /* ============ DETALLE DE UN PEDIDO ============ */

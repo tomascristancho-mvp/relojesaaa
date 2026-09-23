@@ -32,6 +32,14 @@ const CONFIG = {
  * - genero: "Hombre", "Mujer" o "Unisex". Se usa para el filtro "Género".
  * - precio: número en pesos colombianos (ej: 70000) o null si prefieres "Escríbenos por el precio".
  * - imagen: ruta al archivo de la foto (ej: "images/watches/reloj-01.jpg").
+ * - disponible (opcional): pon `disponible: false` para que ese reloj deje
+ *   de aparecer en la página pública (catálogo, búsqueda y enlaces
+ *   compartidos) sin borrar sus datos. Si no lo agregas, se asume
+ *   disponible: true. Úsalo solo cuando una venta ya esté 100% concretada
+ *   (ver "Marcar un reloj como agotado" en el README) -- el panel de
+ *   pedidos NO actualiza esto por sí solo, porque los pedidos que guardas
+ *   ahí viven únicamente en el navegador donde los registraste, no están
+ *   conectados con esta página pública.
  */
 const WATCHES = [
   {
