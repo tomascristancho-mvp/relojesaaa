@@ -294,14 +294,22 @@ function initOrderForm() {
 
       if (editingOrderId) {
         const idx = orders.findIndex((o) => o.id === editingOrderId);
-        if (idx !== -1) {
-          const wasEntregado = orders[idx].estado === "Entregado";
-          orders[idx] = { ...orders[idx], ...values };
-          if (!saveOrders(orders)) return;
-          savedOrder = orders[idx];
-          showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
-          justBecameEntregado = !wasEntregado && values.estado === "Entregado";
+        if (idx === -1) {
+          // El pedido que se estaba editando ya no existe (por ejemplo, se
+          // borró desde otra pestaña abierta en este mismo navegador). Sin
+          // este aviso, el formulario se limpiaría como si hubiera guardado
+          // y los cambios escritos se perderían en silencio.
+          showToast("Este pedido ya no existe (¿se borró en otra pestaña?). No se guardaron los cambios.", "error");
+          renderOrders();
+          exitEditMode();
+          return;
         }
+        const wasEntregado = orders[idx].estado === "Entregado";
+        orders[idx] = { ...orders[idx], ...values };
+        if (!saveOrders(orders)) return;
+        savedOrder = orders[idx];
+        showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
+        justBecameEntregado = !wasEntregado && values.estado === "Entregado";
       } else {
         const newOrder = {
           id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -454,7 +462,14 @@ function renderOrders() {
       const nuevoEstado = estadoSelect.value;
       const orders = loadOrders();
       const idx = orders.findIndex((o) => o.id === order.id);
-      if (idx === -1) return;
+      if (idx === -1) {
+        // El pedido ya no existe (por ejemplo, se borró desde otra pestaña
+        // abierta en este mismo navegador) -- refresca la tabla en vez de
+        // dejar el selector mostrando un cambio que en realidad no se guardó.
+        showToast("Este pedido ya no existe (¿se borró en otra pestaña?). No se guardó el cambio.", "error");
+        renderOrders();
+        return;
+      }
 
       const conflict = findConflictingOrder(orders, { id: order.id, reloj: order.reloj, estado: nuevoEstado });
       if (conflict && !(await confirmSaleConflict(conflict, order.reloj))) {
