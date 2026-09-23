@@ -116,6 +116,15 @@ function isPlainInteger(str) {
  * precio/costo corrupto sin que nadie se entere.
  */
 function validateCsvRow(r, rowNumber) {
+  // El gráfico mensual arma la fecha como `new Date(fecha + "T00:00:00")`,
+  // que solo funciona con el formato AAAA-MM-DD exacto que usa el
+  // formulario -- si Excel reformatea la columna al guardar (por ejemplo a
+  // "15/09/2026"), esa fecha queda como "Invalid Date" sin ningún aviso.
+  const fechaRaw = (r[0] || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaRaw)) {
+    return `Fila ${rowNumber}: fecha "${fechaRaw || "vacía"}" no tiene el formato AAAA-MM-DD (¿Excel la reformateó al guardar?).`;
+  }
+
   const estadoRaw = (r[12] || "").trim();
   if (estadoRaw && !ORDER_STATUSES.includes(estadoRaw)) {
     return `Fila ${rowNumber}: estado "${estadoRaw}" no reconocido (valores válidos: ${ORDER_STATUSES.join(", ")}).`;
