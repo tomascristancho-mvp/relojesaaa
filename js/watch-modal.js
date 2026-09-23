@@ -1,6 +1,7 @@
 /**
- * Modal de detalle de un reloj: abrir/cerrar, la lupa de zoom que sigue
- * el mouse, el botón de compartir (enlace directo a ese reloj vía
+ * Modal de detalle de un reloj: abrir/cerrar, la lupa de zoom (acerca la
+ * misma imagen sobre el mouse o con el botón -- nunca abre ni descarga
+ * nada aparte), el botón de compartir (enlace directo a ese reloj vía
  * ?reloj=REF-01), y las flechas para pasar al reloj anterior/siguiente
  * dentro de los filtros actuales (también con las flechas ← → del
  * teclado).
@@ -17,7 +18,7 @@ function openModal(watch) {
   document.getElementById("modal-price").textContent = formatPrice(watch.precio);
   document.getElementById("modal-desc").textContent = watch.descripcion;
   document.getElementById("modal-whatsapp").href = buildWhatsAppLink(watch);
-  document.getElementById("modal-zoom").href = img;
+  setImageZoomed(false);
 
   const cartBtn = document.getElementById("modal-cart");
   cartBtn.dataset.ref = watch.referencia;
@@ -90,6 +91,7 @@ function initModal() {
     if (e.target === modal) modal.close();
   });
   document.getElementById("modal-close").addEventListener("click", () => modal.close());
+  document.getElementById("modal-back").addEventListener("click", () => modal.close());
   modal.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") {
       const btn = document.getElementById("modal-prev");
@@ -99,6 +101,21 @@ function initModal() {
       if (!btn.hidden) btn.click();
     }
   });
+}
+
+/**
+ * Acerca la foto sobre la parte que se señala -- con el mouse (sigue el
+ * cursor mientras pasa por encima) o tocando la lupa (útil en celular,
+ * donde no existe el "hover"). Nunca navega a otra página ni ofrece
+ * descargar la imagen: solo hace zoom dentro del mismo modal.
+ */
+function setImageZoomed(zoomed) {
+  const wrap = document.querySelector(".modal__img-wrap");
+  const zoomBtn = document.getElementById("modal-zoom");
+  wrap.classList.toggle("is-zoomed", zoomed);
+  zoomBtn.classList.toggle("is-active", zoomed);
+  zoomBtn.setAttribute("aria-pressed", String(zoomed));
+  if (!zoomed) document.getElementById("modal-img").style.transformOrigin = "center";
 }
 
 function initImageZoom() {
@@ -112,5 +129,9 @@ function initImageZoom() {
   });
   wrap.addEventListener("mouseleave", () => {
     img.style.transformOrigin = "center";
+  });
+
+  document.getElementById("modal-zoom").addEventListener("click", () => {
+    setImageZoomed(!wrap.classList.contains("is-zoomed"));
   });
 }

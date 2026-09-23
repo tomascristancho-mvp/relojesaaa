@@ -919,7 +919,8 @@ section[id] {
   transition: transform 0.3s ease;
 }
 
-.modal__img-wrap:hover .modal__img {
+.modal__img-wrap:hover .modal__img,
+.modal__img-wrap.is-zoomed .modal__img {
   transform: scale(2.1);
 }
 
@@ -936,7 +937,9 @@ section[id] {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   z-index: 2;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .modal__zoom-btn svg {
@@ -944,7 +947,8 @@ section[id] {
   height: 17px;
 }
 
-.modal__zoom-btn:hover {
+.modal__zoom-btn:hover,
+.modal__zoom-btn.is-active {
   background: rgba(0, 0, 0, 0.75);
   border-color: var(--accent);
   color: var(--accent-soft);
@@ -1090,6 +1094,33 @@ section[id] {
 }
 
 .modal__close:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal__back {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: var(--text);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s ease;
+}
+
+.modal__back svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal__back:hover {
   background: rgba(0, 0, 0, 0.6);
 }
 
