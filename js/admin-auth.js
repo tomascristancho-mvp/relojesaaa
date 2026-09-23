@@ -55,7 +55,10 @@ function initAdminApp() {
   initConfirmDialog();
   renderOrders();
 
-  document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
+  // También deja el formulario en su estado "limpio" inicial (fecha de
+  // hoy, estado Pendiente) y fija ese punto de partida para detectar
+  // cambios sin guardar.
+  exitEditMode();
 }
 
 document.addEventListener("DOMContentLoaded", initLock);

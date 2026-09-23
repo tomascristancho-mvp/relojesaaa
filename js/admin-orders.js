@@ -128,7 +128,37 @@ function fillOrderForm(order) {
   document.getElementById("order-costo").dataset.touched = "true";
 }
 
-function startEditOrder(order) {
+/* ============ CAMBIOS SIN GUARDAR ============ */
+// Evita perder en silencio lo que se está escribiendo: si el formulario
+// tiene cambios sin guardar (un pedido nuevo a medio llenar, o una edición
+// a medio corregir) y el usuario intenta cancelar o saltar a editar otro
+// pedido, se le pregunta antes de descartarlos.
+let formRestSnapshot = null;
+
+function getFormSnapshot() {
+  return JSON.stringify(
+    ["fecha", "nombre", "cedula", "telefono", "correo", "lugar", "reloj", "pago", "precio", "costo", "vendedor", "estado", "notas"].map(
+      (field) => document.getElementById(`order-${field}`).value
+    )
+  );
+}
+
+function isFormDirty() {
+  return formRestSnapshot !== null && getFormSnapshot() !== formRestSnapshot;
+}
+
+async function confirmDiscardChanges() {
+  return confirmDialog({
+    title: "Tienes cambios sin guardar",
+    message: "Lo que escribiste en el formulario todavía no se ha guardado. ¿Quieres descartarlo?",
+    confirmLabel: "Descartar cambios",
+    cancelLabel: "Seguir editando",
+    danger: true,
+  });
+}
+
+async function startEditOrder(order) {
+  if (isFormDirty() && !(await confirmDiscardChanges())) return;
   editingOrderId = order.id;
   fillOrderForm(order);
   document.getElementById("order-form-title").textContent = `Editando pedido de ${order.nombre || "este cliente"}`;
@@ -136,6 +166,7 @@ function startEditOrder(order) {
   document.getElementById("order-form-cancel").hidden = false;
   document.getElementById("order-form").scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("order-nombre").focus();
+  formRestSnapshot = getFormSnapshot();
 }
 
 function exitEditMode() {
@@ -148,12 +179,14 @@ function exitEditMode() {
   document.getElementById("order-estado").value = "Pendiente";
   document.getElementById("order-precio").dataset.touched = "false";
   document.getElementById("order-costo").dataset.touched = "false";
+  formRestSnapshot = getFormSnapshot();
 }
 
 function initOrderForm() {
   const form = document.getElementById("order-form");
 
-  document.getElementById("order-form-cancel").addEventListener("click", () => {
+  document.getElementById("order-form-cancel").addEventListener("click", async () => {
+    if (isFormDirty() && !(await confirmDiscardChanges())) return;
     exitEditMode();
   });
 
