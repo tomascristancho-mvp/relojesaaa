@@ -106,9 +106,52 @@ function initOrderForm() {
   });
 }
 
+/* ============ FILTRO DE LA TABLA ============ */
+const ordersFilterState = { busqueda: "", estado: "Todos" };
+
+function getFilteredOrders(orders) {
+  const query = ordersFilterState.busqueda.trim().toLowerCase();
+  return orders.filter(
+    (o) =>
+      (ordersFilterState.estado === "Todos" || o.estado === ordersFilterState.estado) &&
+      (!query ||
+        (o.nombre || "").toLowerCase().includes(query) ||
+        (o.reloj || "").toLowerCase().includes(query) ||
+        (o.cedula || "").toLowerCase().includes(query) ||
+        (o.vendedor || "").toLowerCase().includes(query))
+  );
+}
+
+function initOrdersFilter() {
+  const input = document.getElementById("orders-search");
+  const chipsContainer = document.getElementById("orders-status-filter");
+  const statuses = ["Todos", "Pendiente", "Confirmado", "Enviado", "Entregado", "Cancelado"];
+
+  input.addEventListener("input", () => {
+    ordersFilterState.busqueda = input.value;
+    renderOrders();
+  });
+
+  chipsContainer.innerHTML = "";
+  statuses.forEach((status, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.textContent = status;
+    btn.addEventListener("click", () => {
+      chipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.estado = status;
+      renderOrders();
+    });
+    chipsContainer.appendChild(btn);
+  });
+}
+
 /* ============ TABLA Y ESTADÍSTICAS ============ */
 function renderOrders() {
-  const orders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const allOrders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const orders = getFilteredOrders(allOrders);
   const tbody = document.getElementById("orders-tbody");
   tbody.innerHTML = "";
 
@@ -169,11 +212,15 @@ function renderOrders() {
     tbody.appendChild(tr);
   });
 
+  const isFiltered = ordersFilterState.busqueda.trim() !== "" || ordersFilterState.estado !== "Todos";
   document.getElementById("orders-empty").hidden = orders.length !== 0;
+  document.getElementById("orders-empty").textContent =
+    orders.length === 0 && allOrders.length > 0 ? "Ningún pedido coincide con ese filtro." : "Aún no has registrado pedidos.";
   document.getElementById("orders-table").hidden = orders.length === 0;
+  document.getElementById("orders-count").textContent = isFiltered ? `Mostrando ${orders.length} de ${allOrders.length}` : "";
 
-  document.getElementById("stat-total").textContent = orders.length;
-  const soldOrders = orders.filter((o) => o.estado !== "Cancelado");
+  document.getElementById("stat-total").textContent = allOrders.length;
+  const soldOrders = allOrders.filter((o) => o.estado !== "Cancelado");
   const revenue = soldOrders.reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
   document.getElementById("stat-revenue").textContent = formatCOP(revenue);
   const profit = soldOrders.reduce((sum, o) => {
@@ -185,7 +232,7 @@ function renderOrders() {
   document.getElementById("stat-profit-note").textContent = ordersWithoutCosto
     ? `No incluye ${ordersWithoutCosto} pedido(s) sin costo registrado`
     : "";
-  document.getElementById("stat-pending").textContent = orders.filter((o) => o.estado === "Pendiente").length;
+  document.getElementById("stat-pending").textContent = allOrders.filter((o) => o.estado === "Pendiente").length;
 
   if (typeof renderCharts === "function") renderCharts();
 }

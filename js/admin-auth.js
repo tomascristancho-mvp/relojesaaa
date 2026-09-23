@@ -46,6 +46,7 @@ function initAdminApp() {
 
   populateRelojOptions();
   initOrderForm();
+  initOrdersFilter();
   initCsvActions();
   initDetailModal();
   initSalesDetailModal();

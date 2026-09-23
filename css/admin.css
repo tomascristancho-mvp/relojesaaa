@@ -464,6 +464,48 @@
   resize: vertical;
 }
 
+/* ============ ORDERS FILTER ============ */
+.orders-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.orders-search {
+  flex: 1;
+  min-width: 220px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+}
+
+.orders-search:focus {
+  border-color: var(--accent);
+}
+
+.orders-status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip--small {
+  padding: 6px 14px;
+  font-size: 0.78rem;
+}
+
+.orders-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 /* ============ TABLE ============ */
 .table-scroll {
   overflow-x: auto;
