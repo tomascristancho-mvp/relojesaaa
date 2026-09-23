@@ -99,6 +99,39 @@ function parseCsv(text) {
 }
 
 /**
+ * Precio y costo se exportan siempre como enteros sin puntos ni comas
+ * (String(60000) -> "60000"). Si Excel reformatea la columna con
+ * separador de miles al reabrir/guardar el archivo (por ejemplo
+ * "60.000"), Number("60.000") lo interpreta como 60 -- una pérdida de
+ * datos silenciosa que arruinaría todos los cálculos de ganancia. Por
+ * eso solo se acepta un entero "plano".
+ */
+function isPlainInteger(str) {
+  return /^\d+$/.test(str);
+}
+
+/**
+ * Valida una fila de datos del CSV antes de aceptarla, para que un
+ * archivo editado a mano en Excel no meta un estado inventado o un
+ * precio/costo corrupto sin que nadie se entere.
+ */
+function validateCsvRow(r, rowNumber) {
+  const estadoRaw = (r[12] || "").trim();
+  if (estadoRaw && !ORDER_STATUSES.includes(estadoRaw)) {
+    return `Fila ${rowNumber}: estado "${estadoRaw}" no reconocido (valores válidos: ${ORDER_STATUSES.join(", ")}).`;
+  }
+  const precioRaw = (r[9] || "").trim();
+  if (!isPlainInteger(precioRaw) || Number(precioRaw) <= 0) {
+    return `Fila ${rowNumber}: precio "${precioRaw || "vacío"}" no es un número entero válido (sin puntos, comas ni signos).`;
+  }
+  const costoRaw = (r[10] || "").trim();
+  if (costoRaw && !isPlainInteger(costoRaw)) {
+    return `Fila ${rowNumber}: costo "${costoRaw}" no es un número entero válido (sin puntos, comas ni signos).`;
+  }
+  return null;
+}
+
+/**
  * Los pedidos solo viven en el localStorage de este navegador -- sin
  * backup, un caché borrado o un cambio de equipo los pierde para
  * siempre. Este indicador recuerda cuándo fue el último CSV exportado.
@@ -185,6 +218,19 @@ function initCsvActions() {
       }
 
       const [, ...dataRows] = rows;
+
+      // Cada fila se valida antes de importar ninguna -- un solo estado
+      // inventado o un precio/costo corrupto (por ejemplo, reformateado
+      // por Excel con separador de miles) no debe colarse en silencio.
+      for (let i = 0; i < dataRows.length; i++) {
+        const issue = validateCsvRow(dataRows[i], i + 2); // +2: la fila 1 es el encabezado
+        if (issue) {
+          showToast(`${issue} No se importó nada -- corrige el archivo e intenta de nuevo.`, "error");
+          e.target.value = "";
+          return;
+        }
+      }
+
       const imported = dataRows.map((r) => ({
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         fecha: r[0] || "",
