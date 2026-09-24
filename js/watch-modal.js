@@ -36,7 +36,6 @@ function openModal(watch) {
 
   updateModalNav(watch);
   renderRelatedWatches(watch);
-  trackRecentlyViewed(watch.referencia);
 
   modal.showModal();
 }

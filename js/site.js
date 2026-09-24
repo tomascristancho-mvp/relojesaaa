@@ -110,15 +110,6 @@ function initScrollEffects() {
   scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
-function initHeroMosaic() {
-  document.querySelectorAll(".hero__mosaic-item").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const watch = WATCHES.find((w) => w.referencia === btn.dataset.ref && w.disponible !== false);
-      if (watch) openModal(watch);
-    });
-  });
-}
-
 function openWatchFromUrl() {
   const ref = new URLSearchParams(window.location.search).get("reloj");
   if (!ref) return;
@@ -160,14 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
   parseFiltersFromUrl();
   renderFilters();
   renderCatalog();
-  renderRecentlyViewed();
   initSearch();
   initCart();
   initCompare();
   initMobileNav();
   initModal();
   initImageZoom();
-  initHeroMosaic();
   initReveal();
   initYear();
   initScrollEffects();
