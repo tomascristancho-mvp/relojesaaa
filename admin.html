@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel privado — Altitude Watch Co.</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <div id="lock-screen" class="lock-screen">
+    <form id="lock-form" class="lock-card">
+      <svg class="brand__icon lock-card__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
+        <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
+      </svg>
+      <h1>Panel privado</h1>
+      <p>Solo para uso interno de Altitude Watch Co.</p>
+      <input type="password" id="lock-input" placeholder="Código de acceso" autocomplete="off" />
+      <button type="submit" class="btn btn--primary">Entrar</button>
+      <p id="lock-error" class="lock-error" hidden>Código incorrecto.</p>
+      <p class="lock-note">
+        Este código es solo un filtro básico, no seguridad real (ver
+        <code>js/admin-config.js</code>). No es un reemplazo de mantener este
+        link privado.
+      </p>
+    </form>
+  </div>
+
+  <div id="admin-app" class="admin-app" hidden>
+    <header class="site-header admin-header">
+      <div class="container site-header__inner">
+        <a href="index.html" class="brand">
+          <svg class="brand__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
+          </svg>
+          <span class="brand__name">Panel privado</span>
+        </a>
+        <button id="logout-btn" class="btn btn--ghost btn--small" type="button">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <main class="container admin-main">
+      <section id="conflict-alert" class="availability-alert availability-alert--danger" hidden>
+        <div class="availability-alert__header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>
+            <h2>Un mismo reloj aparece en más de un pedido activo</h2>
+            <p>
+              Cada reloj es una pieza única, así que dos pedidos con estado
+              Confirmado, Enviado o Entregado para la misma referencia casi
+              siempre significan una venta duplicada por error. Revisa cuál
+              de los dos pedidos está mal y cancélalo o corrígelo.
+            </p>
+          </div>
+        </div>
+        <ul id="conflict-alert-list" class="availability-alert__list"></ul>
+      </section>
+
+      <section id="availability-alert" class="availability-alert" hidden>
+        <div class="availability-alert__header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <h2>Relojes entregados que siguen visibles en la página pública</h2>
+            <p>
+              Estas referencias ya se entregaron (venta 100% concretada) pero el catálogo público
+              todavía las muestra como disponibles. El panel de pedidos no puede ocultarlas por sí
+              solo -- vive solo en este navegador, no está conectado con la página pública. Pídeme
+              que las marque como agotadas, o edita <code>js/data.js</code> y agrega
+              <code>disponible: false</code> a cada una.
+            </p>
+          </div>
+        </div>
+        <ul id="availability-alert-list" class="availability-alert__list"></ul>
+      </section>
+
+      <section id="stale-pending-alert" class="availability-alert" hidden>
+        <div class="availability-alert__header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div>
+            <h2>Pedidos pendientes hace varios días</h2>
+            <p>
+              Estos pedidos siguen en estado Pendiente desde hace tiempo -- puede
+              que el cliente esté esperando una respuesta. Haz clic en uno para
+              abrir su detalle y darle seguimiento.
+            </p>
+          </div>
+        </div>
+        <ul id="stale-pending-alert-list" class="availability-alert__list"></ul>
+      </section>
+
+      <section class="admin-stats">
+        <div class="stat-card">
+          <span class="stat-card__label">Pedidos totales</span>
+          <span id="stat-total" class="stat-card__value">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">Vendido (sin cancelados)</span>
+          <span id="stat-revenue" class="stat-card__value">$0</span>
+        </div>
+        <button type="button" id="stat-profit-card" class="stat-card stat-card--clickable">
+          <span class="stat-card__label">Ganancia total</span>
+          <span id="stat-profit" class="stat-card__value">$0</span>
+          <span id="stat-profit-note" class="stat-card__note"></span>
+          <span class="stat-card__hint">Ver detalle de ventas ›</span>
+        </button>
+        <div class="stat-card">
+          <span class="stat-card__label">Pendientes</span>
+          <span id="stat-pending" class="stat-card__value">0</span>
+        </div>
+      </section>
+
+      <section id="admin-charts" class="admin-panel admin-charts">
+        <h2>Analítica</h2>
+        <div class="charts-grid">
+          <div class="chart-card chart-card--wide">
+            <h3>Ventas y ganancia (últimos 6 meses)</h3>
+            <p id="chart-monthly-summary" class="chart-summary"></p>
+            <div id="chart-monthly" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Pedidos por estado</h3>
+            <div id="chart-status" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Marcas más vendidas</h3>
+            <div id="chart-top-brands" class="chart-body"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Ventas por encargado</h3>
+            <div id="chart-vendedores" class="chart-body"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <h2 id="order-form-title">Nuevo pedido</h2>
+        <form id="order-form" class="order-form">
+          <div class="order-form__grid">
+            <span class="order-form__section">Datos del cliente</span>
+            <label>
+              Fecha
+              <input type="date" id="order-fecha" required />
+            </label>
+            <label>
+              Nombre del cliente
+              <input type="text" id="order-nombre" placeholder="Nombre completo" required />
+            </label>
+            <label>
+              Cédula
+              <input type="text" id="order-cedula" placeholder="Número de cédula" required />
+            </label>
+            <label>
+              Teléfono
+              <input type="tel" id="order-telefono" placeholder="3001234567" required />
+            </label>
+            <label>
+              Correo (opcional)
+              <input type="email" id="order-correo" placeholder="correo@ejemplo.com" />
+            </label>
+            <label>
+              Lugar de entrega
+              <input type="text" id="order-lugar" placeholder="Ciudad y dirección" required />
+            </label>
+
+            <span class="order-form__section">Detalles de la venta</span>
+            <label class="order-form__wide">
+              Reloj
+              <input list="reloj-options" id="order-reloj" placeholder="Escribe o elige de la lista" required />
+              <datalist id="reloj-options"></datalist>
+            </label>
+            <label>
+              Medio de pago
+              <select id="order-pago" required>
+                <option value="">Selecciona...</option>
+                <option>Efectivo</option>
+                <option>Transferencia bancaria</option>
+                <option>Nequi</option>
+                <option>Daviplata</option>
+                <option>Otro</option>
+              </select>
+            </label>
+            <label>
+              Precio de venta (COP)
+              <input type="number" id="order-precio" placeholder="60000" min="0" step="1000" required />
+            </label>
+            <label>
+              Costo del reloj (COP)
+              <input type="number" id="order-costo" placeholder="Lo que te costó a ti" min="0" step="1000" />
+            </label>
+            <label>
+              Encargado de venta
+              <select id="order-vendedor" required>
+                <option value="">Selecciona...</option>
+                <option>Tomás</option>
+                <option>Falck</option>
+                <option>Condia</option>
+              </select>
+            </label>
+
+            <span class="order-form__section">Estado del pedido</span>
+            <label>
+              Estado
+              <select id="order-estado">
+                <option>Pendiente</option>
+                <option>Confirmado</option>
+                <option>Enviado</option>
+                <option>Entregado</option>
+                <option>Cancelado</option>
+              </select>
+            </label>
+            <label class="order-form__wide">
+              Notas (opcional)
+              <textarea id="order-notas" rows="2" placeholder="Cualquier detalle adicional del pedido"></textarea>
+            </label>
+          </div>
+          <div class="order-form__buttons">
+            <button type="submit" id="order-form-submit" class="btn btn--primary">Guardar pedido</button>
+            <button type="button" id="order-form-cancel" class="btn btn--ghost" hidden>Cancelar edición</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel__toolbar">
+          <h2>Pedidos registrados</h2>
+          <div class="admin-panel__actions">
+            <span id="backup-status" class="backup-status"></span>
+            <button id="export-csv" class="btn btn--ghost btn--small" type="button">Exportar a Excel (CSV)</button>
+            <label class="btn btn--ghost btn--small file-btn">
+              Importar CSV
+              <input type="file" id="import-csv" accept=".csv" hidden />
+            </label>
+          </div>
+        </div>
+        <div class="orders-filter">
+          <input type="search" id="orders-search" class="orders-search" placeholder="Buscar cliente, cédula o reloj..." aria-label="Buscar pedido" />
+          <div id="orders-status-filter" class="orders-status-filter"></div>
+          <div id="orders-date-filter" class="orders-status-filter"></div>
+          <span id="orders-count" class="orders-count"></span>
+        </div>
+        <div class="table-scroll">
+          <table id="orders-table" class="orders-table">
+            <thead>
+              <tr id="orders-thead-row">
+                <th data-sort="fecha">Fecha</th>
+                <th data-sort="nombre">Cliente</th>
+                <th>Encargado</th>
+                <th>Reloj</th>
+                <th>Medio de pago</th>
+                <th data-sort="precio">Precio</th>
+                <th data-sort="ganancia">Ganancia</th>
+                <th data-sort="estado">Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+        </div>
+        <p id="orders-empty" class="orders-empty" hidden>Aún no has registrado pedidos.</p>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="order-detail" class="modal admin-detail-modal">
+    <button id="detail-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <div id="detail-body" class="admin-detail-body"></div>
+  </dialog>
+
+  <dialog id="receipt-modal" class="modal receipt-modal">
+    <button id="receipt-close" class="modal__close no-print" aria-label="Cerrar">✕</button>
+    <div id="receipt-body" class="receipt-body"></div>
+    <button id="receipt-print-btn" class="btn btn--primary no-print" type="button">Imprimir / Guardar como PDF</button>
+  </dialog>
+
+  <dialog id="sales-detail" class="modal sales-detail-modal">
+    <button id="sales-detail-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <h3>Ventas con ganancia registrada</h3>
+    <p id="sales-detail-summary" class="sales-detail-summary"></p>
+    <div id="sales-list" class="sales-list"></div>
+  </dialog>
+
+  <dialog id="client-history" class="modal sales-detail-modal">
+    <button id="client-history-close" class="modal__close" aria-label="Cerrar">✕</button>
+    <h3 id="client-history-title">Historial del cliente</h3>
+    <p id="client-history-summary" class="sales-detail-summary"></p>
+    <div id="client-history-list" class="sales-list"></div>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="modal confirm-dialog">
+    <h3 id="confirm-dialog-title"></h3>
+    <p id="confirm-dialog-message"></p>
+    <div class="confirm-dialog__actions">
+      <button id="confirm-dialog-cancel" type="button" class="btn btn--ghost btn--small"></button>
+      <button id="confirm-dialog-ok" type="button" class="btn btn--primary btn--small"></button>
+    </div>
+  </dialog>
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/admin-config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/admin-ui.js"></script>
+  <script src="js/admin-orders.js"></script>
+  <script src="js/admin-charts.js"></script>
+  <script src="js/admin-availability.js"></script>
+  <script src="js/admin-receipt.js"></script>
+  <script src="js/admin-csv.js"></script>
+  <script src="js/admin-sales-detail.js"></script>
+  <script src="js/admin-client-history.js"></script>
+  <script src="js/admin-auth.js"></script>
+</body>
+</html>

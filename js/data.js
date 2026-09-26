@@ -4,14 +4,13 @@
  */
 const CONFIG = {
   // Nombre de tu marca (aparece en el logo, el título de la pestaña y los mensajes de WhatsApp)
-  businessName: "Tu Marca de Relojes",
+  businessName: "Altitude Watch Co.",
 
   // Frase corta que describe el negocio (aparece debajo del logo)
-  tagline: "Relojes para cada estilo",
+  tagline: "Relojes con altura.",
 
   // Tu número de WhatsApp en formato internacional SIN signos ni espacios.
-  // Ejemplo Colombia: 57 + tu número a 10 dígitos => "573001234567"
-  whatsappNumber: "573000000000",
+  whatsappNumber: "573027167144",
 
   // Ciudad donde estás ubicado
   city: "Bogotá",
@@ -20,145 +19,170 @@ const CONFIG = {
   instagram: "",
 
   // Correo de contacto (opcional). Déjalo vacío ("") si no quieres mostrarlo.
-  email: "",
+  email: "tomascristanchoo@gmail.com",
 };
 
 /**
  * CATÁLOGO DE RELOJES
- * Cada objeto es un reloj. Edita referencia, nombre, categoria, precio, descripcion
- * e imagen con tus datos reales.
+ * Cada objeto es un reloj. Edita marca, genero, precio, descripcion e imagen
+ * con tus datos reales.
  *
- * - precio: número en pesos colombianos (ej: 120000) o null si prefieres "Escríbenos por el precio".
+ * - referencia: código interno para identificar el reloj (no es el código de fábrica).
+ * - marca: se usa para el filtro "Marca".
+ * - genero: "Hombre", "Mujer" o "Unisex". Se usa para el filtro "Género".
+ * - precio: número en pesos colombianos (ej: 70000) o null si prefieres "Escríbenos por el precio".
  * - imagen: ruta al archivo de la foto (ej: "images/watches/reloj-01.jpg").
- *   Si lo dejas en null, se muestra una imagen de referencia temporal.
- * - categoria: úsala para los filtros del catálogo. Puedes usar las que ya existen
- *   (Clásico, Deportivo, Minimalista, Elegante) o crear las tuyas.
+ * - disponible (opcional): pon `disponible: false` para que ese reloj deje
+ *   de aparecer en la página pública (catálogo, búsqueda y enlaces
+ *   compartidos) sin borrar sus datos. Si no lo agregas, se asume
+ *   disponible: true. Úsalo solo cuando una venta ya esté 100% concretada
+ *   (ver "Marcar un reloj como agotado" en el README) -- el panel de
+ *   pedidos NO actualiza esto por sí solo, porque los pedidos que guardas
+ *   ahí viven únicamente en el navegador donde los registraste, no están
+ *   conectados con esta página pública.
  */
 const WATCHES = [
   {
     id: 1,
     referencia: "REF-01",
-    nombre: "Modelo Onix",
-    categoria: "Clásico",
-    precio: null,
-    descripcion: "Diseño atemporal con caja metálica y correa de cuero, ideal para uso diario y ocasiones formales.",
-    imagen: null,
+    marca: "Fossil",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Blanca",
+    precio: 60000,
+    descripcion: "Caja en acero negro, esfera blanca con numeración árabe y correa de silicona bien cómoda para todo el día. Un clásico que nunca falla, para la oficina o la calle.",
+    imagen: "images/watches/reloj-01.jpg",
   },
   {
     id: 2,
     referencia: "REF-02",
-    nombre: "Modelo Vértice",
-    categoria: "Deportivo",
-    precio: null,
-    descripcion: "Resistente al agua, correa de caucho y carátula de alto contraste para actividad física.",
-    imagen: null,
+    marca: "Q&Q",
+    genero: "Mujer",
+    nombre: "Mesh Plata Minimalista",
+    precio: 60000,
+    descripcion: "Caja pequeña en acero plateado, esfera negra y correa de malla milanesa que se ajusta solita a la muñeca. Minimalista y fácil de combinar, para el día a día.",
+    imagen: "images/watches/reloj-02.jpg",
   },
   {
     id: 3,
     referencia: "REF-03",
-    nombre: "Modelo Nórdico",
-    categoria: "Minimalista",
-    precio: null,
-    descripcion: "Líneas limpias, esfera simple y correa delgada. Pensado para quienes prefieren la sobriedad.",
-    imagen: null,
+    marca: "Tommy Hilfiger",
+    genero: "Mujer",
+    nombre: "Mesh Plata Cristales",
+    precio: 60000,
+    descripcion: "Esfera blanca con detalles en cristal y correa de malla milanesa plateada. Ese toque elegante y femenino que no se ve forzado en el día a día.",
+    imagen: "images/watches/reloj-03.jpg",
   },
   {
     id: 4,
     referencia: "REF-04",
-    nombre: "Modelo Aurora",
-    categoria: "Elegante",
-    precio: null,
-    descripcion: "Detalles dorados y carátula nacarada, perfecto para complementar looks de noche.",
-    imagen: null,
+    marca: "Diesel",
+    genero: "Hombre",
+    nombre: "Diver Esfera Crema",
+    precio: 65000,
+    descripcion: "Caja robusta con bisel giratorio negro, esfera crema y manecillas azules que le dan personalidad. Correa de caucho negro, con ese estilo deportivo tipo buceo.",
+    imagen: "images/watches/reloj-04.jpg",
   },
   {
     id: 5,
     referencia: "REF-05",
-    nombre: "Modelo Meridiano",
-    categoria: "Clásico",
-    precio: null,
-    descripcion: "Caja redonda de acero con subesferas funcionales, un básico que nunca pasa de moda.",
-    imagen: null,
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Bisel Dorado Octagonal",
+    precio: 60000,
+    descripcion: "Caja negra con bisel octagonal dorado y esfera texturizada, con calendario incluido. Llamativo sin pasarse -- mezcla lo deportivo con un toque elegante.",
+    imagen: "images/watches/reloj-05.jpg",
   },
+
   {
     id: 6,
     referencia: "REF-06",
-    nombre: "Modelo Pulso",
-    categoria: "Deportivo",
-    precio: null,
-    descripcion: "Cronógrafo digital con luz nocturna y correa ajustable, pensado para el día a día activo.",
-    imagen: null,
+    marca: "Q&Q",
+    genero: "Hombre",
+    nombre: "Deportivo Esfera Negra",
+    precio: 55000,
+    descripcion: "Caja y esfera en negro total, con numeración blanca y correa de caucho. Liviano y fácil de combinar, el reloj que te pones sin pensarlo mucho.",
+    imagen: "images/watches/reloj-06.jpg",
   },
   {
     id: 7,
     referencia: "REF-07",
-    nombre: "Modelo Lino",
-    categoria: "Minimalista",
-    precio: null,
-    descripcion: "Correa de malla milanesa y caja delgada, combina con cualquier atuendo sin esfuerzo.",
-    imagen: null,
+    marca: "Q&Q",
+    genero: "Mujer",
+    nombre: "Bracelet Perlado",
+    precio: 55000,
+    descripcion: "Esfera blanca nacarada con índices minimalistas y un brazalete metálico bien delgado en plata. Delicado sin ser exagerado, para cualquier día.",
+    imagen: "images/watches/reloj-07.jpg",
   },
   {
     id: 8,
     referencia: "REF-08",
-    nombre: "Modelo Cobre",
-    categoria: "Elegante",
-    precio: null,
-    descripcion: "Tonos cobrizos y bisel biselado, una pieza para destacar en cualquier reunión.",
-    imagen: null,
+    marca: "Q&Q",
+    genero: "Hombre",
+    nombre: "Clásico Calendario",
+    precio: 60000,
+    descripcion: "Caja plateada, esfera negra y un calendario que de verdad se usa. Brazalete metálico resistente -- clásico y versátil, sirve para todo.",
+    imagen: "images/watches/reloj-08.jpg",
   },
   {
     id: 9,
     referencia: "REF-09",
-    nombre: "Modelo Andes",
-    categoria: "Clásico",
-    precio: null,
-    descripcion: "Correa de cuero genuino y caja robusta, inspirado en los diseños de siempre.",
-    imagen: null,
+    marca: "Fossil",
+    genero: "Hombre",
+    nombre: "Diver Azul Medianoche",
+    precio: 65000,
+    descripcion: "Bisel giratorio numerado y esfera azul medianoche -- casi se ve negra hasta que le pega la luz y ahí sí se nota el azul. Correa de caucho negro, con ese toque deportivo tipo buceo.",
+    imagen: "images/watches/reloj-09.jpg",
   },
   {
     id: 10,
     referencia: "REF-10",
-    nombre: "Modelo Circuito",
-    categoria: "Deportivo",
-    precio: null,
-    descripcion: "Diseño técnico con indicadores de alto contraste, ideal para entrenamientos y outdoor.",
-    imagen: null,
+    marca: "Casio",
+    genero: "Unisex",
+    nombre: "Digital Retro Acero",
+    precio: 55000,
+    descripcion: "El digital de toda la vida: pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono que nunca pasa de moda.",
+    imagen: "images/watches/reloj-10.jpg",
+    disponible: false,
   },
+
   {
     id: 11,
     referencia: "REF-11",
-    nombre: "Modelo Bruma",
-    categoria: "Minimalista",
-    precio: null,
-    descripcion: "Esfera mate y correa de silicona, pensado para un uso cómodo durante todo el día.",
-    imagen: null,
+    marca: "Tommy Hilfiger",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Crema",
+    precio: 65000,
+    descripcion: "Caja negra con esfera crema, numeración árabe y correa de caucho. Un clásico con un toque cálido que se ve bien sin esforzarse.",
+    imagen: "images/watches/reloj-11.jpg",
   },
   {
     id: 12,
     referencia: "REF-12",
-    nombre: "Modelo Reina",
-    categoria: "Elegante",
-    precio: null,
-    descripcion: "Caja pequeña con incrustaciones brillantes, un diseño delicado para uso femenino.",
-    imagen: null,
+    marca: "Tissot",
+    genero: "Hombre",
+    nombre: "Cronógrafo Rosa y Azul",
+    precio: 65000,
+    descripcion: "Cronógrafo con esfera rosa, subesferas azules y bisel taquímetro -- para el que quiere un reloj que llame la atención. Brazalete metálico y calendario incluidos.",
+    imagen: "images/watches/reloj-12.jpg",
   },
   {
     id: 13,
     referencia: "REF-13",
-    nombre: "Modelo Roble",
-    categoria: "Clásico",
-    precio: null,
-    descripcion: "Combinación de correa café y detalles plateados, versátil para oficina y ciudad.",
-    imagen: null,
+    marca: "Casio",
+    genero: "Unisex",
+    nombre: "Digital Retro Dorado",
+    precio: 55000,
+    descripcion: "El mismo digital de siempre pero en dorado, con pantalla LCD, alarma y cronómetro. Ese brillito extra que le sube el nivel a cualquier look.",
+    imagen: "images/watches/reloj-13.jpg",
   },
   {
     id: 14,
     referencia: "REF-14",
-    nombre: "Modelo Nova",
-    categoria: "Deportivo",
-    precio: null,
-    descripcion: "Caja grande y correa deportiva, pensado para quienes buscan un estilo llamativo.",
-    imagen: null,
+    marca: "Tommy Hilfiger",
+    genero: "Mujer",
+    nombre: "Cristales Nácar",
+    precio: 65000,
+    descripcion: "Esfera blanca nacarada con detalles en cristal y brazalete plateado. Para esos días en que quieres verte arreglada sin complicarte.",
+    imagen: "images/watches/reloj-14.jpg",
   },
 ];

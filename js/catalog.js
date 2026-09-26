@@ -1,0 +1,216 @@
+/**
+ * Catálogo de la página pública: tarjetas de reloj, filtros (marca,
+ * género), búsqueda, el efecto de inclinación 3D y el fade-in de fotos.
+ * No necesitas tocar este archivo para actualizar tu catálogo: edita js/data.js
+ */
+
+const WHATSAPP_ICON = '<svg class="btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.13 2 11.22c0 1.96.63 3.78 1.72 5.27L2.4 21.02a.6.6 0 0 0 .74.75l4.7-1.4a10.6 10.6 0 0 0 4.16.84c5.52 0 10-4.13 10-9.22C22 6.13 17.52 2 12 2Z"/></svg>';
+const CART_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
+
+const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+const COMPARE_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>';
+
+function watchCard(watch) {
+  const img = watch.imagen || PLACEHOLDER_IMAGE;
+  const card = document.createElement("article");
+  card.className = "watch-card";
+  card.dataset.marca = watch.marca;
+  card.dataset.genero = watch.genero;
+  card.innerHTML = `
+    <button class="watch-card__compare${isInCompare(watch.referencia) ? " is-active" : ""}" type="button" data-ref="${watch.referencia}" aria-pressed="${isInCompare(watch.referencia)}" aria-label="Agregar a comparar">
+      ${COMPARE_ICON}
+    </button>
+    <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
+      <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
+      <span class="watch-card__view">Ver detalle</span>
+    </button>
+    <div class="watch-card__body">
+      <div class="watch-card__ref-row">
+        <span class="watch-card__ref">${watch.referencia}</span>
+        <span class="unique-badge" title="Es la única unidad disponible de este reloj">Pieza única</span>
+      </div>
+      <span class="watch-card__brand">${watch.marca}</span>
+      <h3 class="watch-card__title">${watch.nombre}</h3>
+      <p class="watch-card__price">${formatPrice(watch.precio)}</p>
+      <div class="watch-card__actions">
+        <a class="btn btn--whatsapp" href="${buildWhatsAppLink(watch)}" target="_blank" rel="noopener">
+          ${WHATSAPP_ICON}
+          Pedir por WhatsApp
+        </a>
+        <button class="btn btn--cart cart-add-btn${isInCart(watch.referencia) ? " is-active" : ""}" type="button" data-ref="${watch.referencia}" aria-pressed="${isInCart(watch.referencia)}">
+          ${CART_ICON}
+          <span class="cart-btn__label">${isInCart(watch.referencia) ? "En el carrito ✓" : "Agregar al carrito"}</span>
+        </button>
+      </div>
+    </div>
+  `;
+  card.querySelector(".watch-card__media").addEventListener("click", () => openModal(watch));
+  card.querySelector(".cart-add-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleCartItem(watch.referencia);
+    updateCartButton(e.currentTarget);
+  });
+  card.querySelector(".watch-card__compare").addEventListener("click", () => toggleCompare(watch.referencia));
+  initFadeImg(card.querySelector(".fade-img"));
+  initCardTilt(card);
+  return card;
+}
+
+function initCardTilt(card) {
+  if (!supportsHoverTilt) return;
+  card.addEventListener("mousemove", (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(700px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`;
+  });
+  card.addEventListener("mouseleave", () => {
+    card.style.transform = "";
+  });
+}
+
+function initFadeImg(img) {
+  if (img.complete) {
+    img.classList.add("is-loaded");
+  } else {
+    img.addEventListener("load", () => img.classList.add("is-loaded"));
+  }
+}
+
+const filterState = { marca: "Todas", genero: "Todos", busqueda: "", orden: "Recomendados" };
+
+function sortWatches(list) {
+  if (filterState.orden === "Precio: menor a mayor") {
+    return [...list].sort((a, b) => (a.precio ?? Infinity) - (b.precio ?? Infinity));
+  }
+  if (filterState.orden === "Precio: mayor a menor") {
+    return [...list].sort((a, b) => (b.precio ?? -Infinity) - (a.precio ?? -Infinity));
+  }
+  return list; // "Recomendados": el orden del catálogo tal como está en js/data.js
+}
+
+function getFilteredWatches() {
+  const query = filterState.busqueda.trim().toLowerCase();
+  const filtered = WATCHES.filter(
+    (w) =>
+      w.disponible !== false &&
+      (filterState.marca === "Todas" || w.marca === filterState.marca) &&
+      (filterState.genero === "Todos" || w.genero === filterState.genero) &&
+      (!query ||
+        w.referencia.toLowerCase().includes(query) ||
+        w.marca.toLowerCase().includes(query) ||
+        w.nombre.toLowerCase().includes(query))
+  );
+  return sortWatches(filtered);
+}
+
+function renderCatalog() {
+  const grid = document.getElementById("catalog-grid");
+  grid.innerHTML = "";
+  const items = getFilteredWatches();
+  items.forEach((watch) => grid.appendChild(watchCard(watch)));
+  document.getElementById("catalog-empty").hidden = items.length !== 0;
+
+  const availableCount = WATCHES.filter((w) => w.disponible !== false).length;
+  const countEl = document.getElementById("catalog-count");
+  countEl.textContent =
+    items.length === availableCount
+      ? `${availableCount} relojes disponibles`
+      : `Mostrando ${items.length} de ${availableCount} relojes`;
+}
+
+function renderFilterGroup(containerId, key, allLabel, values, getCount) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  [allLabel, ...values].forEach((value) => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (value === filterState[key] ? " chip--active" : "");
+    btn.textContent = getCount ? `${value} (${getCount(value)})` : value;
+    btn.type = "button";
+    btn.addEventListener("click", () => {
+      container.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      filterState[key] = value;
+      renderCatalog();
+      syncFiltersToUrl();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderFilters() {
+  const available = WATCHES.filter((w) => w.disponible !== false);
+
+  const marcas = [...new Set(available.map((w) => w.marca))];
+  const generos = [...new Set(available.map((w) => w.genero))];
+  const ordenes = ["Precio: menor a mayor", "Precio: mayor a menor"];
+  // Un enlace con un valor que ya no existe (una marca renombrada, un filtro
+  // viejo guardado en favoritos) vuelve al valor por defecto en vez de dejar
+  // la sección de filtros sin ningún chip marcado como activo.
+  if (!marcas.includes(filterState.marca)) filterState.marca = "Todas";
+  if (!generos.includes(filterState.genero)) filterState.genero = "Todos";
+  if (!ordenes.includes(filterState.orden)) filterState.orden = "Recomendados";
+
+  const marcaCounts = new Map();
+  const generoCounts = new Map();
+  available.forEach((w) => {
+    marcaCounts.set(w.marca, (marcaCounts.get(w.marca) || 0) + 1);
+    generoCounts.set(w.genero, (generoCounts.get(w.genero) || 0) + 1);
+  });
+
+  renderFilterGroup("filter-brand", "marca", "Todas", marcas, (value) => (value === "Todas" ? available.length : marcaCounts.get(value)));
+  renderFilterGroup("filter-gender", "genero", "Todos", generos, (value) => (value === "Todos" ? available.length : generoCounts.get(value)));
+  renderFilterGroup("filter-sort", "orden", "Recomendados", ordenes);
+}
+
+/**
+ * Guarda los filtros actuales en la URL (?marca=...&genero=...&q=...&orden=...)
+ * para que un catálogo filtrado se pueda compartir o recargar tal cual --
+ * usa replaceState (no pushState) para no llenar el historial del navegador
+ * con una entrada por cada letra escrita en el buscador.
+ */
+function syncFiltersToUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const setOrClear = (key, value, defaultValue) => {
+    if (value && value !== defaultValue) params.set(key, value);
+    else params.delete(key);
+  };
+  setOrClear("marca", filterState.marca, "Todas");
+  setOrClear("genero", filterState.genero, "Todos");
+  setOrClear("q", filterState.busqueda, "");
+  setOrClear("orden", filterState.orden, "Recomendados");
+  const query = params.toString();
+  history.replaceState(null, "", window.location.pathname + (query ? `?${query}` : "") + window.location.hash);
+}
+
+function parseFiltersFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("marca")) filterState.marca = params.get("marca");
+  if (params.has("genero")) filterState.genero = params.get("genero");
+  if (params.has("q")) filterState.busqueda = params.get("q");
+  if (params.has("orden")) filterState.orden = params.get("orden");
+}
+
+function initSearch() {
+  const input = document.getElementById("catalog-search");
+  input.value = filterState.busqueda;
+  input.addEventListener("input", () => {
+    filterState.busqueda = input.value;
+    renderCatalog();
+    syncFiltersToUrl();
+  });
+
+  document.getElementById("catalog-clear-filters").addEventListener("click", () => {
+    filterState.marca = "Todas";
+    filterState.genero = "Todos";
+    filterState.busqueda = "";
+    filterState.orden = "Recomendados";
+    input.value = "";
+    renderFilters();
+    renderCatalog();
+    syncFiltersToUrl();
+  });
+}
