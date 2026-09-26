@@ -142,6 +142,7 @@ const WATCHES = [
     precio: 55000,
     descripcion: "El digital de toda la vida: pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono que nunca pasa de moda.",
     imagen: "images/watches/reloj-10.jpg",
+    disponible: false,
   },
 
   {
