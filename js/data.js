@@ -71,6 +71,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Esfera blanca con detalles en cristal y correa de malla milanesa plateada. Ese toque elegante y femenino que no se ve forzado en el día a día.",
     imagen: "images/watches/reloj-03.jpg",
+    disponible: false,
   },
   {
     id: 4,
