@@ -61,6 +61,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Caja pequeña en acero plateado, esfera negra y correa de malla milanesa que se ajusta solita a la muñeca. Minimalista y fácil de combinar, para el día a día.",
     imagen: "images/watches/reloj-02.jpg",
+    disponible: false,
   },
   {
     id: 3,
@@ -143,7 +144,6 @@ const WATCHES = [
     precio: 55000,
     descripcion: "El digital de toda la vida: pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono que nunca pasa de moda.",
     imagen: "images/watches/reloj-10.jpg",
-    disponible: false,
   },
 
   {
