@@ -66,7 +66,7 @@ function renderRelatedWatches(watch) {
     .map(
       (w) => `
         <button class="modal__related-item" type="button" data-ref="${w.referencia}">
-          <img src="${w.imagen || PLACEHOLDER_IMAGE}" alt="${w.marca} ${w.nombre}" loading="lazy" />
+          <img src="${w.imagen || PLACEHOLDER_IMAGE}" alt="${w.marca} ${w.nombre}" loading="lazy" decoding="async" />
           <span class="modal__related-name">${w.marca} ${w.nombre}</span>
           <span class="modal__related-price">${formatPrice(w.precio)}</span>
         </button>`

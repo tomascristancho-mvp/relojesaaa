@@ -24,7 +24,7 @@ function watchCard(watch) {
       ${COMPARE_ICON}
     </button>
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
-      <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" />
+      <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" decoding="async" />
       <span class="watch-card__view">Ver detalle</span>
     </button>
     <div class="watch-card__body">
