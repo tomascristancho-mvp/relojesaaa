@@ -50,6 +50,11 @@ function updateCartBadge() {
   const badge = document.getElementById("cart-count");
   badge.textContent = String(count);
   badge.hidden = count === 0;
+  if (count > 0) {
+    badge.classList.remove("cart-toggle__badge--bump");
+    void badge.offsetWidth;
+    badge.classList.add("cart-toggle__badge--bump");
+  }
 }
 
 function updateCartButton(btn) {
