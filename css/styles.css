@@ -1003,6 +1003,33 @@ section[id] {
   color: var(--accent-soft);
 }
 
+.site-footer__social {
+  display: flex;
+  gap: 10px;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.social-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.social-icon:hover {
+  color: var(--accent-soft);
+  border-color: var(--accent);
+}
+
 .site-footer__copy {
   width: 100%;
   text-align: center;

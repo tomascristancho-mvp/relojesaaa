@@ -16,7 +16,10 @@ const CONFIG = {
   city: "Bogotá",
 
   // Usuario de Instagram (opcional). Déjalo vacío ("") si no quieres mostrarlo.
-  instagram: "",
+  instagram: "allucanbuy.col",
+
+  // Usuario de TikTok (opcional). Déjalo vacío ("") si no quieres mostrarlo.
+  tiktok: "allucanbuy.col",
 
   // Correo de contacto (opcional). Déjalo vacío ("") si no quieres mostrarlo.
   email: "tomascristanchoo@gmail.com",

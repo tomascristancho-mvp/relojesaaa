@@ -17,8 +17,13 @@ function applyBranding() {
   const igLink = document.getElementById("footer-instagram");
   if (CONFIG.instagram) {
     igLink.href = `https://instagram.com/${CONFIG.instagram.replace("@", "")}`;
-    igLink.textContent = `@${CONFIG.instagram.replace("@", "")}`;
     igLink.hidden = false;
+  }
+
+  const ttLink = document.getElementById("footer-tiktok");
+  if (CONFIG.tiktok) {
+    ttLink.href = `https://www.tiktok.com/@${CONFIG.tiktok.replace("@", "")}`;
+    ttLink.hidden = false;
   }
 
   const emailLink = document.getElementById("footer-email");
