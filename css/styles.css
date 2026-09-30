@@ -326,6 +326,12 @@ section[id] {
   letter-spacing: 0.01em;
 }
 
+@media (max-width: 400px) {
+  .site-header__left .brand__name {
+    display: none;
+  }
+}
+
 .site-nav {
   display: none;
   gap: 28px;
@@ -1028,6 +1034,21 @@ section[id] {
 .social-icon:hover {
   color: var(--accent-soft);
   border-color: var(--accent);
+}
+
+.site-header__social {
+  display: flex;
+  gap: 8px;
+}
+
+.social-icon--small {
+  width: 30px;
+  height: 30px;
+}
+
+.social-icon--small svg {
+  width: 15px;
+  height: 15px;
 }
 
 .site-footer__copy {

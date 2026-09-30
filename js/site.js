@@ -14,16 +14,22 @@ function applyBranding() {
   document.querySelectorAll("[data-city]").forEach((el) => (el.textContent = CONFIG.city));
   document.querySelectorAll("a[data-whatsapp-link]").forEach((el) => (el.href = buildGeneralWhatsAppLink()));
 
-  const igLink = document.getElementById("footer-instagram");
   if (CONFIG.instagram) {
-    igLink.href = `https://instagram.com/${CONFIG.instagram.replace("@", "")}`;
-    igLink.hidden = false;
+    const igHref = `https://instagram.com/${CONFIG.instagram.replace("@", "")}`;
+    ["footer-instagram", "header-instagram"].forEach((id) => {
+      const el = document.getElementById(id);
+      el.href = igHref;
+      el.hidden = false;
+    });
   }
 
-  const ttLink = document.getElementById("footer-tiktok");
   if (CONFIG.tiktok) {
-    ttLink.href = `https://www.tiktok.com/@${CONFIG.tiktok.replace("@", "")}`;
-    ttLink.hidden = false;
+    const ttHref = `https://www.tiktok.com/@${CONFIG.tiktok.replace("@", "")}`;
+    ["footer-tiktok", "header-tiktok"].forEach((id) => {
+      const el = document.getElementById(id);
+      el.href = ttHref;
+      el.hidden = false;
+    });
   }
 
   const emailLink = document.getElementById("footer-email");
