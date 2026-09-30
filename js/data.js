@@ -155,6 +155,7 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Caja negra con esfera crema, numeración árabe y correa de caucho. Un clásico con un toque cálido que se ve bien sin esforzarse.",
     imagen: "images/watches/reloj-11.jpg",
+    disponible: false,
   },
   {
     id: 12,
