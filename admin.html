@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel privado — Altitude Watch Co.</title>
+  <title>Panel privado — All U Can Buy</title>
   <meta name="robots" content="noindex, nofollow" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/admin.css" />
@@ -13,13 +13,9 @@
 <body>
   <div id="lock-screen" class="lock-screen">
     <form id="lock-form" class="lock-card">
-      <svg class="brand__icon lock-card__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
-        <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
-      </svg>
+      <img class="brand__icon lock-card__icon" src="images/logo.png" alt="" />
       <h1>Panel privado</h1>
-      <p>Solo para uso interno de Altitude Watch Co.</p>
+      <p>Solo para uso interno de All U Can Buy.</p>
       <input type="password" id="lock-input" placeholder="Código de acceso" autocomplete="off" />
       <button type="submit" class="btn btn--primary">Entrar</button>
       <p id="lock-error" class="lock-error" hidden>Código incorrecto.</p>
@@ -35,11 +31,7 @@
     <header class="site-header admin-header">
       <div class="container site-header__inner">
         <a href="index.html" class="brand">
-          <svg class="brand__icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="20" cy="20" r="15" stroke="currentColor" stroke-width="2"/>
-            <path d="M20 4v4M20 32v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M11 27 L18 15 L22 20 L27 11 L33 27 Z" fill="currentColor"/>
-          </svg>
+          <img class="brand__icon" src="images/logo.png" alt="" />
           <span class="brand__name">Panel privado</span>
         </a>
         <button id="logout-btn" class="btn btn--ghost btn--small" type="button">Cerrar sesión</button>

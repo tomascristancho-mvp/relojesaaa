@@ -13,7 +13,7 @@ const CHART_STATUS_COLORS = {
   Entregado: "#4fd18b",
   Cancelado: "#e5876c",
 };
-const CHART_COLOR_VENTA = "#c9a24a";
+const CHART_COLOR_VENTA = "#2f8fff";
 const CHART_COLOR_GANANCIA = "#4fd18b";
 
 function svgEl(tag, attrs) {

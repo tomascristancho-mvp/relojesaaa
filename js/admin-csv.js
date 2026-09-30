@@ -186,7 +186,7 @@ function initCsvActions() {
     const a = document.createElement("a");
     const today = new Date().toISOString().slice(0, 10);
     a.href = url;
-    a.download = `pedidos-altitude-watch-co-${today}.csv`;
+    a.download = `pedidos-all-u-can-buy-${today}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     showToast(`CSV descargado (${orders.length} pedido${orders.length === 1 ? "" : "s"}) ✓`);

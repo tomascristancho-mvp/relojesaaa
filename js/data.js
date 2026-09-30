@@ -4,10 +4,10 @@
  */
 const CONFIG = {
   // Nombre de tu marca (aparece en el logo, el título de la pestaña y los mensajes de WhatsApp)
-  businessName: "Altitude Watch Co.",
+  businessName: "All U Can Buy",
 
   // Frase corta que describe el negocio (aparece debajo del logo)
-  tagline: "Relojes con altura.",
+  tagline: "Relojes para cada estilo.",
 
   // Tu número de WhatsApp en formato internacional SIN signos ni espacios.
   whatsappNumber: "573027167144",
