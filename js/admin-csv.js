@@ -198,6 +198,27 @@ function initCsvActions() {
     updateBackupStatus();
   });
 
+  /* Exporta solo lo que está filtrado en la tabla (por encargado, fecha,
+   * estado o búsqueda) -- para liquidaciones puntuales, no cuenta como
+   * backup completo así que no toca el indicador de respaldo. */
+  const exportFilteredBtn = document.getElementById("export-csv-filtered");
+  if (exportFilteredBtn) {
+    exportFilteredBtn.addEventListener("click", () => {
+      const orders = sortOrders(getFilteredOrders(loadOrders()));
+      const csv = "﻿" + ordersToCsv(orders);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const today = new Date().toISOString().slice(0, 10);
+      const vendedorPart = ordersFilterState.vendedor !== "Todos" ? `-${slug(ordersFilterState.vendedor)}` : "";
+      a.href = url;
+      a.download = `pedidos-filtrados${vendedorPart}-${today}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`CSV descargado (${orders.length} pedido${orders.length === 1 ? "" : "s"} de esta vista) ✓`);
+    });
+  }
+
   updateBackupStatus();
 
   document.getElementById("import-csv").addEventListener("change", (e) => {

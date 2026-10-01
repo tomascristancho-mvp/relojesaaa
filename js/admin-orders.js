@@ -518,6 +518,30 @@ function initOrdersSort() {
   });
 }
 
+/**
+ * Resumen de lo que queda visible al filtrar (por encargado, fecha,
+ * estado o búsqueda) -- útil para repartir cuentas: filtras por un
+ * encargado y/o un rango de fechas y ves de una vez su total vendido y
+ * su ganancia de ese período, sin tener que sumar fila por fila.
+ */
+function renderFilteredSummary(orders, isFiltered) {
+  const bar = document.getElementById("filtered-summary");
+  if (!isFiltered) {
+    bar.hidden = true;
+    return;
+  }
+  const activeOrders = orders.filter((o) => o.estado !== "Cancelado");
+  const revenue = activeOrders.reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
+  const profit = activeOrders.reduce((sum, o) => {
+    const ganancia = calcGanancia(o);
+    return ganancia != null ? sum + ganancia : sum;
+  }, 0);
+  document.getElementById("filtered-summary-text").innerHTML = `<strong>${orders.length}</strong> ${
+    orders.length === 1 ? "pedido" : "pedidos"
+  } en esta vista · <strong>${formatCOP(revenue)}</strong> vendido · <strong>${formatCOP(profit)}</strong> ganancia`;
+  bar.hidden = false;
+}
+
 /* ============ TABLA Y ESTADÍSTICAS ============ */
 function renderOrders() {
   const allOrders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
@@ -668,6 +692,7 @@ function renderOrders() {
     ordersFilterState.estado !== "Todos" ||
     ordersFilterState.rango !== "Todos" ||
     ordersFilterState.vendedor !== "Todos";
+  renderFilteredSummary(orders, isFiltered);
   document.getElementById("orders-empty").hidden = orders.length !== 0;
   document.getElementById("orders-empty").textContent =
     orders.length === 0 && allOrders.length > 0 ? "Ningún pedido coincide con ese filtro." : "Aún no has registrado pedidos.";

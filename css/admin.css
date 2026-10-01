@@ -654,6 +654,28 @@
   white-space: nowrap;
 }
 
+.filtered-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(47, 143, 255, 0.08);
+  border: 1px solid rgba(47, 143, 255, 0.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 0.86rem;
+}
+
+.filtered-summary[hidden] {
+  display: none;
+}
+
+.filtered-summary strong {
+  color: var(--accent-soft);
+}
+
 /* ============ TABLE ============ */
 .table-scroll {
   overflow-x: auto;
