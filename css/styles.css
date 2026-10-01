@@ -75,6 +75,24 @@ img {
   outline-offset: 2px;
 }
 
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 12px;
+  z-index: 100;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: top 0.2s var(--ease-premium);
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
 html {
   scrollbar-color: var(--border) var(--bg);
   scrollbar-width: thin;
