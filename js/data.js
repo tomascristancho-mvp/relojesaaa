@@ -195,9 +195,9 @@ const WATCHES = [
     referencia: "REF-15",
     marca: "Casio",
     genero: "Hombre",
-    nombre: "Clásico Esfera Verde Oliva",
+    nombre: "Clásico Esfera Negra",
     precio: 65000,
-    descripcion: "Caja y brazalete en acero plateado con esfera verde oliva texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
+    descripcion: "Caja y brazalete en acero plateado con esfera negra texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
     imagen: "images/watches/reloj-15.jpg",
   },
 ];
