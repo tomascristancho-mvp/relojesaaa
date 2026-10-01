@@ -410,26 +410,59 @@ function getFilteredOrders(orders) {
   );
 }
 
+/**
+ * El filtro de la tabla (búsqueda, estado, fecha, encargado) se guarda
+ * en este navegador para que sobreviva un refresh o cerrar y volver a
+ * abrir la pestaña -- antes se perdía en silencio y tocaba volver a
+ * armar el mismo filtro cada vez.
+ */
+const ORDERS_FILTER_STORAGE_KEY = "altitude_orders_filter_v1";
+
+function loadPersistedFilterState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ORDERS_FILTER_STORAGE_KEY) || "{}");
+    if (typeof saved.busqueda === "string") ordersFilterState.busqueda = saved.busqueda;
+    if (typeof saved.estado === "string") ordersFilterState.estado = saved.estado;
+    if (typeof saved.rango === "string") ordersFilterState.rango = saved.rango;
+    if (typeof saved.vendedor === "string") ordersFilterState.vendedor = saved.vendedor;
+  } catch (e) {
+    // Si el valor guardado está corrupto se ignora y sigue con los valores por defecto.
+  }
+}
+
+function persistFilterState() {
+  try {
+    localStorage.setItem(ORDERS_FILTER_STORAGE_KEY, JSON.stringify(ordersFilterState));
+  } catch (e) {
+    // No es crítico si no se puede guardar -- el filtro solo no sobrevive un refresh.
+  }
+}
+
 function initOrdersFilter() {
+  loadPersistedFilterState();
+
   const input = document.getElementById("orders-search");
+  input.value = ordersFilterState.busqueda;
   const chipsContainer = document.getElementById("orders-status-filter");
   const statuses = ["Todos", ...ORDER_STATUSES];
 
   input.addEventListener("input", () => {
     ordersFilterState.busqueda = input.value;
+    persistFilterState();
     renderOrders();
   });
 
   chipsContainer.innerHTML = "";
-  statuses.forEach((status, i) => {
+  statuses.forEach((status) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.className = "chip chip--small" + (status === ordersFilterState.estado ? " chip--active" : "");
     btn.textContent = status;
     btn.addEventListener("click", () => {
       chipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
       btn.classList.add("chip--active");
       ordersFilterState.estado = status;
+      persistFilterState();
       renderOrders();
     });
     chipsContainer.appendChild(btn);
@@ -437,15 +470,16 @@ function initOrdersFilter() {
 
   const dateChipsContainer = document.getElementById("orders-date-filter");
   dateChipsContainer.innerHTML = "";
-  ORDER_DATE_RANGES.forEach((rango, i) => {
+  ORDER_DATE_RANGES.forEach((rango) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.className = "chip chip--small" + (rango === ordersFilterState.rango ? " chip--active" : "");
     btn.textContent = rango;
     btn.addEventListener("click", () => {
       dateChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
       btn.classList.add("chip--active");
       ordersFilterState.rango = rango;
+      persistFilterState();
       renderOrders();
     });
     dateChipsContainer.appendChild(btn);
@@ -458,16 +492,21 @@ function initOrdersFilter() {
     .map((o) => o.value)
     .filter(Boolean);
   const vendedores = ["Todos", ...vendedorNames];
+  // Si el encargado guardado ya no existe en el <select> (lo borraron o
+  // le cambiaron el nombre), vuelve a "Todos" en vez de quedar en un
+  // filtro que nunca va a mostrar nada.
+  if (!vendedores.includes(ordersFilterState.vendedor)) ordersFilterState.vendedor = "Todos";
   vendedorChipsContainer.innerHTML = "";
-  vendedores.forEach((vendedor, i) => {
+  vendedores.forEach((vendedor) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.className = "chip chip--small" + (vendedor === ordersFilterState.vendedor ? " chip--active" : "");
     btn.textContent = vendedor;
     btn.addEventListener("click", () => {
       vendedorChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
       btn.classList.add("chip--active");
       ordersFilterState.vendedor = vendedor;
+      persistFilterState();
       renderOrders();
     });
     vendedorChipsContainer.appendChild(btn);
