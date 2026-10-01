@@ -714,6 +714,12 @@ function renderOrders() {
     : "";
   document.getElementById("stat-pending").textContent = allOrders.filter((o) => o.estado === "Pendiente").length;
 
+  const allWatches = typeof WATCHES !== "undefined" ? WATCHES : [];
+  const available = allWatches.filter((w) => w.disponible !== false).length;
+  document.getElementById("stat-catalog-available").textContent = `${available} de ${allWatches.length}`;
+  const sold = allWatches.length - available;
+  document.getElementById("stat-catalog-note").textContent = sold > 0 ? `${sold} marcado(s) como vendido(s)` : "";
+
   if (typeof renderCharts === "function") renderCharts();
   if (typeof renderAvailabilityAlerts === "function") renderAvailabilityAlerts();
 }

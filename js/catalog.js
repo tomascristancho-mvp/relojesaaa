@@ -13,6 +13,19 @@ const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)"
 const COMPARE_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>';
 
+/**
+ * Las últimas 2 referencias agregadas a WATCHES (por id más alto) se
+ * marcan como "Nuevo" en el catálogo -- no depende de ninguna fecha,
+ * solo del orden de llegada al array.
+ */
+const NEW_BADGE_COUNT = 2;
+const recentWatchIds = new Set(
+  [...WATCHES]
+    .sort((a, b) => b.id - a.id)
+    .slice(0, NEW_BADGE_COUNT)
+    .map((w) => w.id)
+);
+
 function watchCard(watch) {
   const img = watch.imagen || PLACEHOLDER_IMAGE;
   const card = document.createElement("article");
@@ -23,6 +36,7 @@ function watchCard(watch) {
     <button class="watch-card__compare${isInCompare(watch.referencia) ? " is-active" : ""}" type="button" data-ref="${watch.referencia}" aria-pressed="${isInCompare(watch.referencia)}" aria-label="Agregar a comparar">
       ${COMPARE_ICON}
     </button>
+    ${recentWatchIds.has(watch.id) ? '<span class="new-badge">Nuevo</span>' : ""}
     <button class="watch-card__media" data-id="${watch.id}" aria-label="Ver detalle de ${watch.nombre}">
       <img class="fade-img" src="${img}" alt="${watch.marca} ${watch.nombre} - ${watch.referencia}" loading="lazy" decoding="async" />
       <span class="watch-card__view">Ver detalle</span>
