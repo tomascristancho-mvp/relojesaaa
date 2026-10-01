@@ -126,6 +126,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Caja plateada, esfera negra y un calendario que de verdad se usa. Brazalete metálico resistente -- clásico y versátil, sirve para todo.",
     imagen: "images/watches/reloj-08.jpg",
+    disponible: false,
   },
   {
     id: 9,
