@@ -345,7 +345,7 @@ section[id] {
   display: none;
 }
 
-.cart-toggle__badge--bump {
+.is-bumped {
   animation: cartBump 0.45s var(--ease-premium);
 }
 
@@ -634,6 +634,7 @@ section[id] {
   color: var(--text);
   font-family: var(--font-body);
   font-size: 0.9rem;
+  transition: border-color 0.25s var(--ease-premium), box-shadow 0.25s var(--ease-premium);
 }
 
 .catalog-search input::placeholder {
@@ -642,6 +643,8 @@ section[id] {
 
 .catalog-search input:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(47, 143, 255, 0.15);
+  outline: none;
 }
 
 .catalog-search input::-webkit-search-cancel-button {
@@ -683,12 +686,16 @@ section[id] {
   font-family: var(--font-body);
   font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.25s var(--ease-premium), border-color 0.25s var(--ease-premium), color 0.25s var(--ease-premium), transform 0.15s var(--ease-premium);
 }
 
 .chip:hover {
   border-color: var(--accent);
   color: var(--text);
+}
+
+.chip:active {
+  transform: scale(0.96);
 }
 
 .chip--active {
@@ -1470,11 +1477,21 @@ section[id] {
   box-shadow: 0 8px 18px -6px rgba(0, 0, 0, 0.6);
   z-index: 45;
   opacity: 0.9;
-  transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.25s var(--ease-premium), border-color 0.2s ease, transform 0.25s var(--ease-premium), display 0.25s allow-discrete;
 }
 
 .scroll-top[hidden] {
   display: none;
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+}
+
+@starting-style {
+  .scroll-top:not([hidden]) {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
 }
 
 .scroll-top svg {

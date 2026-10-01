@@ -24,8 +24,9 @@ function openModal(watch) {
   cartBtn.dataset.ref = watch.referencia;
   updateCartButton(cartBtn);
   cartBtn.onclick = () => {
-    toggleCartItem(watch.referencia);
+    const nowActive = toggleCartItem(watch.referencia);
     updateCartButton(cartBtn);
+    if (nowActive) bumpElement(cartBtn);
     const cardCartBtn = document.querySelector(`#catalog-grid .cart-add-btn[data-ref="${watch.referencia}"]`);
     if (cardCartBtn) updateCartButton(cardCartBtn);
   };

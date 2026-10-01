@@ -50,8 +50,9 @@ function watchCard(watch) {
   card.querySelector(".watch-card__media").addEventListener("click", () => openModal(watch));
   card.querySelector(".cart-add-btn").addEventListener("click", (e) => {
     e.stopPropagation();
-    toggleCartItem(watch.referencia);
+    const nowActive = toggleCartItem(watch.referencia);
     updateCartButton(e.currentTarget);
+    if (nowActive) bumpElement(e.currentTarget);
   });
   card.querySelector(".watch-card__compare").addEventListener("click", () => toggleCompare(watch.referencia));
   initFadeImg(card.querySelector(".fade-img"));

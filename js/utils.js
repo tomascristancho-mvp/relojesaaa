@@ -114,3 +114,9 @@ function showToast(message, type = "success", options = {}) {
   requestAnimationFrame(() => toast.classList.add("is-visible"));
   setTimeout(dismiss, duration ?? (actionLabel ? 6000 : 3000));
 }
+
+function bumpElement(el) {
+  el.classList.remove("is-bumped");
+  void el.offsetWidth;
+  el.classList.add("is-bumped");
+}
