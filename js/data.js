@@ -190,4 +190,14 @@ const WATCHES = [
     descripcion: "Esfera blanca nacarada con detalles en cristal y brazalete plateado. Para esos días en que quieres verte arreglada sin complicarte.",
     imagen: "images/watches/reloj-14.jpg",
   },
+  {
+    id: 15,
+    referencia: "REF-15",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Verde Oliva",
+    precio: 65000,
+    descripcion: "Caja y brazalete en acero plateado con esfera verde oliva texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
+    imagen: "images/watches/reloj-15.jpg",
+  },
 ];
