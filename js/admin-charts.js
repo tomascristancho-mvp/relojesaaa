@@ -276,6 +276,34 @@ function computeSalesByVendedor(orders) {
     .sort((a, b) => b.value - a.value);
 }
 
+function computeOrderCountByVendedor(orders) {
+  const soldOrders = orders.filter((o) => o.estado !== "Cancelado" && o.vendedor);
+  const map = new Map();
+  soldOrders.forEach((o) => {
+    map.set(o.vendedor, (map.get(o.vendedor) || 0) + 1);
+  });
+  return Array.from(map.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
+/**
+ * Igual que computeSalesByVendedor pero con ganancia (precio - costo) en
+ * vez de precio. Los pedidos sin costo registrado no suman -- igual que
+ * el cálculo de "Ganancia total" de las tarjetas de arriba.
+ */
+function computeGananciaByVendedor(orders) {
+  const soldOrders = orders.filter((o) => o.estado !== "Cancelado" && o.vendedor);
+  const map = new Map();
+  soldOrders.forEach((o) => {
+    const ganancia = calcGanancia(o);
+    if (ganancia != null) map.set(o.vendedor, (map.get(o.vendedor) || 0) + ganancia);
+  });
+  return Array.from(map.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
 function renderMonthlySummary(container, monthlyData) {
   const thisMonth = monthlyData[monthlyData.length - 1];
   const lastMonth = monthlyData[monthlyData.length - 2];
@@ -310,9 +338,19 @@ function renderCharts() {
     emptyMessage: "Aún no hay ventas para mostrar.",
     formatValue: (v) => `${v} ${v === 1 ? "venta" : "ventas"}`,
   });
+  renderHorizontalBars(document.getElementById("chart-vendedores-pedidos"), computeOrderCountByVendedor(orders), {
+    color: CHART_COLOR_VENTA,
+    emptyMessage: "Aún no hay pedidos asignados a un encargado.",
+    formatValue: (v) => `${v} ${v === 1 ? "pedido" : "pedidos"}`,
+  });
   renderHorizontalBars(document.getElementById("chart-vendedores"), computeSalesByVendedor(orders), {
-    color: CHART_COLOR_GANANCIA,
+    color: CHART_COLOR_VENTA,
     emptyMessage: "Aún no hay ventas asignadas a un encargado.",
+    formatValue: (v) => formatCOP(v),
+  });
+  renderHorizontalBars(document.getElementById("chart-vendedores-ganancia"), computeGananciaByVendedor(orders), {
+    color: CHART_COLOR_GANANCIA,
+    emptyMessage: "Aún no hay ganancia registrada por encargado.",
     formatValue: (v) => formatCOP(v),
   });
 }

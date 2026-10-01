@@ -367,7 +367,7 @@ function initOrderForm() {
 }
 
 /* ============ FILTRO DE LA TABLA ============ */
-const ordersFilterState = { busqueda: "", estado: "Todos", rango: "Todos" };
+const ordersFilterState = { busqueda: "", estado: "Todos", rango: "Todos", vendedor: "Todos" };
 const ORDER_DATE_RANGES = ["Todos", "Hoy", "Esta semana", "Este mes"];
 
 /**
@@ -401,6 +401,7 @@ function getFilteredOrders(orders) {
     (o) =>
       (ordersFilterState.estado === "Todos" || o.estado === ordersFilterState.estado) &&
       matchesDateRange(o.fecha, ordersFilterState.rango) &&
+      (ordersFilterState.vendedor === "Todos" || o.vendedor === ordersFilterState.vendedor) &&
       (!query ||
         (o.nombre || "").toLowerCase().includes(query) ||
         (o.reloj || "").toLowerCase().includes(query) ||
@@ -448,6 +449,28 @@ function initOrdersFilter() {
       renderOrders();
     });
     dateChipsContainer.appendChild(btn);
+  });
+
+  /* Los nombres salen del <select> "Encargado de venta" del formulario,
+   * para no mantener la misma lista duplicada en dos lugares. */
+  const vendedorChipsContainer = document.getElementById("orders-vendedor-filter");
+  const vendedorNames = Array.from(document.getElementById("order-vendedor").options)
+    .map((o) => o.value)
+    .filter(Boolean);
+  const vendedores = ["Todos", ...vendedorNames];
+  vendedorChipsContainer.innerHTML = "";
+  vendedores.forEach((vendedor, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (i === 0 ? " chip--active" : "");
+    btn.textContent = vendedor;
+    btn.addEventListener("click", () => {
+      vendedorChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.vendedor = vendedor;
+      renderOrders();
+    });
+    vendedorChipsContainer.appendChild(btn);
   });
 }
 
@@ -641,7 +664,10 @@ function renderOrders() {
   });
 
   const isFiltered =
-    ordersFilterState.busqueda.trim() !== "" || ordersFilterState.estado !== "Todos" || ordersFilterState.rango !== "Todos";
+    ordersFilterState.busqueda.trim() !== "" ||
+    ordersFilterState.estado !== "Todos" ||
+    ordersFilterState.rango !== "Todos" ||
+    ordersFilterState.vendedor !== "Todos";
   document.getElementById("orders-empty").hidden = orders.length !== 0;
   document.getElementById("orders-empty").textContent =
     orders.length === 0 && allOrders.length > 0 ? "Ningún pedido coincide con ese filtro." : "Aún no has registrado pedidos.";
