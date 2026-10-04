@@ -211,4 +211,14 @@ const WATCHES = [
     descripcion: "Cronógrafo en acero gris con detalles en tono rosado, carátula con subesferas funcionales, tacómetro y calendario a las 3. Un reloj robusto y llamativo, con esa presencia deportiva que se nota.",
     imagen: "images/watches/reloj-16.jpg",
   },
+  {
+    id: 17,
+    referencia: "REF-17",
+    marca: "Calvin Klein",
+    genero: "Hombre",
+    nombre: "Calvin Klein Minimal Plata",
+    precio: 120000,
+    descripcion: "Caja plateada con esfera negra minimalista y correa de malla milanesa. Elegante y discreto, perfecto para combinar con cualquier outfit formal o casual.",
+    imagen: "images/watches/reloj-17.jpg",
+  },
 ];
