@@ -201,4 +201,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera negra texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
     imagen: "images/watches/reloj-15.jpg",
   },
+  {
+    id: 16,
+    referencia: "REF-16",
+    marca: "Curren",
+    genero: "Hombre",
+    nombre: "Curren Original Hombre",
+    precio: 220000,
+    descripcion: "Cronógrafo en acero gris con detalles en tono rosado, carátula con subesferas funcionales, tacómetro y calendario a las 3. Un reloj robusto y llamativo, con esa presencia deportiva que se nota.",
+    imagen: "images/watches/reloj-16.jpg",
+  },
 ];
