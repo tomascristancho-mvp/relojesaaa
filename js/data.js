@@ -10,7 +10,7 @@ const CONFIG = {
   tagline: "Relojes para cada estilo.",
 
   // Tu número de WhatsApp en formato internacional SIN signos ni espacios.
-  whatsappNumber: "573027167144",
+  whatsappNumber: "573132388993",
 
   // Ciudad donde estás ubicado
   city: "Bogotá",
