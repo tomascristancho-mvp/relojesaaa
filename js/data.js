@@ -75,6 +75,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Esfera blanca con detalles en cristal y correa de malla milanesa plateada. Ese toque elegante y femenino que no se ve forzado en el día a día.",
     imagen: "images/watches/reloj-03.jpg",
+    disponible: false,
   },
   {
     id: 4,
@@ -180,6 +181,7 @@ const WATCHES = [
     precio: 55000,
     descripcion: "El mismo digital de siempre pero en dorado, con pantalla LCD, alarma y cronómetro. Ese brillito extra que le sube el nivel a cualquier look.",
     imagen: "images/watches/reloj-13.jpg",
+    disponible: false,
   },
   {
     id: 14,
@@ -200,6 +202,7 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Caja y brazalete en acero plateado con esfera negra texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
     imagen: "images/watches/reloj-15.jpg",
+    disponible: false,
   },
   {
     id: 16,
@@ -220,5 +223,6 @@ const WATCHES = [
     precio: 120000,
     descripcion: "Caja plateada con esfera negra minimalista y correa de malla milanesa. Elegante y discreto, perfecto para combinar con cualquier outfit formal o casual.",
     imagen: "images/watches/reloj-17.jpg",
+    disponible: false,
   },
 ];
