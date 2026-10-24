@@ -158,9 +158,25 @@ function updateBackupStatus() {
     return;
   }
 
+  /* Los pedidos solo existen en este navegador -- sin un backup
+   * reciente, perder el celular (o que otro de los 3 nunca haya
+   * visto estos pedidos porque están en un navegador distinto) deja
+   * esta información sin ninguna copia. El indicador chiquito junto
+   * al botón de exportar es fácil de pasar por alto, así que cuando
+   * el backup lleva muchos días vencido también se muestra un aviso
+   * grande arriba, igual que las otras alertas del panel. */
+  const banner = document.getElementById("backup-alert");
+  const bannerText = document.getElementById("backup-alert-text");
+  const hasOrders = (typeof loadOrders === "function" ? loadOrders() : []).length > 0;
+
   if (!last) {
     el.textContent = "Nunca has exportado un backup";
     el.className = "backup-status backup-status--warn";
+    if (banner) {
+      banner.hidden = !hasOrders;
+      bannerText.textContent =
+        "Todavía no has exportado ningún respaldo y ya tienes pedidos guardados. Viven solo en este navegador -- si el celular se pierde, se daña o se le borran los datos, se pierden con él.";
+    }
     return;
   }
 
@@ -168,12 +184,18 @@ function updateBackupStatus() {
   if (days <= 0) {
     el.textContent = "Backup de hoy ✓";
     el.className = "backup-status backup-status--ok";
+    if (banner) banner.hidden = true;
   } else if (days < BACKUP_WARN_DAYS) {
     el.textContent = `Backup hace ${days} día${days === 1 ? "" : "s"}`;
     el.className = "backup-status backup-status--ok";
+    if (banner) banner.hidden = true;
   } else {
     el.textContent = `Backup hace ${days} días -- exporta de nuevo`;
     el.className = "backup-status backup-status--warn";
+    if (banner) {
+      banner.hidden = !hasOrders;
+      bannerText.textContent = `Tu último backup fue hace ${days} días. Todos los pedidos viven solo en este navegador -- si el celular se pierde, se daña o se le borran los datos, se pierden con él. Exporta un CSV y guárdalo en otro lugar (correo, Drive, etc.) para no quedarte sin esta información.`;
+    }
   }
 }
 
@@ -217,6 +239,11 @@ function initCsvActions() {
       URL.revokeObjectURL(url);
       showToast(`CSV descargado (${orders.length} pedido${orders.length === 1 ? "" : "s"} de esta vista) ✓`);
     });
+  }
+
+  const backupAlertBtn = document.getElementById("backup-alert-export");
+  if (backupAlertBtn) {
+    backupAlertBtn.addEventListener("click", () => document.getElementById("export-csv").click());
   }
 
   updateBackupStatus();

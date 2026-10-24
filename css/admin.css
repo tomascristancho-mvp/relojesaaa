@@ -122,6 +122,10 @@
   font-size: 0.82em;
 }
 
+.backup-alert__btn {
+  margin-top: 12px;
+}
+
 .availability-alert__list {
   list-style: none;
   margin: 14px 0 0;

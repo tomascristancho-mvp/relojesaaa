@@ -761,6 +761,7 @@ function renderOrders() {
 
   if (typeof renderCharts === "function") renderCharts();
   if (typeof renderAvailabilityAlerts === "function") renderAvailabilityAlerts();
+  if (typeof updateBackupStatus === "function") updateBackupStatus();
 }
 
 /* ============ DETALLE DE UN PEDIDO ============ */
