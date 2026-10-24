@@ -126,7 +126,7 @@ section[id] {
   transform: translateY(0);
 }
 
-.hero__logo.reveal { transition-delay: 0ms; }
+.hero__logo-wrap.reveal { transition-delay: 0ms; }
 .hero__title.reveal { transition-delay: 90ms; }
 .hero__subtitle.reveal { transition-delay: 180ms; }
 .hero__actions.reveal { transition-delay: 270ms; }
@@ -558,6 +558,9 @@ section[id] {
   filter: blur(90px);
   mix-blend-mode: screen;
   z-index: 0;
+  --px: 0px;
+  --py: 0px;
+  transition: transform 0.6s var(--ease-premium);
 }
 
 .hero__blob--1 {
@@ -579,13 +582,13 @@ section[id] {
 }
 
 @keyframes heroBlob1 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
-  50% { transform: translate(20px, 30px) scale(1.15); opacity: 0.7; }
+  0%, 100% { transform: translate(var(--px), var(--py)) scale(1); opacity: 1; }
+  50% { transform: translate(calc(var(--px) + 20px), calc(var(--py) + 30px)) scale(1.15); opacity: 0.7; }
 }
 
 @keyframes heroBlob2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
-  50% { transform: translate(-25px, -20px) scale(1.1); opacity: 1; }
+  0%, 100% { transform: translate(var(--px), var(--py)) scale(1); opacity: 0.8; }
+  50% { transform: translate(calc(var(--px) - 25px), calc(var(--py) - 20px)) scale(1.1); opacity: 1; }
 }
 
 .hero::after {
@@ -603,15 +606,77 @@ section[id] {
   z-index: 1;
 }
 
+.hero__logo-wrap {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto 28px;
+}
+
+.hero__logo-wrap::before,
+.hero__logo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(47, 143, 255, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero__logo-wrap::before {
+  animation: logoShockwave 1.5s var(--ease-premium) 0.1s 1;
+}
+
+.hero__logo-wrap::after {
+  animation: logoShockwave 1.5s var(--ease-premium) 0.4s 1;
+}
+
+@keyframes logoShockwave {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.9;
+    border-width: 3px;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
 .hero__logo {
   display: block;
   width: 108px;
   height: 108px;
-  margin: 0 auto 28px;
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 0 50px rgba(47, 143, 255, 0.4);
-  animation: logoFloat 6s ease-in-out 0.85s infinite;
+  animation:
+    logoEntrance 1s var(--ease-premium) both,
+    logoFloat 6s ease-in-out 1s infinite;
+}
+
+@keyframes logoEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.25) rotate(-35deg);
+    filter: brightness(2) saturate(1.4);
+    box-shadow: 0 0 0 rgba(47, 143, 255, 0);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.15) rotate(6deg);
+    filter: brightness(1.35) saturate(1.15);
+  }
+  80% {
+    transform: scale(0.96) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1) saturate(1);
+    box-shadow: 0 0 50px rgba(47, 143, 255, 0.4);
+  }
 }
 
 @keyframes logoFloat {

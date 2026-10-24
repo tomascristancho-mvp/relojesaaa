@@ -121,6 +121,45 @@ function initScrollEffects() {
   scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
+/**
+ * Las burbujas de luz del hero siguen sutilmente el cursor (solo en
+ * escritorio con mouse real, y nunca si el usuario pidió menos
+ * movimiento). Cada burbuja se mueve a su propia profundidad para dar
+ * sensación de capas.
+ */
+function initHeroParallax() {
+  const hero = document.querySelector(".hero");
+  const blobs = document.querySelectorAll(".hero__blob");
+  if (!hero || !blobs.length) return;
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const depths = [18, -12];
+  let rafId = null;
+
+  hero.addEventListener("mousemove", (e) => {
+    const rect = hero.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5;
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      blobs.forEach((blob, i) => {
+        const depth = depths[i] ?? 15;
+        blob.style.setProperty("--px", `${nx * depth}px`);
+        blob.style.setProperty("--py", `${ny * depth}px`);
+      });
+      rafId = null;
+    });
+  });
+
+  hero.addEventListener("mouseleave", () => {
+    blobs.forEach((blob) => {
+      blob.style.setProperty("--px", "0px");
+      blob.style.setProperty("--py", "0px");
+    });
+  });
+}
+
 function openWatchFromUrl() {
   const ref = new URLSearchParams(window.location.search).get("reloj");
   if (!ref) return;
@@ -169,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initModal();
   initImageZoom();
   initReveal();
+  initHeroParallax();
   initYear();
   initScrollEffects();
   injectStructuredData();
