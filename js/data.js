@@ -247,4 +247,14 @@ const WATCHES = [
     descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
     imagen: "images/watches/reloj-18.jpg",
   },
+  {
+    id: 20,
+    referencia: "REF-20",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Esfera Verde Menta Acero",
+    precio: 115000,
+    descripcion: "Caja y brazalete en acero plateado con esfera verde menta texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 30M) -- fresco y distinto, para salir de lo clásico sin perder elegancia.",
+    imagen: "images/watches/reloj-20.jpg",
+  },
 ];
