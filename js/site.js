@@ -32,6 +32,9 @@ function applyBranding() {
     });
   }
 
+  const wholesaleLink = document.getElementById("wholesale-whatsapp");
+  if (wholesaleLink) wholesaleLink.href = buildWholesaleWhatsAppLink();
+
   const emailLink = document.getElementById("footer-email");
   if (CONFIG.email) {
     emailLink.href = `mailto:${CONFIG.email}`;

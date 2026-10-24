@@ -52,6 +52,13 @@ function buildGeneralWhatsAppLink() {
   return buildWhatsAppUrl(CONFIG.whatsappNumber, message);
 }
 
+function buildWholesaleWhatsAppLink() {
+  const message =
+    `Hola${CONFIG.businessName ? " " + CONFIG.businessName : ""}, me gustaría emprender vendiendo relojes. ` +
+    `¿Me puedes contar los precios de mayorista?`;
+  return buildWhatsAppUrl(CONFIG.whatsappNumber, message);
+}
+
 function buildWatchShareUrl(watch) {
   return `${window.location.origin}${window.location.pathname}?reloj=${encodeURIComponent(watch.referencia)}`;
 }
