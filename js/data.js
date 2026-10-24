@@ -237,4 +237,14 @@ const WATCHES = [
     descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
     imagen: "images/watches/reloj-18.jpg",
   },
+  {
+    id: 19,
+    referencia: "REF-19",
+    marca: "Tommy Hilfiger",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Crema Caja Negra",
+    precio: 60000,
+    descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
+    imagen: "images/watches/reloj-18.jpg",
+  },
 ];
