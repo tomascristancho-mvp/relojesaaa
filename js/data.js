@@ -227,4 +227,14 @@ const WATCHES = [
     imagen: "images/watches/reloj-17.jpg",
     disponible: false,
   },
+  {
+    id: 18,
+    referencia: "REF-18",
+    marca: "Tommy Hilfiger",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Crema Caja Negra",
+    precio: 60000,
+    descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
+    imagen: "images/watches/reloj-18.jpg",
+  },
 ];
