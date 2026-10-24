@@ -22,7 +22,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -78,6 +78,8 @@
 
   <main id="top">
     <section class="hero">
+      <div class="hero__blob hero__blob--1" aria-hidden="true"></div>
+      <div class="hero__blob hero__blob--2" aria-hidden="true"></div>
       <div class="container hero__inner">
         <img src="images/logo.png" alt="" class="hero__logo reveal" />
         <h1 class="hero__title reveal">
@@ -85,8 +87,16 @@
         </h1>
         <p class="hero__subtitle reveal" data-tagline>Relojes para cada estilo</p>
         <div class="hero__actions reveal">
-          <a href="#catalogo" class="btn btn--primary">Ver catálogo</a>
-          <a href="#como-comprar" class="btn btn--ghost">Cómo comprar</a>
+          <a href="#catalogo" class="btn btn--hero-primary">
+            <span>Ver catálogo</span>
+            <span class="btn--hero-primary__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </a>
+          <a href="#como-comprar" class="btn btn--hero-ghost">
+            Cómo comprar
+            <svg class="btn--hero-ghost__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
         </div>
         <ul class="hero__badges reveal">
           <li>
