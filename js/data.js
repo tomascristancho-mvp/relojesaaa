@@ -117,6 +117,7 @@ const WATCHES = [
     precio: 55000,
     descripcion: "Esfera blanca nacarada con índices minimalistas y un brazalete metálico bien delgado en plata. Delicado sin ser exagerado, para cualquier día.",
     imagen: "images/watches/reloj-07.jpg",
+    disponible: false,
   },
   {
     id: 8,
@@ -138,6 +139,7 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Bisel giratorio numerado y esfera azul medianoche -- casi se ve negra hasta que le pega la luz y ahí sí se nota el azul. Correa de caucho negro, con ese toque deportivo tipo buceo.",
     imagen: "images/watches/reloj-09.jpg",
+    disponible: false,
   },
   {
     id: 10,
