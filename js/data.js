@@ -257,4 +257,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera verde menta texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 30M) -- fresco y distinto, para salir de lo clásico sin perder elegancia.",
     imagen: "images/watches/reloj-20.jpg",
   },
+  {
+    id: 21,
+    referencia: "REF-21",
+    marca: "Orient",
+    genero: "Mujer",
+    nombre: "Bicolor Esfera Champán Números Romanos",
+    precio: 65000,
+    descripcion: "Brazalete bicolor en acero plateado y dorado, esfera champán con números romanos y calendario a las 3. Resistente al agua (WR 50M) -- elegante y femenino, perfecto para looks formales o del día a día.",
+    imagen: "images/watches/reloj-21.jpg",
+  },
 ];
