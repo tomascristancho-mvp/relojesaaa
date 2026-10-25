@@ -108,6 +108,9 @@ function sortWatches(list) {
   if (filterState.orden === "Precio: mayor a menor") {
     return [...list].sort((a, b) => (b.precio ?? -Infinity) - (a.precio ?? -Infinity));
   }
+  if (filterState.orden === "Más vendidos") {
+    return [...list].sort((a, b) => (a.popularidad ?? Infinity) - (b.popularidad ?? Infinity));
+  }
   return list; // "Recomendados": el orden del catálogo tal como está en js/data.js
 }
 
@@ -166,7 +169,7 @@ function renderFilters() {
 
   const marcas = [...new Set(available.map((w) => w.marca))];
   const generos = [...new Set(available.map((w) => w.genero))];
-  const ordenes = ["Precio: menor a mayor", "Precio: mayor a menor"];
+  const ordenes = ["Más vendidos", "Precio: menor a mayor", "Precio: mayor a menor"];
   // Un enlace con un valor que ya no existe (una marca renombrada, un filtro
   // viejo guardado en favoritos) vuelve al valor por defecto en vez de dejar
   // la sección de filtros sin ningún chip marcado como activo.
