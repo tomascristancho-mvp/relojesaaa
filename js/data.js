@@ -347,4 +347,14 @@ const WATCHES = [
     descripcion: "Caja octagonal en acero plateado con esfera negra texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 50M) -- robusto y moderno, con esa forma distinta que no pasa desapercibida.",
     imagen: "images/watches/reloj-29.jpg",
   },
+  {
+    id: 30,
+    referencia: "REF-30",
+    marca: "Q&Q",
+    genero: "Mujer",
+    nombre: "Mesh Plata Esfera Negra Mini",
+    precio: 55000,
+    descripcion: "Caja pequeña en acero plateado con correa de malla milanesa y esfera negra minimalista. Resistente al agua -- delicado y fácil de combinar, perfecto para el día a día.",
+    imagen: "images/watches/reloj-30.jpg",
+  },
 ];
