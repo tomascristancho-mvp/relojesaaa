@@ -315,7 +315,7 @@ function initCsvActions() {
         danger: true,
       });
       const current = loadOrders();
-      if (!saveOrders(replace ? imported : [...current, ...imported])) return;
+      if (!(await saveOrders(replace ? imported : [...current, ...imported]))) return;
       renderOrders();
       showToast(`${imported.length} pedido(s) importado(s) ✓`);
       e.target.value = "";

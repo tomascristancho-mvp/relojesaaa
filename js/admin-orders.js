@@ -97,24 +97,131 @@ async function confirmPhoneSanity() {
   });
 }
 
+/**
+ * Los pedidos ya no viven solo en este navegador -- viven en Firestore
+ * (ver js/firebase-init.js), así que Tomás, Falck y Condia ven siempre
+ * lo mismo desde cualquier dispositivo. `ordersCache` es una copia en
+ * memoria que se mantiene al día sola gracias a `initOrdersSync()` (un
+ * listener en tiempo real): así el resto del panel puede seguir leyendo
+ * `loadOrders()` de forma instantánea y sencilla, como siempre lo hizo.
+ */
+const ORDERS_COLLECTION = "orders";
+let ordersCache = [];
+let ordersCacheById = new Map();
+let ordersReady = false;
+
 function loadOrders() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    console.error("No se pudieron leer los pedidos guardados", e);
-    return [];
-  }
+  return ordersCache;
 }
 
-function saveOrders(orders) {
+/**
+ * Compara el array completo contra lo último sincronizado y solo escribe
+ * en Firestore los pedidos que de verdad cambiaron (cada pedido es su
+ * propio documento) -- así, si dos personas guardan cosas distintas casi
+ * al mismo tiempo desde sus propios dispositivos, no se pisan el trabajo
+ * el uno al otro.
+ */
+async function saveOrders(newOrders) {
+  if (!window.fb) {
+    showToast("No se pudo guardar: no hay conexión con la base de datos.", "error");
+    return false;
+  }
+  const { db, collection, doc, writeBatch } = window.fb;
+  const col = collection(db, ORDERS_COLLECTION);
+  const newById = new Map(newOrders.map((o) => [o.id, o]));
+  const batch = writeBatch(db);
+  let writes = 0;
+
+  for (const [id, order] of newById) {
+    const prev = ordersCacheById.get(id);
+    if (!prev || JSON.stringify(prev) !== JSON.stringify(order)) {
+      batch.set(doc(col, id), order);
+      writes++;
+    }
+  }
+  for (const id of ordersCacheById.keys()) {
+    if (!newById.has(id)) {
+      batch.delete(doc(col, id));
+      writes++;
+    }
+  }
+  if (writes === 0) return true;
+
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    await batch.commit();
     return true;
   } catch (e) {
     console.error("No se pudo guardar el pedido", e);
-    showToast("No se pudo guardar: el navegador rechazó el cambio (¿modo privado o espacio lleno?)", "error");
+    showToast("No se pudo guardar: revisa tu conexión a internet e intenta de nuevo.", "error");
     return false;
+  }
+}
+
+/**
+ * Se conecta una sola vez, al arrancar el panel, y llama a `onChange`
+ * cada vez que los pedidos cambian -- ya sea porque tú guardaste algo
+ * acá mismo, o porque Falck o Condia guardaron algo desde su propio
+ * dispositivo. Así la tabla se actualiza sola, sin recargar la página.
+ */
+function initOrdersSync(onChange) {
+  if (!window.fb) {
+    console.error("Firebase no está disponible -- revisa js/firebase-config.js");
+    return;
+  }
+  const { db, collection, onSnapshot } = window.fb;
+  onSnapshot(
+    collection(db, ORDERS_COLLECTION),
+    (snapshot) => {
+      ordersCache = snapshot.docs.map((d) => d.data());
+      ordersCacheById = new Map(ordersCache.map((o) => [o.id, o]));
+      ordersReady = true;
+      onChange();
+      maybeOfferLocalMigration();
+    },
+    (error) => {
+      console.error("Error al sincronizar pedidos", error);
+      showToast("No se pudieron cargar los pedidos. Revisa tu conexión e intenta de nuevo.", "error");
+    }
+  );
+}
+
+/**
+ * De antes de conectar la base de datos compartida, puede que este
+ * navegador tenga pedidos guardados solo acá (con el sistema viejo de
+ * `localStorage`). Una sola vez por dispositivo, si encuentra alguno que
+ * todavía no esté en la nube, ofrece subirlo -- así nadie pierde su
+ * historial al pasar al nuevo sistema.
+ */
+const LOCAL_MIGRATION_FLAG = "altitude_orders_migrated_v1";
+
+async function maybeOfferLocalMigration() {
+  if (localStorage.getItem(LOCAL_MIGRATION_FLAG) === "true") return;
+  localStorage.setItem(LOCAL_MIGRATION_FLAG, "true"); // no volver a preguntar, pase lo que pase abajo
+
+  let localOrders = [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    localOrders = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    localOrders = [];
+  }
+
+  const cloudIds = new Set(ordersCache.map((o) => o.id));
+  const onlyLocal = localOrders.filter((o) => o && o.id && !cloudIds.has(o.id));
+  if (onlyLocal.length === 0) return;
+
+  const upload = await confirmDialog({
+    title: "Pedidos guardados en este navegador",
+    message: `Encontramos ${onlyLocal.length} pedido(s) guardados en este navegador de antes de conectar la base de datos compartida. ¿Los subimos para que los tres los vean?`,
+    confirmLabel: "Subir ahora",
+    cancelLabel: "No subir",
+  });
+  if (!upload) return;
+
+  const ok = await saveOrders([...ordersCache, ...onlyLocal]);
+  if (ok) {
+    showToast(`${onlyLocal.length} pedido(s) antiguo(s) subido(s) a la base de datos compartida ✓`);
+    renderOrders();
   }
 }
 
@@ -341,7 +448,7 @@ function initOrderForm() {
         }
         const wasEntregado = orders[idx].estado === "Entregado";
         orders[idx] = { ...orders[idx], ...values };
-        if (!saveOrders(orders)) return;
+        if (!(await saveOrders(orders))) return;
         savedOrder = orders[idx];
         showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
         justBecameEntregado = !wasEntregado && values.estado === "Entregado";
@@ -352,7 +459,7 @@ function initOrderForm() {
           createdAt: new Date().toISOString(),
         };
         orders.push(newOrder);
-        if (!saveOrders(orders)) return;
+        if (!(await saveOrders(orders))) return;
         savedOrder = newOrder;
         showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
         justBecameEntregado = values.estado === "Entregado";
@@ -643,7 +750,7 @@ function renderOrders() {
 
       const wasEntregado = orders[idx].estado === "Entregado";
       orders[idx] = { ...orders[idx], estado: nuevoEstado };
-      if (!saveOrders(orders)) {
+      if (!(await saveOrders(orders))) {
         estadoSelect.value = order.estado;
         return;
       }
@@ -716,14 +823,14 @@ function renderOrders() {
         danger: true,
       });
       if (!confirmed) return;
-      if (!saveOrders(loadOrders().filter((o) => o.id !== order.id))) return;
+      if (!(await saveOrders(loadOrders().filter((o) => o.id !== order.id)))) return;
       renderOrders();
       showToast(`Pedido de ${order.nombre || "cliente"} eliminado`, "success", {
         actionLabel: "Deshacer",
-        onAction: () => {
+        onAction: async () => {
           // Vuelve a insertar el mismo pedido tal cual estaba -- si mientras
-          // tanto se borró desde otra pestaña, restaurarlo no pisa nada.
-          if (!saveOrders([...loadOrders(), order])) return;
+          // tanto se borró desde otro dispositivo, restaurarlo no pisa nada.
+          if (!(await saveOrders([...loadOrders(), order]))) return;
           renderOrders();
           showToast(`Pedido de ${order.nombre || "cliente"} restaurado ✓`);
         },
@@ -740,9 +847,12 @@ function renderOrders() {
     ordersFilterState.rango !== "Todos" ||
     ordersFilterState.vendedor !== "Todos";
   renderFilteredSummary(orders, isFiltered);
-  document.getElementById("orders-empty").hidden = orders.length !== 0;
-  document.getElementById("orders-empty").textContent =
-    orders.length === 0 && allOrders.length > 0 ? "Ningún pedido coincide con ese filtro." : "Aún no has registrado pedidos.";
+  document.getElementById("orders-empty").hidden = ordersReady && orders.length !== 0;
+  document.getElementById("orders-empty").textContent = !ordersReady
+    ? "Cargando pedidos…"
+    : orders.length === 0 && allOrders.length > 0
+      ? "Ningún pedido coincide con ese filtro."
+      : "Aún no has registrado pedidos.";
   document.getElementById("orders-table").hidden = orders.length === 0;
   document.getElementById("orders-count").textContent = isFiltered ? `Mostrando ${orders.length} de ${allOrders.length}` : "";
 

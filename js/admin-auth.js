@@ -1,17 +1,19 @@
 /**
- * Candado de acceso del panel y arranque general una vez desbloqueado.
- * El código de acceso vive en js/admin-config.js. Recuerda: esto NO es
- * seguridad real (ver README, sección "Panel privado").
+ * Candado de acceso del panel: inicio de sesión real con Firebase
+ * (correo + contraseña), una cuenta por persona (Tomás, Falck, Condia).
+ * La protección de verdad vive en las reglas de Firestore
+ * (firestore.rules) -- sin una sesión válida, Firestore rechaza
+ * cualquier lectura o escritura, sin importar lo que haga esta página.
  */
-
-const UNLOCK_KEY = "altitude_admin_unlocked";
 
 function initLock() {
   const lockScreen = document.getElementById("lock-screen");
   const app = document.getElementById("admin-app");
   const form = document.getElementById("lock-form");
-  const input = document.getElementById("lock-input");
+  const emailInput = document.getElementById("lock-email");
+  const passwordInput = document.getElementById("lock-password");
   const error = document.getElementById("lock-error");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   function unlock() {
     lockScreen.hidden = true;
@@ -19,28 +21,50 @@ function initLock() {
     initAdminApp();
   }
 
-  if (sessionStorage.getItem(UNLOCK_KEY) === "true") {
-    unlock();
-    return;
+  function waitForFirebase() {
+    return new Promise((resolve) => {
+      if (window.fb) return resolve();
+      window.addEventListener("firebase-ready", () => resolve(), { once: true });
+    });
   }
 
-  form.addEventListener("submit", (e) => {
+  waitForFirebase().then(() => {
+    const { auth, onAuthStateChanged } = window.fb;
+    // Si ya había una sesión abierta en este navegador (Firebase la
+    // recuerda solo), entra directo sin pedir el correo de nuevo.
+    onAuthStateChanged(auth, (user) => {
+      if (user && lockScreen.hidden === false) unlock();
+    });
+  });
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (input.value === ADMIN_CONFIG.passcode) {
-      sessionStorage.setItem(UNLOCK_KEY, "true");
-      error.hidden = true;
-      unlock();
-    } else {
+    if (!window.fb) {
+      error.textContent = "No se pudo conectar con la base de datos. Revisa tu conexión a internet.";
       error.hidden = false;
-      input.value = "";
-      input.focus();
+      return;
+    }
+    const { auth, signInWithEmailAndPassword } = window.fb;
+    submitBtn.disabled = true;
+    try {
+      await signInWithEmailAndPassword(auth, emailInput.value.trim(), passwordInput.value);
+      error.hidden = true;
+      passwordInput.value = "";
+      unlock();
+    } catch (e) {
+      error.textContent = "Correo o contraseña incorrectos.";
+      error.hidden = false;
+      passwordInput.value = "";
+      passwordInput.focus();
+    } finally {
+      submitBtn.disabled = false;
     }
   });
 }
 
 function initAdminApp() {
   document.getElementById("logout-btn").addEventListener("click", () => {
-    sessionStorage.removeItem(UNLOCK_KEY);
+    if (window.fb) window.fb.signOut(window.fb.auth);
     window.location.reload();
   });
 
@@ -54,7 +78,7 @@ function initAdminApp() {
   initClientHistory();
   initReceiptModal();
   initConfirmDialog();
-  renderOrders();
+  initOrdersSync(renderOrders);
 
   // También deja el formulario en su estado "limpio" inicial (fecha de
   // hoy, estado Pendiente) y fija ese punto de partida para detectar

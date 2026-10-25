@@ -13,14 +13,15 @@ admin.html                 → panel privado de pedidos/contabilidad (ver abajo)
 css/styles.css              → estilos de la página pública
 css/admin.css                → estilos del panel privado
 js/data.js                      → tu información de negocio y el catálogo de relojes (edita aquí)
-js/admin-config.js               → código de acceso del panel privado (edítalo aquí)
+js/firebase-config.js            → conexión a tu base de datos compartida de pedidos (edítalo aquí)
+firestore.rules                   → reglas de seguridad para pegar en la consola de Firebase
 images/watches/                    → aquí van las fotos de tus relojes
 favicon.svg                         → ícono de la pestaña del navegador
 ```
 
 El resto de los archivos en `js/` son la lógica del sitio — no necesitas
 tocarlos para actualizar tu catálogo o tu negocio, eso se edita en
-`js/data.js` y `js/admin-config.js`. Están divididos en piezas chicas en
+`js/data.js` y `js/firebase-config.js`. Están divididos en piezas chicas en
 vez de un solo archivo gigante, cada una con una sola responsabilidad:
 
 **Compartido por ambas páginas**
@@ -32,14 +33,19 @@ vez de un solo archivo gigante, cada una con una sola responsabilidad:
 - `js/site.js` — tu marca, menú móvil, SEO, y el arranque general de la página.
 
 **Panel privado** (cargados por `admin.html`)
-- `js/admin-orders.js` — guardar/leer pedidos, el formulario, la tabla y sus estadísticas.
+- `js/firebase-init.js` — conecta con Firebase (base de datos compartida de pedidos).
+- `js/admin-orders.js` — guardar/leer pedidos (sincronizados en tiempo real), el formulario, la tabla y sus estadísticas.
 - `js/admin-csv.js` — exportar/importar CSV (Excel).
 - `js/admin-sales-detail.js` — la lista que se abre al hacer clic en "Ganancia total".
-- `js/admin-auth.js` — el candado de acceso y el arranque del panel.
+- `js/admin-auth.js` — el inicio de sesión (correo/contraseña) y el arranque del panel.
 
 Cada archivo HTML carga sus scripts en orden con etiquetas `<script>`
-normales (sin `import`/`export`, sin paso de compilación), así que sigues
-pudiendo abrir `index.html` con doble clic sin instalar nada.
+normales (sin paso de compilación), así que sigues pudiendo abrir
+`index.html` con doble clic sin instalar nada. La única excepción es
+`js/firebase-init.js` en `admin.html`, que sí usa `import`/`export` (lo
+exige el SDK de Firebase) -- por eso el panel privado, a diferencia de la
+página pública, sí necesita abrirse desde un servidor (ver "Cómo ver la
+página en tu computador" más abajo) y no funciona con doble clic.
 
 ## Cómo personalizar tu información
 
@@ -141,17 +147,20 @@ se genera solo a partir de los datos de cada reloj.
 
 ## Cómo ver la página en tu computador
 
-No necesitas instalar nada. Basta con abrir el archivo `index.html`
-directamente en tu navegador (doble clic).
+Para `index.html` (la página pública) no necesitas instalar nada: basta con
+abrir el archivo directamente en tu navegador (doble clic).
 
-Si prefieres verla con un servidor local (opcional, útil para evitar
-restricciones del navegador con algunos archivos):
+`admin.html` (el panel privado) sí necesita un servidor local -- el
+navegador bloquea por seguridad los `import`/`export` que usa Firebase
+cuando el archivo se abre con doble clic. Corre esto desde la carpeta del
+proyecto:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-y luego abre `http://localhost:8000` en tu navegador.
+y luego abre `http://localhost:8000/admin.html` en tu navegador. (También
+funciona para `index.html`, si prefieres verlas las dos así.)
 
 ## Cómo publicar la página (gratis)
 
@@ -257,47 +266,72 @@ avisa cuántos pedidos le faltan costo.
 ### Cómo entrar
 
 Abre `admin.html` (por ejemplo `https://tu-usuario.github.io/relojesaaa/admin.html`)
-y escribe el código de acceso. El código por defecto está en
-`js/admin-config.js` — ábrelo y cámbialo por el que tú quieras, es solo
-texto plano en ese archivo.
+e inicia sesión con tu correo y contraseña. Ya no es un código compartido:
+cada uno de los tres (Tomás, Falck, Condia) tiene su propia cuenta, y los
+pedidos quedan sincronizados al instante entre los tres, desde cualquier
+dispositivo -- ya no importa quién entre desde dónde.
 
-### Muy importante: esto NO es un sistema con seguridad real
+### Cómo está armado por dentro: Firebase
 
-`admin.html` es una página estática más de este mismo sitio (no hay un
-servidor tuyo ni una base de datos real detrás). Eso significa:
+El panel usa [Firebase](https://firebase.google.com/) (gratis para este
+tamaño de negocio) como base de datos compartida: cuando alguien guarda un
+pedido, los otros dos lo ven aparecer solo, sin recargar la página. Esto
+reemplaza por completo el sistema anterior (código compartido +
+`localStorage`), que guardaba los datos solo en el navegador de cada
+quien.
 
-1. **El código de acceso no es seguridad de verdad.** Cualquiera con
-   conocimientos básicos puede ver el código de la página (clic derecho →
-   "Ver código fuente") y leer el código de acceso tal cual está escrito en
-   `js/admin-config.js`. El candado solo evita que alguien entre por
-   accidente si llega a encontrar el link — no protege datos de alguien que
-   de verdad se lo proponga.
-2. **No compartas el link de `admin.html` públicamente.** No lo pongas en
-   Instagram, en el link de WhatsApp que le das a tus clientes, ni en
-   ninguna parte visible. Solo tú (y quien tú autorices) debería tener ese
-   link.
-3. **Los datos viven solo en el navegador donde los escribiste**, guardados
-   con una tecnología llamada `localStorage`. Si entras desde el celular,
-   esos pedidos NO aparecen automáticamente si luego entras desde el
-   computador — son navegadores distintos. Por eso:
-   - Exporta a CSV seguido y guarda una copia en Google Drive, tu correo, o
-     donde prefieras.
-   - Si quieres mover los datos de un dispositivo a otro, expórtalos en uno
-     e impórtalos en el otro con el botón "Importar CSV".
-   - Si borras los datos del navegador (caché/cookies) o cambias de
-     computador sin haber exportado, pierdes lo que no hayas respaldado.
-4. **Estás guardando datos personales de tus clientes** (nombre, cédula,
-   teléfono, correo, dirección). En Colombia esto lo cubre la Ley de
-   Protección de Datos (Habeas Data, Ley 1581 de 2012): en términos
-   simples, usa esos datos solo para procesar el pedido, no los compartas
-   con terceros sin avisar a tus clientes, y bórralos si un cliente te lo
-   pide. Si tu negocio crece mucho, en algún momento vale la pena migrar
-   esto a una herramienta con una base de datos y seguridad real (por
-   ejemplo, una app con backend, o incluso una hoja de Google Sheets
-   compartida solo contigo) — este panel es un punto de partida simple y
-   gratuito, no la solución definitiva.
+**Si el proyecto ya tiene un proyecto de Firebase configurado** (pregúntame
+a mí o a quien lo haya armado), solo necesitas que te creen una cuenta
+(correo + contraseña) ahí -- no necesitas tocar ningún archivo.
 
-Si en algún momento quieres algo con seguridad real (usuarios con
-contraseña de verdad, base de datos en la nube, copias de seguridad
-automáticas), avísame y armamos ese siguiente paso — requiere un servicio
-adicional (no alcanza con GitHub Pages solo), pero es totalmente posible.
+**Si es la primera vez que se configura:**
+
+1. Ve a [console.firebase.google.com](https://console.firebase.google.com/)
+   y crea un proyecto gratis ("Agregar proyecto"). Puedes desactivar Google
+   Analytics, no se necesita.
+2. En la página principal del proyecto, haz clic en el ícono `</>` (Web)
+   para agregar una app web. Ponle cualquier apodo y NO marques
+   "Configurar también Firebase Hosting".
+3. Firebase te muestra un bloque `firebaseConfig = {...}` -- copia esos
+   valores dentro de `js/firebase-config.js`, reemplazando cada
+   `"CAMBIA_ESTO"`. Es el único archivo que necesitas editar.
+4. Menú izquierdo → **Authentication** → pestaña "Sign-in method" → activa
+   "Correo electrónico/contraseña". Luego en la pestaña "Users", crea una
+   cuenta (correo + contraseña) para cada uno de los tres.
+5. Menú izquierdo → **Firestore Database** → "Crear base de datos" → elige
+   la ubicación más cercana (por ejemplo `southamerica-east1`) → modo
+   "producción".
+6. Dentro de Firestore, pestaña **Reglas**: borra lo que haya y pega todo
+   el contenido del archivo `firestore.rules` de este proyecto → "Publicar".
+   **Este paso es el que de verdad protege los datos** -- sin él, cualquiera
+   con el link podría leer o borrar pedidos sin iniciar sesión, sin importar
+   qué tan bien esté hecho el formulario de inicio de sesión.
+7. Publica el cambio en `js/firebase-config.js` (commit + push, o pídemelo
+   a mí) y listo: las tres cuentas ya pueden entrar a `admin.html` y ver lo
+   mismo.
+
+Si el navegador de alguien tenía pedidos guardados con el sistema viejo
+(antes de este cambio), al iniciar sesión por primera vez el panel los
+detecta solo y pregunta si quieres subirlos a la base de datos compartida
+-- no se pierde nada del historial.
+
+### Qué tan segura es esta configuración
+
+- **Ninguno de los valores en `js/firebase-config.js` es secreto.** Firebase
+  los diseñó para vivir en el código del navegador sin problema (cualquier
+  sitio hecho con Firebase los expone igual). Lo que de verdad protege tus
+  datos son las **reglas de Firestore** (paso 6 arriba) y que **solo existan
+  las 3 cuentas que ustedes crearon** (paso 4) -- sin una sesión válida con
+  una de esas cuentas, Firestore rechaza cualquier lectura o escritura, sin
+  importar qué tanto alguien sepa de programación.
+- **No compartas el link de `admin.html` públicamente** de todos modos (no
+  lo pongas en Instagram, en el WhatsApp de difusión, etc.) -- es una buena
+  práctica adicional, aunque ya no sea la única protección.
+- **Estás guardando datos personales de tus clientes** (nombre, cédula,
+  teléfono, correo, dirección). En Colombia esto lo cubre la Ley de
+  Protección de Datos (Habeas Data, Ley 1581 de 2012): usa esos datos solo
+  para procesar el pedido, no los compartas con terceros sin avisar a tus
+  clientes, y bórralos si un cliente te lo pide.
+- Sigue siendo buena idea **exportar a CSV de vez en cuando** (botón
+  "Exportar a Excel (CSV)") y guardar una copia aparte -- no reemplaza la
+  base de datos compartida, es solo una copia de seguridad extra.

@@ -17,13 +17,14 @@
       <img class="brand__icon lock-card__icon" src="images/logo.png" alt="" />
       <h1>Panel privado</h1>
       <p>Solo para uso interno de All U Can Buy.</p>
-      <input type="password" id="lock-input" placeholder="Código de acceso" autocomplete="off" />
+      <input type="email" id="lock-email" placeholder="Correo" autocomplete="username" required />
+      <input type="password" id="lock-password" placeholder="Contraseña" autocomplete="current-password" required />
       <button type="submit" class="btn btn--primary">Entrar</button>
-      <p id="lock-error" class="lock-error" hidden>Código incorrecto.</p>
+      <p id="lock-error" class="lock-error" hidden>Correo o contraseña incorrectos.</p>
       <p class="lock-note">
-        Este código es solo un filtro básico, no seguridad real (ver
-        <code>js/admin-config.js</code>). No es un reemplazo de mantener este
-        link privado.
+        Acceso solo para las cuentas creadas en Firebase para este panel
+        (Tomás, Falck y Condia). Los pedidos quedan sincronizados para
+        los tres al instante, desde cualquier dispositivo.
       </p>
     </form>
   </div>
@@ -268,7 +269,7 @@
           <button type="button" id="export-csv-filtered" class="btn btn--ghost btn--small">Exportar esta vista (CSV)</button>
         </div>
         <div class="table-scroll">
-          <table id="orders-table" class="orders-table">
+          <table id="orders-table" class="orders-table" hidden>
             <thead>
               <tr id="orders-thead-row">
                 <th data-sort="fecha">Fecha</th>
@@ -285,7 +286,7 @@
             <tbody id="orders-tbody"></tbody>
           </table>
         </div>
-        <p id="orders-empty" class="orders-empty" hidden>Aún no has registrado pedidos.</p>
+        <p id="orders-empty" class="orders-empty">Cargando pedidos…</p>
       </section>
     </main>
   </div>
@@ -326,8 +327,8 @@
 
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
+  <script type="module" src="js/firebase-init.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/admin-config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/admin-ui.js"></script>
   <script src="js/admin-orders.js"></script>
