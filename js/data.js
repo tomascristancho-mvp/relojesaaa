@@ -317,4 +317,14 @@ const WATCHES = [
     descripcion: "Correa de malla milanesa plateada y esfera gris con índices de cristal. Resistente al agua -- delicado y elegante, perfecto para combinar con cualquier look del día a día.",
     imagen: "images/watches/reloj-26.jpg",
   },
+  {
+    id: 27,
+    referencia: "REF-27",
+    marca: "Guldo",
+    genero: "Hombre",
+    nombre: "Esfera Negra Bisel Acanalado",
+    precio: 55000,
+    descripcion: "Caja en acero con bisel acanalado estilo moneda, esfera negra texturizada, segundero independiente y calendario. Correa de cuero negro. Un diseño robusto tipo buceo con un toque clásico.",
+    imagen: "images/watches/reloj-27.jpg",
+  },
 ];
