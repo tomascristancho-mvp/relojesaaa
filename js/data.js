@@ -273,6 +273,7 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera verde menta texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 30M) -- fresco y distinto, para salir de lo clásico sin perder elegancia.",
     imagen: "images/watches/reloj-20.jpg",
     popularidad: 20,
+    resistenteAgua: true,
   },
   {
     id: 21,
