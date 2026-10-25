@@ -170,12 +170,18 @@ function openWatchFromUrl() {
   if (watch) openModal(watch);
 }
 
+/**
+ * Solo incluye los relojes que de verdad se ven en la página (disponible
+ * !== false) -- antes se listaban todos, incluidos los vendidos, siempre
+ * como "InStock", lo que no coincidía con lo que el visitante realmente
+ * ve ni con lo que hay en el catálogo.
+ */
 function injectStructuredData() {
   const siteUrl = window.location.href.split("#")[0];
   const data = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: WATCHES.map((watch, i) => ({
+    itemListElement: WATCHES.filter((w) => w.disponible !== false).map((watch, i) => ({
       "@type": "Product",
       position: i + 1,
       name: `${watch.marca} ${watch.nombre}`,
