@@ -267,4 +267,14 @@ const WATCHES = [
     descripcion: "Brazalete bicolor en acero plateado y dorado, esfera champán con números romanos y calendario a las 3. Resistente al agua (WR 50M) -- elegante y femenino, perfecto para looks formales o del día a día.",
     imagen: "images/watches/reloj-21.jpg",
   },
+  {
+    id: 22,
+    referencia: "REF-22",
+    marca: "Q&Q",
+    genero: "Hombre",
+    nombre: "Clásico Esfera Negra Acero",
+    precio: 63000,
+    descripcion: "Caja y brazalete en acero plateado con esfera negra de círculos concéntricos y calendario a las 3. Un clásico elegante y sobrio, perfecto para la oficina o cualquier ocasión formal.",
+    imagen: "images/watches/reloj-22.jpg",
+  },
 ];
