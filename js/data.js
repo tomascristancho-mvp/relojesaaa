@@ -337,4 +337,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera gris efecto sunburst, numeración romana y calendario a las 3. Un clásico elegante y versátil, perfecto para la oficina o cualquier ocasión.",
     imagen: "images/watches/reloj-28.jpg",
   },
+  {
+    id: 29,
+    referencia: "REF-29",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Esfera Negra Octagonal Día y Fecha",
+    precio: 115000,
+    descripcion: "Caja octagonal en acero plateado con esfera negra texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 50M) -- robusto y moderno, con esa forma distinta que no pasa desapercibida.",
+    imagen: "images/watches/reloj-29.jpg",
+  },
 ];
