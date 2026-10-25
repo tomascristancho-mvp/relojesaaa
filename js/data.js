@@ -277,4 +277,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera negra de círculos concéntricos y calendario a las 3. Un clásico elegante y sobrio, perfecto para la oficina o cualquier ocasión formal.",
     imagen: "images/watches/reloj-22.jpg",
   },
+  {
+    id: 23,
+    referencia: "REF-23",
+    marca: "Casio",
+    genero: "Unisex",
+    nombre: "Digital F-91W Clásico",
+    precio: 60000,
+    descripcion: "El ícono de siempre: pantalla digital con alarma, cronómetro y correa de caucho negro. Resistente al agua, liviano y nunca pasa de moda -- el digital que todos reconocen.",
+    imagen: "images/watches/reloj-23.jpg",
+  },
 ];
