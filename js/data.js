@@ -170,6 +170,7 @@ const WATCHES = [
     precio: 55000,
     descripcion: "El digital de toda la vida: pantalla LCD, alarma, cronómetro y brazalete de acero plateado. Un ícono que nunca pasa de moda.",
     imagen: "images/watches/reloj-10.jpg",
+    resistenteAgua: true,
     disponible: false,
   },
 
@@ -226,7 +227,6 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Caja y brazalete en acero plateado con esfera negra texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
     imagen: "images/watches/reloj-15.jpg",
-    resistenteAgua: true,
     disponible: false,
   },
   {
@@ -273,7 +273,6 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera verde menta texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 30M) -- fresco y distinto, para salir de lo clásico sin perder elegancia.",
     imagen: "images/watches/reloj-20.jpg",
     popularidad: 20,
-    resistenteAgua: true,
   },
   {
     id: 21,
@@ -285,7 +284,6 @@ const WATCHES = [
     descripcion: "Brazalete bicolor en acero plateado y dorado, esfera champán con números romanos y calendario a las 3. Resistente al agua (WR 50M) -- elegante y femenino, perfecto para looks formales o del día a día.",
     imagen: "images/watches/reloj-21.jpg",
     popularidad: 15,
-    resistenteAgua: true,
   },
   {
     id: 22,
@@ -308,7 +306,6 @@ const WATCHES = [
     descripcion: "El ícono de siempre: pantalla digital con alarma, cronómetro y correa de caucho negro. Resistente al agua, liviano y nunca pasa de moda -- el digital que todos reconocen.",
     imagen: "images/watches/reloj-23.jpg",
     popularidad: 1,
-    resistenteAgua: true,
   },
   {
     id: 24,
@@ -320,7 +317,6 @@ const WATCHES = [
     descripcion: "Caja y brazalete bicolor en acero y dorado, esfera dorada con numeración árabe grande y calendario a las 3. Resistente al agua -- un clásico elegante con ese brillo que le sube el nivel a cualquier look.",
     imagen: "images/watches/reloj-24.jpg",
     popularidad: 7,
-    resistenteAgua: true,
   },
   {
     id: 25,
@@ -344,7 +340,6 @@ const WATCHES = [
     descripcion: "Correa de malla milanesa plateada y esfera gris con índices de cristal. Resistente al agua -- delicado y elegante, perfecto para combinar con cualquier look del día a día.",
     imagen: "images/watches/reloj-26.jpg",
     popularidad: 6,
-    resistenteAgua: true,
   },
   {
     id: 27,
@@ -390,7 +385,6 @@ const WATCHES = [
     descripcion: "Caja pequeña en acero plateado con correa de malla milanesa y esfera negra minimalista. Resistente al agua -- delicado y fácil de combinar, perfecto para el día a día.",
     imagen: "images/watches/reloj-30.jpg",
     popularidad: 5,
-    resistenteAgua: true,
   },
   {
     id: 31,
@@ -413,7 +407,6 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera plateada efecto sunburst, numeración árabe y calendario a las 3. Resistente al agua (WR 50M) -- un clásico limpio y elegante que combina con todo.",
     imagen: "images/watches/reloj-32.jpg",
     popularidad: 18,
-    resistenteAgua: true,
   },
   {
     id: 33,
@@ -425,6 +418,5 @@ const WATCHES = [
     descripcion: "Caja y brazalete expansible en acero plateado con esfera blanca y numeración árabe grande, fácil de leer de un vistazo. Resistente al agua -- simple, clásico y cómodo para todos los días.",
     imagen: "images/watches/reloj-33.jpg",
     popularidad: 2,
-    resistenteAgua: true,
   },
 ];
