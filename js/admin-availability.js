@@ -23,9 +23,9 @@ function computeUnmarkedSoldWatches(orders) {
       deliveredRefs.get(ref).clientes.push(o.nombre || "cliente sin nombre");
     });
 
-  return Array.from(deliveredRefs.values()).filter(({ ref }) => {
+  return Array.from(deliveredRefs.values()).filter(({ ref, clientes }) => {
     const watch = findWatchByRef(ref);
-    return watch && watch.disponible !== false;
+    return watch && watch.disponible !== false && clientes.length >= watchQuantity(watch);
   });
 }
 
@@ -59,9 +59,10 @@ function renderAvailabilityAlerts() {
 }
 
 /**
- * Como cada reloj es una pieza única, dos pedidos con estado Confirmado,
- * Enviado o Entregado para la misma referencia al mismo tiempo casi
- * siempre significan una venta duplicada por error. La confirmación al
+ * Cada reloj del catálogo es una pieza única por defecto (salvo que
+ * tenga `cantidad` en js/data.js) -- más pedidos activos (Confirmado,
+ * Enviado o Entregado) para la misma referencia que unidades tiene casi
+ * siempre significa una venta duplicada por error. La confirmación al
  * guardar (ver findConflictingOrder en admin-orders.js) atrapa la
  * mayoría de estos casos en el momento, pero este aviso permanente
  * también detecta los que se cuelan por una importación de CSV o una
@@ -78,7 +79,7 @@ function computeDuplicateSaleConflicts(orders) {
       map.get(ref).push(o);
     });
   return Array.from(map.entries())
-    .filter(([, list]) => list.length > 1)
+    .filter(([ref, list]) => list.length > watchQuantity(findWatchByRef(ref)))
     .map(([ref, list]) => ({ ref, reloj: list[0].reloj, orders: list }));
 }
 

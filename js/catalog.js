@@ -28,6 +28,7 @@ const recentWatchIds = new Set(
 
 function watchCard(watch) {
   const img = watch.imagen || PLACEHOLDER_IMAGE;
+  const badge = availabilityBadge(watch);
   const card = document.createElement("article");
   card.className = "watch-card";
   card.dataset.marca = watch.marca;
@@ -44,7 +45,7 @@ function watchCard(watch) {
     <div class="watch-card__body">
       <div class="watch-card__ref-row">
         <span class="watch-card__ref">${watch.referencia}</span>
-        <span class="unique-badge" title="Es la única unidad disponible de este reloj">Pieza única</span>
+        <span class="unique-badge" title="${badge.title}">${badge.label}</span>
       </div>
       <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>
@@ -129,12 +130,13 @@ function renderCatalog() {
   items.forEach((watch) => grid.appendChild(watchCard(watch)));
   document.getElementById("catalog-empty").hidden = items.length !== 0;
 
-  const availableCount = WATCHES.filter((w) => w.disponible !== false).length;
+  const availableCount = sumWatchQuantities(WATCHES.filter((w) => w.disponible !== false));
+  const shownCount = sumWatchQuantities(items);
   const countEl = document.getElementById("catalog-count");
   countEl.textContent =
-    items.length === availableCount
+    shownCount === availableCount
       ? `${availableCount} relojes disponibles`
-      : `Mostrando ${items.length} de ${availableCount} relojes`;
+      : `Mostrando ${shownCount} de ${availableCount} relojes`;
 }
 
 function renderFilterGroup(containerId, key, allLabel, values, getCount) {

@@ -81,6 +81,24 @@ function findWatchByRef(refCode) {
   return WATCHES.find((w) => w.referencia.toUpperCase() === refCode.toUpperCase()) || null;
 }
 
+/** Cuántas unidades físicas tiene esa referencia (ver `cantidad` en js/data.js). 1 si no se definió. */
+function watchQuantity(watch) {
+  return watch && watch.cantidad > 1 ? watch.cantidad : 1;
+}
+
+/** Suma las unidades físicas (no solo las referencias) de una lista de relojes. */
+function sumWatchQuantities(watches) {
+  return watches.reduce((total, w) => total + watchQuantity(w), 0);
+}
+
+/** Texto + tooltip del badge de disponibilidad en la tarjeta, el modal y el comparador. */
+function availabilityBadge(watch) {
+  const qty = watchQuantity(watch);
+  return qty > 1
+    ? { label: `${qty} disponibles`, title: `Quedan ${qty} unidades disponibles de este reloj` }
+    : { label: "Pieza única", title: "Es la única unidad disponible de este reloj" };
+}
+
 /**
  * `options.actionLabel` + `options.onAction` agregan un botón (por ejemplo
  * "Deshacer") al toast. Si se usa, el toast dura más para dar tiempo a

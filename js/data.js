@@ -43,6 +43,14 @@ const CONFIG = {
  *   pedidos NO actualiza esto por sí solo, porque los pedidos que guardas
  *   ahí viven únicamente en el navegador donde los registraste, no están
  *   conectados con esta página pública.
+ * - cantidad (opcional): cuántas unidades físicas iguales tienes de esa
+ *   referencia (ej: el mismo reloj en 2 cajas idénticas). Si no lo
+ *   agregas, se asume 1 ("Pieza única" en la tarjeta y el detalle). Con
+ *   cantidad: 2 aparece UNA sola tarjeta que dice "2 disponibles", y el
+ *   panel de pedidos permite esa cantidad de pedidos activos para la
+ *   misma referencia sin avisar de "venta duplicada". Cuando se venda
+ *   una unidad, baja el número en 1; cuando llegue a 0 (o se vendió la
+ *   última), usa `disponible: false` como con cualquier otro reloj.
  */
 const WATCHES = [
   {
@@ -236,16 +244,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
     imagen: "images/watches/reloj-18.jpg",
-  },
-  {
-    id: 19,
-    referencia: "REF-19",
-    marca: "Tommy Hilfiger",
-    genero: "Hombre",
-    nombre: "Clásico Esfera Crema Caja Negra",
-    precio: 60000,
-    descripcion: "Caja en acero negro con esfera crema y numeración árabe grande, correa de caucho negro. Clásico, cómodo y fácil de combinar con cualquier outfit.",
-    imagen: "images/watches/reloj-18.jpg",
+    cantidad: 2,
   },
   {
     id: 20,

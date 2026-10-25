@@ -13,6 +13,10 @@ function openModal(watch) {
   document.getElementById("modal-img").src = img;
   document.getElementById("modal-img").alt = `${watch.nombre} - ${watch.referencia}`;
   document.getElementById("modal-ref").textContent = watch.referencia;
+  const badge = availabilityBadge(watch);
+  const badgeEl = document.getElementById("modal-unique-badge");
+  badgeEl.textContent = badge.label;
+  badgeEl.title = badge.title;
   document.getElementById("modal-brand").textContent = watch.marca;
   document.getElementById("modal-title").textContent = watch.nombre;
   document.getElementById("modal-price").textContent = formatPrice(watch.precio);

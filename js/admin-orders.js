@@ -9,29 +9,37 @@ const ORDER_STATUSES = ["Pendiente", "Confirmado", "Enviado", "Entregado", "Canc
 const ACTIVE_ESTADOS = ["Confirmado", "Enviado", "Entregado"];
 
 /**
- * Cada reloj del catálogo es una pieza única (no hay stock por
- * referencia) -- si dos pedidos distintos quedan "activos" (Confirmado,
- * Enviado o Entregado) para la misma referencia al mismo tiempo, casi
- * seguro uno de los dos está mal: vendido dos veces por error, o al otro
- * pedido le falta cancelarse. `candidate` no necesita existir todavía en
- * `orders` (se usa también para validar un pedido antes de guardarlo).
+ * Cada reloj del catálogo es una pieza única por defecto (no hay stock
+ * por referencia), salvo que tenga `cantidad` en js/data.js (ej: 2
+ * unidades físicas iguales) -- si quedan más pedidos "activos"
+ * (Confirmado, Enviado o Entregado) para la misma referencia que
+ * unidades tiene, casi seguro alguno está mal: vendido de más por error,
+ * o a otro pedido le falta cancelarse. `candidate` no necesita existir
+ * todavía en `orders` (se usa también para validar un pedido antes de
+ * guardarlo).
  */
 function findConflictingOrder(orders, candidate) {
   if (!ACTIVE_ESTADOS.includes(candidate.estado)) return null;
   const ref = extractRefCode(candidate.reloj);
   if (!ref) return null;
-  return (
-    orders.find(
-      (o) => o.id !== candidate.id && ACTIVE_ESTADOS.includes(o.estado) && extractRefCode(o.reloj) === ref
-    ) || null
+  const otherActive = orders.filter(
+    (o) => o.id !== candidate.id && ACTIVE_ESTADOS.includes(o.estado) && extractRefCode(o.reloj) === ref
   );
+  const cantidad = watchQuantity(findWatchByRef(ref));
+  if (otherActive.length < cantidad) return null;
+  return otherActive[0] || null;
 }
 
 async function confirmSaleConflict(conflict, reloj) {
   const ref = extractRefCode(reloj) || "Este reloj";
+  const cantidad = watchQuantity(findWatchByRef(ref));
+  const message =
+    cantidad > 1
+      ? `${ref} ya tiene ${cantidad} pedido(s) activo(s) -- el máximo que registraste en stock para esa referencia. El más reciente es de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Revisa si alguno debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`
+      : `${ref} ya figura como ${conflict.estado} en el pedido de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Como cada reloj es una pieza única, esto suele significar una venta duplicada -- revisa si el otro pedido debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`;
   return confirmDialog({
     title: "Este reloj ya está en otro pedido activo",
-    message: `${ref} ya figura como ${conflict.estado} en el pedido de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Como cada reloj es una pieza única, esto suele significar una venta duplicada -- revisa si el otro pedido debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`,
+    message,
     confirmLabel: "Guardar de todas formas",
     cancelLabel: "Revisar antes",
     danger: true,
@@ -754,9 +762,10 @@ function renderOrders() {
   document.getElementById("stat-pending").textContent = allOrders.filter((o) => o.estado === "Pendiente").length;
 
   const allWatches = typeof WATCHES !== "undefined" ? WATCHES : [];
-  const available = allWatches.filter((w) => w.disponible !== false).length;
-  document.getElementById("stat-catalog-available").textContent = `${available} de ${allWatches.length}`;
-  const sold = allWatches.length - available;
+  const totalUnits = sumWatchQuantities(allWatches);
+  const available = sumWatchQuantities(allWatches.filter((w) => w.disponible !== false));
+  document.getElementById("stat-catalog-available").textContent = `${available} de ${totalUnits}`;
+  const sold = totalUnits - available;
   document.getElementById("stat-catalog-note").textContent = sold > 0 ? `${sold} marcado(s) como vendido(s)` : "";
 
   if (typeof renderCharts === "function") renderCharts();
