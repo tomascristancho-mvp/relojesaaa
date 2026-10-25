@@ -297,4 +297,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete bicolor en acero y dorado, esfera dorada con numeración árabe grande y calendario a las 3. Resistente al agua -- un clásico elegante con ese brillo que le sube el nivel a cualquier look.",
     imagen: "images/watches/reloj-24.jpg",
   },
+  {
+    id: 25,
+    referencia: "REF-25",
+    marca: "Baltick",
+    genero: "Hombre",
+    nombre: "Digital Dual Time Deportivo",
+    precio: 58000,
+    descripcion: "Caja octagonal en negro con doble horario, brújula decorativa, alarma, cronómetro y luz EL. Correa de caucho negro. Resistente al agua (WR 30M) -- deportivo y resistente, para el día a día activo.",
+    imagen: "images/watches/reloj-25.jpg",
+  },
 ];
