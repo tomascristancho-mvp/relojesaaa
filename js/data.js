@@ -377,4 +377,14 @@ const WATCHES = [
     descripcion: "Caja y brazalete en acero plateado con esfera plateada efecto sunburst, numeración árabe y calendario a las 3. Resistente al agua (WR 50M) -- un clásico limpio y elegante que combina con todo.",
     imagen: "images/watches/reloj-32.jpg",
   },
+  {
+    id: 33,
+    referencia: "REF-33",
+    marca: "Q&Q",
+    genero: "Unisex",
+    nombre: "Esfera Blanca Números Grandes",
+    precio: 60000,
+    descripcion: "Caja y brazalete expansible en acero plateado con esfera blanca y numeración árabe grande, fácil de leer de un vistazo. Resistente al agua -- simple, clásico y cómodo para todos los días.",
+    imagen: "images/watches/reloj-33.jpg",
+  },
 ];
