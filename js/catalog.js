@@ -48,8 +48,8 @@ function watchCard(watch) {
       <div class="watch-card__ref-row">
         <span class="watch-card__ref">${watch.referencia}</span>
         <span class="unique-badge" title="${badge.title}">${badge.label}</span>
-        ${watch.resistenteAgua ? `<span class="water-badge" title="Resistente al agua">${WATER_DROP_ICON}</span>` : ""}
       </div>
+      ${watch.resistenteAgua ? `<span class="water-badge" title="Resistente al agua">${WATER_DROP_ICON} Water Resistant</span>` : ""}
       <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>
       <p class="watch-card__price">${formatPrice(watch.precio)}</p>
