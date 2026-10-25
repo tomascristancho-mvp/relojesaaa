@@ -307,4 +307,14 @@ const WATCHES = [
     descripcion: "Caja octagonal en negro con doble horario, brújula decorativa, alarma, cronómetro y luz EL. Correa de caucho negro. Resistente al agua (WR 30M) -- deportivo y resistente, para el día a día activo.",
     imagen: "images/watches/reloj-25.jpg",
   },
+  {
+    id: 26,
+    referencia: "REF-26",
+    marca: "Q&Q",
+    genero: "Mujer",
+    nombre: "Mesh Plata Esfera Gris Cristales",
+    precio: 60000,
+    descripcion: "Correa de malla milanesa plateada y esfera gris con índices de cristal. Resistente al agua -- delicado y elegante, perfecto para combinar con cualquier look del día a día.",
+    imagen: "images/watches/reloj-26.jpg",
+  },
 ];
