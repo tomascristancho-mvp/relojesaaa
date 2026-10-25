@@ -327,4 +327,14 @@ const WATCHES = [
     descripcion: "Caja en acero con bisel acanalado estilo moneda, esfera negra texturizada, segundero independiente y calendario. Correa de cuero negro. Un diseño robusto tipo buceo con un toque clásico.",
     imagen: "images/watches/reloj-27.jpg",
   },
+  {
+    id: 28,
+    referencia: "REF-28",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Esfera Gris Números Romanos",
+    precio: 63000,
+    descripcion: "Caja y brazalete en acero plateado con esfera gris efecto sunburst, numeración romana y calendario a las 3. Un clásico elegante y versátil, perfecto para la oficina o cualquier ocasión.",
+    imagen: "images/watches/reloj-28.jpg",
+  },
 ];
