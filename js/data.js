@@ -287,4 +287,14 @@ const WATCHES = [
     descripcion: "El ícono de siempre: pantalla digital con alarma, cronómetro y correa de caucho negro. Resistente al agua, liviano y nunca pasa de moda -- el digital que todos reconocen.",
     imagen: "images/watches/reloj-23.jpg",
   },
+  {
+    id: 24,
+    referencia: "REF-24",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Bicolor Esfera Dorada Números",
+    precio: 60000,
+    descripcion: "Caja y brazalete bicolor en acero y dorado, esfera dorada con numeración árabe grande y calendario a las 3. Resistente al agua -- un clásico elegante con ese brillo que le sube el nivel a cualquier look.",
+    imagen: "images/watches/reloj-24.jpg",
+  },
 ];
