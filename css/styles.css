@@ -1088,6 +1088,24 @@ section[id] {
   white-space: nowrap;
 }
 
+.water-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--accent-soft);
+  background: rgba(47, 143, 255, 0.14);
+  border: 1px solid rgba(47, 143, 255, 0.3);
+}
+
+.water-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
 .watch-card__brand {
   font-size: 0.78rem;
   color: var(--text-muted);

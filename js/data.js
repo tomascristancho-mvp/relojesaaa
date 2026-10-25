@@ -43,6 +43,9 @@ const CONFIG = {
  *   pedidos NO actualiza esto por sí solo, porque los pedidos que guardas
  *   ahí viven únicamente en el navegador donde los registraste, no están
  *   conectados con esta página pública.
+ * - resistenteAgua (opcional): pon `resistenteAgua: true` para que
+ *   aparezca un icono de gota de agua en la tarjeta y el detalle. Úsalo
+ *   solo si el reloj de verdad lo dice (ej: "WATER RESIST" en la esfera).
  * - cantidad (opcional): cuántas unidades físicas iguales tienes de esa
  *   referencia (ej: el mismo reloj en 2 cajas idénticas). Si no lo
  *   agregas, se asume 1 ("Pieza única" en la tarjeta y el detalle). Con
@@ -212,6 +215,7 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Caja y brazalete en acero plateado con esfera negra texturizada y calendario a las 3. Resistente al agua (WR 50M) y con ese aire clásico que combina con todo, para la oficina o el día a día.",
     imagen: "images/watches/reloj-15.jpg",
+    resistenteAgua: true,
     disponible: false,
   },
   {
@@ -255,6 +259,7 @@ const WATCHES = [
     precio: 115000,
     descripcion: "Caja y brazalete en acero plateado con esfera verde menta texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 30M) -- fresco y distinto, para salir de lo clásico sin perder elegancia.",
     imagen: "images/watches/reloj-20.jpg",
+    resistenteAgua: true,
   },
   {
     id: 21,
@@ -265,6 +270,7 @@ const WATCHES = [
     precio: 65000,
     descripcion: "Brazalete bicolor en acero plateado y dorado, esfera champán con números romanos y calendario a las 3. Resistente al agua (WR 50M) -- elegante y femenino, perfecto para looks formales o del día a día.",
     imagen: "images/watches/reloj-21.jpg",
+    resistenteAgua: true,
   },
   {
     id: 22,
@@ -285,6 +291,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "El ícono de siempre: pantalla digital con alarma, cronómetro y correa de caucho negro. Resistente al agua, liviano y nunca pasa de moda -- el digital que todos reconocen.",
     imagen: "images/watches/reloj-23.jpg",
+    resistenteAgua: true,
   },
   {
     id: 24,
@@ -295,6 +302,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Caja y brazalete bicolor en acero y dorado, esfera dorada con numeración árabe grande y calendario a las 3. Resistente al agua -- un clásico elegante con ese brillo que le sube el nivel a cualquier look.",
     imagen: "images/watches/reloj-24.jpg",
+    resistenteAgua: true,
   },
   {
     id: 25,
@@ -305,6 +313,7 @@ const WATCHES = [
     precio: 58000,
     descripcion: "Caja octagonal en negro con doble horario, brújula decorativa, alarma, cronómetro y luz EL. Correa de caucho negro. Resistente al agua (WR 30M) -- deportivo y resistente, para el día a día activo.",
     imagen: "images/watches/reloj-25.jpg",
+    resistenteAgua: true,
   },
   {
     id: 26,
@@ -315,6 +324,7 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Correa de malla milanesa plateada y esfera gris con índices de cristal. Resistente al agua -- delicado y elegante, perfecto para combinar con cualquier look del día a día.",
     imagen: "images/watches/reloj-26.jpg",
+    resistenteAgua: true,
   },
   {
     id: 27,
@@ -345,6 +355,7 @@ const WATCHES = [
     precio: 115000,
     descripcion: "Caja octagonal en acero plateado con esfera negra texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 50M) -- robusto y moderno, con esa forma distinta que no pasa desapercibida.",
     imagen: "images/watches/reloj-29.jpg",
+    resistenteAgua: true,
   },
   {
     id: 30,
@@ -355,6 +366,7 @@ const WATCHES = [
     precio: 55000,
     descripcion: "Caja pequeña en acero plateado con correa de malla milanesa y esfera negra minimalista. Resistente al agua -- delicado y fácil de combinar, perfecto para el día a día.",
     imagen: "images/watches/reloj-30.jpg",
+    resistenteAgua: true,
   },
   {
     id: 31,
@@ -375,6 +387,7 @@ const WATCHES = [
     precio: 68000,
     descripcion: "Caja y brazalete en acero plateado con esfera plateada efecto sunburst, numeración árabe y calendario a las 3. Resistente al agua (WR 50M) -- un clásico limpio y elegante que combina con todo.",
     imagen: "images/watches/reloj-32.jpg",
+    resistenteAgua: true,
   },
   {
     id: 33,
@@ -385,5 +398,6 @@ const WATCHES = [
     precio: 60000,
     descripcion: "Caja y brazalete expansible en acero plateado con esfera blanca y numeración árabe grande, fácil de leer de un vistazo. Resistente al agua -- simple, clásico y cómodo para todos los días.",
     imagen: "images/watches/reloj-33.jpg",
+    resistenteAgua: true,
   },
 ];

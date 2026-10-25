@@ -12,6 +12,8 @@ const supportsHoverTilt = window.matchMedia("(hover: hover) and (pointer: fine)"
 
 const COMPARE_ICON =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg>';
+const WATER_DROP_ICON =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69s-5.5 7.6-5.5 11.5a5.5 5.5 0 0 0 11 0c0-3.9-5.5-11.5-5.5-11.5Z"/></svg>';
 
 /**
  * Las últimas 2 referencias agregadas a WATCHES (por id más alto) se
@@ -46,6 +48,7 @@ function watchCard(watch) {
       <div class="watch-card__ref-row">
         <span class="watch-card__ref">${watch.referencia}</span>
         <span class="unique-badge" title="${badge.title}">${badge.label}</span>
+        ${watch.resistenteAgua ? `<span class="water-badge" title="Resistente al agua">${WATER_DROP_ICON}</span>` : ""}
       </div>
       <span class="watch-card__brand">${watch.marca}</span>
       <h3 class="watch-card__title">${watch.nombre}</h3>

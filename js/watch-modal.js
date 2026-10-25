@@ -17,6 +17,7 @@ function openModal(watch) {
   const badgeEl = document.getElementById("modal-unique-badge");
   badgeEl.textContent = badge.label;
   badgeEl.title = badge.title;
+  document.getElementById("modal-water-badge").hidden = !watch.resistenteAgua;
   document.getElementById("modal-brand").textContent = watch.marca;
   document.getElementById("modal-title").textContent = watch.nombre;
   document.getElementById("modal-price").textContent = formatPrice(watch.precio);
