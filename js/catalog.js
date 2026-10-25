@@ -99,7 +99,7 @@ function initFadeImg(img) {
   }
 }
 
-const filterState = { marca: "Todas", genero: "Todos", busqueda: "", orden: "Recomendados" };
+const filterState = { marca: "Todas", genero: "Todos", busqueda: "", orden: "Recomendados", soloResistenteAgua: false };
 
 function sortWatches(list) {
   if (filterState.orden === "Precio: menor a mayor") {
@@ -121,6 +121,7 @@ function getFilteredWatches() {
       w.disponible !== false &&
       (filterState.marca === "Todas" || w.marca === filterState.marca) &&
       (filterState.genero === "Todos" || w.genero === filterState.genero) &&
+      (!filterState.soloResistenteAgua || w.resistenteAgua) &&
       (!query ||
         w.referencia.toLowerCase().includes(query) ||
         w.marca.toLowerCase().includes(query) ||
@@ -187,6 +188,36 @@ function renderFilters() {
   renderFilterGroup("filter-brand", "marca", "Todas", marcas, (value) => (value === "Todas" ? available.length : marcaCounts.get(value)));
   renderFilterGroup("filter-gender", "genero", "Todos", generos, (value) => (value === "Todos" ? available.length : generoCounts.get(value)));
   renderFilterGroup("filter-sort", "orden", "Recomendados", ordenes);
+  renderWaterFilter(available);
+}
+
+function renderWaterFilter(available) {
+  const container = document.getElementById("filter-water");
+  if (!container) return;
+  const count = available.filter((w) => w.resistenteAgua).length;
+  if (count === 0) {
+    container.closest(".filter-group").hidden = true;
+    return;
+  }
+  container.closest(".filter-group").hidden = false;
+  container.innerHTML = "";
+  [
+    { label: "Todas", active: !filterState.soloResistenteAgua },
+    { label: `${WATER_DROP_ICON} Resistente al agua (${count})`, active: filterState.soloResistenteAgua },
+  ].forEach(({ label, active }, i) => {
+    const btn = document.createElement("button");
+    btn.className = "chip" + (active ? " chip--active" : "") + (i === 1 ? " chip--water" : "");
+    btn.type = "button";
+    btn.innerHTML = label;
+    btn.addEventListener("click", () => {
+      filterState.soloResistenteAgua = i === 1;
+      container.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      renderCatalog();
+      syncFiltersToUrl();
+    });
+    container.appendChild(btn);
+  });
 }
 
 /**
@@ -205,6 +236,7 @@ function syncFiltersToUrl() {
   setOrClear("genero", filterState.genero, "Todos");
   setOrClear("q", filterState.busqueda, "");
   setOrClear("orden", filterState.orden, "Recomendados");
+  setOrClear("agua", filterState.soloResistenteAgua ? "1" : "", "");
   const query = params.toString();
   history.replaceState(null, "", window.location.pathname + (query ? `?${query}` : "") + window.location.hash);
 }
@@ -215,6 +247,7 @@ function parseFiltersFromUrl() {
   if (params.has("genero")) filterState.genero = params.get("genero");
   if (params.has("q")) filterState.busqueda = params.get("q");
   if (params.has("orden")) filterState.orden = params.get("orden");
+  if (params.has("agua")) filterState.soloResistenteAgua = params.get("agua") === "1";
 }
 
 function initSearch() {
@@ -231,6 +264,7 @@ function initSearch() {
     filterState.genero = "Todos";
     filterState.busqueda = "";
     filterState.orden = "Recomendados";
+    filterState.soloResistenteAgua = false;
     input.value = "";
     renderFilters();
     renderCatalog();

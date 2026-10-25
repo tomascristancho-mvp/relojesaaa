@@ -874,6 +874,18 @@ section[id] {
   font-weight: 600;
 }
 
+.chip--water {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip--water svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
