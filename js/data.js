@@ -420,4 +420,15 @@ const WATCHES = [
     imagen: "images/watches/reloj-33.jpg",
     popularidad: 2,
   },
+  {
+    id: 34,
+    referencia: "REF-34",
+    marca: "Casio",
+    genero: "Hombre",
+    nombre: "Esfera Blanca Octagonal Día y Fecha",
+    precio: 115000,
+    descripcion: "Caja octagonal en acero plateado con esfera blanca texturizada en líneas y calendario con día y fecha. Resistente al agua (WR 50M) -- elegante y moderno, con esa forma distinta que no pasa desapercibida.",
+    imagen: "images/watches/reloj-34.jpg",
+    resistenteAgua: true,
+  },
 ];
