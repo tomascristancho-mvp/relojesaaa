@@ -7,37 +7,168 @@
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#0a0d12" />
   <meta name="color-scheme" content="dark" />
-  <link rel="icon" type="image/png" href="/relojesaaa/favicon.png" />
+  <link rel="icon" type="image/png" href="https://tomascristancho-mvp.github.io/relojesaaa/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/relojesaaa/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
+  <!--
+    Esta página NO carga css/styles.css ni images/logo.png a propósito:
+    un 404 personalizado en GitHub Pages puede "activarse" desde
+    cualquier ruta rota, a cualquier profundidad (ej. /algo/que/no/existe),
+    así que una ruta relativa a esos archivos (o incluso una absoluta
+    con el nombre del repo) se rompe según desde dónde se haya disparado,
+    y si el sitio algún día se sirve desde otro dominio (ej. un dominio
+    propio, o Vercel) tampoco serviría. Por eso todo el estilo necesario
+    va directo aquí adentro -- así esta página siempre se ve bien, sin
+    depender de ninguna otra ruta del sitio.
+  -->
   <style>
-    .not-found {
-      min-height: 100vh;
+    :root {
+      --bg: #0a0d12;
+      --bg-elevated: #10141b;
+      --border: #262c36;
+      --text: #f2f4f7;
+      --text-muted: #98a2b0;
+      --accent: #2f8fff;
+      --accent-soft: #8cc2ff;
+      --accent-contrast: #f5f9ff;
+      --font-display: "Fraunces", serif;
+      --font-body: "Instrument Sans", system-ui, sans-serif;
+      --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
       display: flex;
       align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
     }
+
+    .glow {
+      position: absolute;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(640px, 90vw);
+      height: 420px;
+      background: radial-gradient(closest-side, rgba(47, 143, 255, 0.22), transparent 70%);
+      pointer-events: none;
+    }
+
+    .not-found {
+      position: relative;
+      z-index: 1;
+      max-width: 440px;
+    }
+
     .not-found__code {
       font-family: var(--font-display);
+      font-weight: 600;
       font-size: clamp(3.5rem, 12vw, 6rem);
-      color: var(--accent-soft);
       line-height: 1;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .not-found__title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      line-height: 1.15;
+      margin: 0 0 14px;
+    }
+
+    .not-found__text {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin: 0 0 32px;
+    }
+
+    .not-found__actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 26px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.25s var(--ease-premium), background 0.2s ease, border-color 0.2s ease, box-shadow 0.25s var(--ease-premium), color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: var(--accent-contrast);
+    }
+
+    .btn--primary:hover {
+      background: var(--accent-soft);
+      box-shadow: 0 12px 28px -10px rgba(47, 143, 255, 0.55);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn--ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent-soft);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn {
+        transition: none;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="hero not-found">
-    <div class="container hero__inner">
-      <img src="/relojesaaa/images/logo.png" alt="" class="hero__logo" />
-      <p class="not-found__code">404</p>
-      <h1 class="hero__title">Esta página<br />no existe</h1>
-      <p class="hero__subtitle">Puede que el enlace esté roto o la página se haya movido. Vuelve al catálogo para seguir viendo relojes.</p>
-      <div class="hero__actions">
-        <a href="/relojesaaa/" class="btn btn--primary">Ver catálogo</a>
-        <a href="https://wa.me/573132388993" class="btn btn--ghost" target="_blank" rel="noopener">Escríbenos</a>
-      </div>
+  <div class="glow" aria-hidden="true"></div>
+  <main class="not-found">
+    <p class="not-found__code">404</p>
+    <h1 class="not-found__title">Esta página no existe</h1>
+    <p class="not-found__text">Puede que el enlace esté roto o la página se haya movido. Vuelve al catálogo para seguir viendo relojes.</p>
+    <div class="not-found__actions">
+      <a href="https://tomascristancho-mvp.github.io/relojesaaa/" class="btn btn--primary">Ver catálogo</a>
+      <a href="https://wa.me/573132388993" class="btn btn--ghost" target="_blank" rel="noopener">Escríbenos</a>
     </div>
   </main>
 </body>
