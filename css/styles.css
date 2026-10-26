@@ -1342,12 +1342,21 @@ section[id] {
 .wholesale__card .btn {
   position: relative;
   z-index: 1;
+  width: auto;
+  max-width: 100%;
+  white-space: normal;
 }
 
 /* ============ CONTACT ============ */
 .contact {
   padding: 90px 0;
   text-align: center;
+}
+
+.contact .btn {
+  width: auto;
+  max-width: 100%;
+  white-space: normal;
 }
 
 .contact__inner h2 {
