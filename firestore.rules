@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para el panel privado (admin.html).
+//
+// CÓMO USAR ESTE ARCHIVO: no se aplica solo. Ve a tu proyecto en
+// https://console.firebase.google.com/ → Firestore Database → pestaña
+// "Reglas", borra lo que haya ahí, pega TODO el contenido de este
+// archivo, y haz clic en "Publicar". Sin este paso, cualquiera con el
+// link de tu proyecto podría leer o modificar los pedidos sin iniciar
+// sesión -- esta es la protección real (el formulario de correo y
+// contraseña del panel no alcanza por sí solo).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Solo las cuentas creadas a mano para este proyecto (ver
+    // Authentication → Users en la consola) pueden leer o escribir
+    // pedidos. Nadie más puede ver ni tocar estos datos.
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

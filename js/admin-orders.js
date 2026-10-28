@@ -1,0 +1,939 @@
+/**
+ * Núcleo del panel privado: guardar/leer pedidos (localStorage), el
+ * formulario de "Nuevo pedido", la tabla con sus estadísticas, y el
+ * detalle de un pedido individual.
+ */
+
+const STORAGE_KEY = "altitude_orders_v1";
+const ORDER_STATUSES = ["Pendiente", "Confirmado", "Enviado", "Entregado", "Cancelado"];
+const ACTIVE_ESTADOS = ["Confirmado", "Enviado", "Entregado"];
+
+/**
+ * Cada reloj del catálogo es una pieza única por defecto (no hay stock
+ * por referencia), salvo que tenga `cantidad` en js/data.js (ej: 2
+ * unidades físicas iguales) -- si quedan más pedidos "activos"
+ * (Confirmado, Enviado o Entregado) para la misma referencia que
+ * unidades tiene, casi seguro alguno está mal: vendido de más por error,
+ * o a otro pedido le falta cancelarse. `candidate` no necesita existir
+ * todavía en `orders` (se usa también para validar un pedido antes de
+ * guardarlo).
+ */
+function findConflictingOrder(orders, candidate) {
+  if (!ACTIVE_ESTADOS.includes(candidate.estado)) return null;
+  const ref = extractRefCode(candidate.reloj);
+  if (!ref) return null;
+  const otherActive = orders.filter(
+    (o) => o.id !== candidate.id && ACTIVE_ESTADOS.includes(o.estado) && extractRefCode(o.reloj) === ref
+  );
+  const cantidad = watchQuantity(findWatchByRef(ref));
+  if (otherActive.length < cantidad) return null;
+  return otherActive[0] || null;
+}
+
+async function confirmSaleConflict(conflict, reloj) {
+  const ref = extractRefCode(reloj) || "Este reloj";
+  const cantidad = watchQuantity(findWatchByRef(ref));
+  const message =
+    cantidad > 1
+      ? `${ref} ya tiene ${cantidad} pedido(s) activo(s) -- el máximo que registraste en stock para esa referencia. El más reciente es de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Revisa si alguno debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`
+      : `${ref} ya figura como ${conflict.estado} en el pedido de ${conflict.nombre || "otro cliente"} (${conflict.fecha || "sin fecha"}). Como cada reloj es una pieza única, esto suele significar una venta duplicada -- revisa si el otro pedido debería cancelarse antes de continuar. ¿Seguro que quieres guardar igual?`;
+  return confirmDialog({
+    title: "Este reloj ya está en otro pedido activo",
+    message,
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
+
+function calcGanancia(order) {
+  return order.costo != null && order.costo !== "" ? Number(order.precio) - Number(order.costo) : null;
+}
+
+/**
+ * Detecta el error de digitación más común al registrar una venta:
+ * un precio en $0, o un costo igual o mayor al precio (la venta no
+ * dejaría ganancia -- casi siempre es un cero de más/de menos, o el
+ * precio y el costo quedaron cambiados entre sí).
+ */
+function checkPriceSanity(values) {
+  if (!(values.precio > 0)) {
+    return "El precio de venta quedó en $0.";
+  }
+  if (values.costo != null && values.costo >= values.precio) {
+    return `El costo (${formatCOP(values.costo)}) es igual o mayor al precio de venta (${formatCOP(values.precio)}) -- esta venta no dejaría ganancia.`;
+  }
+  return null;
+}
+
+async function confirmPriceSanity(reason) {
+  return confirmDialog({
+    title: "Revisa el precio antes de guardar",
+    message: `${reason} Si es un error de digitación, corrígelo antes de continuar. ¿Seguro que quieres guardar igual?`,
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
+
+/**
+ * El teléfono es el único canal de contacto real con el cliente (el botón
+ * de WhatsApp de la tabla y el comprobante lo usan tal cual) -- un celular
+ * colombiano mal digitado (dígito de más/de menos) hace que ese botón le
+ * escriba a la persona equivocada o a nadie, sin ningún aviso.
+ */
+function isSuspiciousPhone(telefono) {
+  const digits = String(telefono || "").replace(/\D/g, "").replace(/^57(?=\d{10}$)/, "");
+  return digits.length !== 10 || !digits.startsWith("3");
+}
+
+async function confirmPhoneSanity() {
+  return confirmDialog({
+    title: "Revisa el teléfono antes de guardar",
+    message: "Este número no parece un celular colombiano válido (10 dígitos, empieza en 3) -- el botón de WhatsApp del pedido podría no funcionar. Si es un error de digitación, corrígelo antes de continuar. ¿Seguro que quieres guardar igual?",
+    confirmLabel: "Guardar de todas formas",
+    cancelLabel: "Revisar antes",
+    danger: true,
+  });
+}
+
+/**
+ * Los pedidos ya no viven solo en este navegador -- viven en Firestore
+ * (ver js/firebase-init.js), así que Tomás, Falck y Condia ven siempre
+ * lo mismo desde cualquier dispositivo. `ordersCache` es una copia en
+ * memoria que se mantiene al día sola gracias a `initOrdersSync()` (un
+ * listener en tiempo real): así el resto del panel puede seguir leyendo
+ * `loadOrders()` de forma instantánea y sencilla, como siempre lo hizo.
+ */
+const ORDERS_COLLECTION = "orders";
+let ordersCache = [];
+let ordersCacheById = new Map();
+let ordersReady = false;
+
+function loadOrders() {
+  return ordersCache;
+}
+
+/**
+ * Compara el array completo contra lo último sincronizado y solo escribe
+ * en Firestore los pedidos que de verdad cambiaron (cada pedido es su
+ * propio documento) -- así, si dos personas guardan cosas distintas casi
+ * al mismo tiempo desde sus propios dispositivos, no se pisan el trabajo
+ * el uno al otro.
+ */
+async function saveOrders(newOrders) {
+  if (!window.fb) {
+    showToast("No se pudo guardar: no hay conexión con la base de datos.", "error");
+    return false;
+  }
+  const { db, collection, doc, writeBatch } = window.fb;
+  const col = collection(db, ORDERS_COLLECTION);
+  const newById = new Map(newOrders.map((o) => [o.id, o]));
+  const batch = writeBatch(db);
+  let writes = 0;
+
+  for (const [id, order] of newById) {
+    const prev = ordersCacheById.get(id);
+    if (!prev || JSON.stringify(prev) !== JSON.stringify(order)) {
+      batch.set(doc(col, id), order);
+      writes++;
+    }
+  }
+  for (const id of ordersCacheById.keys()) {
+    if (!newById.has(id)) {
+      batch.delete(doc(col, id));
+      writes++;
+    }
+  }
+  if (writes === 0) return true;
+
+  try {
+    await batch.commit();
+    return true;
+  } catch (e) {
+    console.error("No se pudo guardar el pedido", e);
+    showToast("No se pudo guardar: revisa tu conexión a internet e intenta de nuevo.", "error");
+    return false;
+  }
+}
+
+/**
+ * Se conecta una sola vez, al arrancar el panel, y llama a `onChange`
+ * cada vez que los pedidos cambian -- ya sea porque tú guardaste algo
+ * acá mismo, o porque Falck o Condia guardaron algo desde su propio
+ * dispositivo. Así la tabla se actualiza sola, sin recargar la página.
+ */
+function initOrdersSync(onChange) {
+  if (!window.fb) {
+    console.error("Firebase no está disponible -- revisa js/firebase-config.js");
+    return;
+  }
+  const { db, collection, onSnapshot } = window.fb;
+  onSnapshot(
+    collection(db, ORDERS_COLLECTION),
+    (snapshot) => {
+      ordersCache = snapshot.docs.map((d) => d.data());
+      ordersCacheById = new Map(ordersCache.map((o) => [o.id, o]));
+      ordersReady = true;
+      onChange();
+      maybeOfferLocalMigration();
+    },
+    (error) => {
+      console.error("Error al sincronizar pedidos", error);
+      showToast("No se pudieron cargar los pedidos. Revisa tu conexión e intenta de nuevo.", "error");
+    }
+  );
+}
+
+/**
+ * De antes de conectar la base de datos compartida, puede que este
+ * navegador tenga pedidos guardados solo acá (con el sistema viejo de
+ * `localStorage`). Una sola vez por dispositivo, si encuentra alguno que
+ * todavía no esté en la nube, ofrece subirlo -- así nadie pierde su
+ * historial al pasar al nuevo sistema.
+ */
+const LOCAL_MIGRATION_FLAG = "altitude_orders_migrated_v1";
+
+async function maybeOfferLocalMigration() {
+  if (localStorage.getItem(LOCAL_MIGRATION_FLAG) === "true") return;
+  localStorage.setItem(LOCAL_MIGRATION_FLAG, "true"); // no volver a preguntar, pase lo que pase abajo
+
+  let localOrders = [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    localOrders = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    localOrders = [];
+  }
+
+  const cloudIds = new Set(ordersCache.map((o) => o.id));
+  const onlyLocal = localOrders.filter((o) => o && o.id && !cloudIds.has(o.id));
+  if (onlyLocal.length === 0) return;
+
+  const upload = await confirmDialog({
+    title: "Pedidos guardados en este navegador",
+    message: `Encontramos ${onlyLocal.length} pedido(s) guardados en este navegador de antes de conectar la base de datos compartida. ¿Los subimos para que los tres los vean?`,
+    confirmLabel: "Subir ahora",
+    cancelLabel: "No subir",
+  });
+  if (!upload) return;
+
+  const ok = await saveOrders([...ordersCache, ...onlyLocal]);
+  if (ok) {
+    showToast(`${onlyLocal.length} pedido(s) antiguo(s) subido(s) a la base de datos compartida ✓`);
+    renderOrders();
+  }
+}
+
+function toWhatsAppLink(telefono) {
+  return buildWhatsAppUrl(normalizePhoneCO(telefono));
+}
+
+function slug(text) {
+  return String(text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+}
+
+/* ============ FORMULARIO ============ */
+function populateRelojOptions() {
+  const datalist = document.getElementById("reloj-options");
+  const precioInput = document.getElementById("order-precio");
+  const relojInput = document.getElementById("order-reloj");
+  const costoInput = document.getElementById("order-costo");
+
+  (typeof WATCHES !== "undefined" ? WATCHES : []).forEach((w) => {
+    const opt = document.createElement("option");
+    opt.value = `${w.referencia} — ${w.marca} ${w.nombre}`;
+    datalist.appendChild(opt);
+  });
+
+  relojInput.addEventListener("change", () => {
+    const match = findWatchByRef(extractRefCode(relojInput.value));
+    if (match && precioInput.dataset.touched !== "true" && match.precio != null) {
+      precioInput.value = match.precio;
+    }
+
+    if (costoInput.dataset.touched !== "true") {
+      const previous = loadOrders()
+        .filter((o) => o.reloj === relojInput.value && o.costo != null)
+        .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))[0];
+      if (previous) costoInput.value = previous.costo;
+    }
+  });
+  precioInput.addEventListener("input", () => {
+    precioInput.dataset.touched = "true";
+  });
+  costoInput.addEventListener("input", () => {
+    costoInput.dataset.touched = "true";
+  });
+}
+
+let editingOrderId = null;
+
+function fillOrderForm(order) {
+  document.getElementById("order-fecha").value = order.fecha || "";
+  document.getElementById("order-nombre").value = order.nombre || "";
+  document.getElementById("order-cedula").value = order.cedula || "";
+  document.getElementById("order-telefono").value = order.telefono || "";
+  document.getElementById("order-correo").value = order.correo || "";
+  document.getElementById("order-lugar").value = order.lugar || "";
+  document.getElementById("order-reloj").value = order.reloj || "";
+  document.getElementById("order-pago").value = order.medioPago || "";
+  document.getElementById("order-precio").value = order.precio ?? "";
+  document.getElementById("order-costo").value = order.costo ?? "";
+  document.getElementById("order-vendedor").value = order.vendedor || "";
+  document.getElementById("order-estado").value = order.estado || "Pendiente";
+  document.getElementById("order-notas").value = order.notas || "";
+  document.getElementById("order-precio").dataset.touched = "true";
+  document.getElementById("order-costo").dataset.touched = "true";
+}
+
+/* ============ CAMBIOS SIN GUARDAR ============ */
+// Evita perder en silencio lo que se está escribiendo: si el formulario
+// tiene cambios sin guardar (un pedido nuevo a medio llenar, o una edición
+// a medio corregir) y el usuario intenta cancelar o saltar a editar otro
+// pedido, se le pregunta antes de descartarlos.
+let formRestSnapshot = null;
+
+function getFormSnapshot() {
+  return JSON.stringify(
+    ["fecha", "nombre", "cedula", "telefono", "correo", "lugar", "reloj", "pago", "precio", "costo", "vendedor", "estado", "notas"].map(
+      (field) => document.getElementById(`order-${field}`).value
+    )
+  );
+}
+
+function isFormDirty() {
+  return formRestSnapshot !== null && getFormSnapshot() !== formRestSnapshot;
+}
+
+async function confirmDiscardChanges() {
+  return confirmDialog({
+    title: "Tienes cambios sin guardar",
+    message: "Lo que escribiste en el formulario todavía no se ha guardado. ¿Quieres descartarlo?",
+    confirmLabel: "Descartar cambios",
+    cancelLabel: "Seguir editando",
+    danger: true,
+  });
+}
+
+async function startEditOrder(order) {
+  if (isFormDirty() && !(await confirmDiscardChanges())) return;
+  editingOrderId = order.id;
+  fillOrderForm(order);
+  document.getElementById("order-form-title").textContent = `Editando pedido de ${order.nombre || "este cliente"}`;
+  document.getElementById("order-form-submit").textContent = "Guardar cambios";
+  document.getElementById("order-form-cancel").hidden = false;
+  document.getElementById("order-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("order-nombre").focus();
+  formRestSnapshot = getFormSnapshot();
+}
+
+/**
+ * Precarga el formulario con los datos de un pedido existente, pero como
+ * un pedido NUEVO (fecha de hoy, estado Pendiente, notas en blanco) -- útil
+ * para un cliente que repite compra, o para corregir un error copiando un
+ * pedido y ajustando el reloj/precio en vez de escribir todo de nuevo.
+ * `editingOrderId` queda en null a propósito: al guardar se crea un
+ * registro aparte, nunca se sobreescribe el pedido original.
+ */
+async function duplicateOrder(order) {
+  if (isFormDirty() && !(await confirmDiscardChanges())) return;
+  editingOrderId = null;
+  fillOrderForm({
+    ...order,
+    fecha: new Date().toISOString().slice(0, 10),
+    estado: "Pendiente",
+    notas: "",
+  });
+  document.getElementById("order-form-title").textContent = `Nuevo pedido (copiado de ${order.nombre || "este cliente"})`;
+  document.getElementById("order-form-submit").textContent = "Guardar pedido";
+  document.getElementById("order-form-cancel").hidden = false;
+  document.getElementById("order-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  const nombreInput = document.getElementById("order-nombre");
+  nombreInput.focus();
+  nombreInput.select();
+  formRestSnapshot = getFormSnapshot();
+}
+
+function exitEditMode() {
+  editingOrderId = null;
+  document.getElementById("order-form-title").textContent = "Nuevo pedido";
+  document.getElementById("order-form-submit").textContent = "Guardar pedido";
+  document.getElementById("order-form-cancel").hidden = true;
+  document.getElementById("order-form").reset();
+  document.getElementById("order-fecha").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("order-estado").value = "Pendiente";
+  document.getElementById("order-precio").dataset.touched = "false";
+  document.getElementById("order-costo").dataset.touched = "false";
+  formRestSnapshot = getFormSnapshot();
+}
+
+function initOrderForm() {
+  const form = document.getElementById("order-form");
+
+  document.getElementById("order-form-cancel").addEventListener("click", async () => {
+    if (isFormDirty() && !(await confirmDiscardChanges())) return;
+    exitEditMode();
+  });
+
+  // Misma protección que el botón "Cancelar", pero para cuando el
+  // navegador se cierra/recarga por accidente con cambios sin guardar.
+  window.addEventListener("beforeunload", (e) => {
+    if (!isFormDirty()) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("order-form-submit");
+    // Evita que un doble clic (o un usuario impaciente mientras espera el
+    // diálogo de conflicto) dispare el guardado dos veces y cree un pedido
+    // duplicado.
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+
+    try {
+      const values = {
+        fecha: document.getElementById("order-fecha").value,
+        nombre: document.getElementById("order-nombre").value.trim(),
+        cedula: document.getElementById("order-cedula").value.trim(),
+        telefono: document.getElementById("order-telefono").value.trim(),
+        correo: document.getElementById("order-correo").value.trim(),
+        lugar: document.getElementById("order-lugar").value.trim(),
+        reloj: document.getElementById("order-reloj").value.trim(),
+        medioPago: document.getElementById("order-pago").value,
+        precio: Number(document.getElementById("order-precio").value) || 0,
+        costo: document.getElementById("order-costo").value === "" ? null : Number(document.getElementById("order-costo").value),
+        vendedor: document.getElementById("order-vendedor").value,
+        estado: document.getElementById("order-estado").value,
+        notas: document.getElementById("order-notas").value.trim(),
+      };
+
+      const orders = loadOrders();
+      const original = editingOrderId ? orders.find((o) => o.id === editingOrderId) : null;
+
+      // Solo se revisa el precio/teléfono si de verdad se tocaron en este
+      // guardado -- así no se vuelve a preguntar cada vez que se edita un
+      // pedido histórico cuyos datos ya se aceptaron tal como están.
+      const priceTouched = !original || original.precio !== values.precio || original.costo !== values.costo;
+      if (priceTouched) {
+        const priceIssue = checkPriceSanity(values);
+        if (priceIssue && !(await confirmPriceSanity(priceIssue))) return;
+      }
+
+      const phoneTouched = !original || original.telefono !== values.telefono;
+      if (phoneTouched && isSuspiciousPhone(values.telefono) && !(await confirmPhoneSanity())) return;
+
+      const conflict = findConflictingOrder(orders, { id: editingOrderId, reloj: values.reloj, estado: values.estado });
+      if (conflict && !(await confirmSaleConflict(conflict, values.reloj))) return;
+
+      let savedOrder = null;
+      let justBecameEntregado = false;
+
+      if (editingOrderId) {
+        const idx = orders.findIndex((o) => o.id === editingOrderId);
+        if (idx === -1) {
+          // El pedido que se estaba editando ya no existe (por ejemplo, se
+          // borró desde otra pestaña abierta en este mismo navegador). Sin
+          // este aviso, el formulario se limpiaría como si hubiera guardado
+          // y los cambios escritos se perderían en silencio.
+          showToast("Este pedido ya no existe (¿se borró en otra pestaña?). No se guardaron los cambios.", "error");
+          renderOrders();
+          exitEditMode();
+          return;
+        }
+        const wasEntregado = orders[idx].estado === "Entregado";
+        orders[idx] = { ...orders[idx], ...values };
+        if (!(await saveOrders(orders))) return;
+        savedOrder = orders[idx];
+        showToast(`Pedido de ${values.nombre || "cliente"} actualizado ✓`);
+        justBecameEntregado = !wasEntregado && values.estado === "Entregado";
+      } else {
+        const newOrder = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          ...values,
+          createdAt: new Date().toISOString(),
+        };
+        orders.push(newOrder);
+        if (!(await saveOrders(orders))) return;
+        savedOrder = newOrder;
+        showToast(`Pedido de ${values.nombre || "cliente"} guardado ✓`);
+        justBecameEntregado = values.estado === "Entregado";
+      }
+
+      renderOrders();
+      exitEditMode();
+
+      // Venta 100% concretada (Entregado): genera el comprobante y abre el
+      // diálogo de impresión/PDF automáticamente. Solo en esta transición,
+      // no cada vez que se edite un pedido que ya estaba Entregado (por
+      // ejemplo, para corregir una nota), para no repetir la interrupción.
+      if (justBecameEntregado && savedOrder && typeof triggerAutoReceipt === "function") {
+        triggerAutoReceipt(savedOrder);
+      }
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+/* ============ FILTRO DE LA TABLA ============ */
+const ordersFilterState = { busqueda: "", estado: "Todos", rango: "Todos", vendedor: "Todos" };
+const ORDER_DATE_RANGES = ["Todos", "Hoy", "Esta semana", "Este mes"];
+
+/**
+ * Compara `fecha` (AAAA-MM-DD, el mismo formato que usa el formulario)
+ * contra el rango elegido. "Esta semana" empieza el lunes -- coincide con
+ * como la mayoría cuenta la semana en Colombia.
+ */
+function matchesDateRange(fecha, rango) {
+  if (rango === "Todos") return true;
+  if (!fecha) return false;
+  const d = new Date(fecha + "T00:00:00");
+  if (isNaN(d)) return false;
+  const now = new Date();
+  if (rango === "Hoy") return fecha === now.toISOString().slice(0, 10);
+  if (rango === "Esta semana") {
+    const start = new Date(now);
+    const diffToMonday = (start.getDay() + 6) % 7;
+    start.setDate(start.getDate() - diffToMonday);
+    start.setHours(0, 0, 0, 0);
+    return d >= start && d <= now;
+  }
+  if (rango === "Este mes") {
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }
+  return true;
+}
+
+function getFilteredOrders(orders) {
+  const query = ordersFilterState.busqueda.trim().toLowerCase();
+  return orders.filter(
+    (o) =>
+      (ordersFilterState.estado === "Todos" || o.estado === ordersFilterState.estado) &&
+      matchesDateRange(o.fecha, ordersFilterState.rango) &&
+      (ordersFilterState.vendedor === "Todos" || o.vendedor === ordersFilterState.vendedor) &&
+      (!query ||
+        (o.nombre || "").toLowerCase().includes(query) ||
+        (o.reloj || "").toLowerCase().includes(query) ||
+        (o.cedula || "").toLowerCase().includes(query) ||
+        (o.vendedor || "").toLowerCase().includes(query))
+  );
+}
+
+/**
+ * El filtro de la tabla (búsqueda, estado, fecha, encargado) se guarda
+ * en este navegador para que sobreviva un refresh o cerrar y volver a
+ * abrir la pestaña -- antes se perdía en silencio y tocaba volver a
+ * armar el mismo filtro cada vez.
+ */
+const ORDERS_FILTER_STORAGE_KEY = "altitude_orders_filter_v1";
+
+function loadPersistedFilterState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ORDERS_FILTER_STORAGE_KEY) || "{}");
+    if (typeof saved.busqueda === "string") ordersFilterState.busqueda = saved.busqueda;
+    if (typeof saved.estado === "string") ordersFilterState.estado = saved.estado;
+    if (typeof saved.rango === "string") ordersFilterState.rango = saved.rango;
+    if (typeof saved.vendedor === "string") ordersFilterState.vendedor = saved.vendedor;
+  } catch (e) {
+    // Si el valor guardado está corrupto se ignora y sigue con los valores por defecto.
+  }
+}
+
+function persistFilterState() {
+  try {
+    localStorage.setItem(ORDERS_FILTER_STORAGE_KEY, JSON.stringify(ordersFilterState));
+  } catch (e) {
+    // No es crítico si no se puede guardar -- el filtro solo no sobrevive un refresh.
+  }
+}
+
+function initOrdersFilter() {
+  loadPersistedFilterState();
+
+  const input = document.getElementById("orders-search");
+  input.value = ordersFilterState.busqueda;
+  const chipsContainer = document.getElementById("orders-status-filter");
+  const statuses = ["Todos", ...ORDER_STATUSES];
+
+  input.addEventListener("input", () => {
+    ordersFilterState.busqueda = input.value;
+    persistFilterState();
+    renderOrders();
+  });
+
+  chipsContainer.innerHTML = "";
+  statuses.forEach((status) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (status === ordersFilterState.estado ? " chip--active" : "");
+    btn.textContent = status;
+    btn.addEventListener("click", () => {
+      chipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.estado = status;
+      persistFilterState();
+      renderOrders();
+    });
+    chipsContainer.appendChild(btn);
+  });
+
+  const dateChipsContainer = document.getElementById("orders-date-filter");
+  dateChipsContainer.innerHTML = "";
+  ORDER_DATE_RANGES.forEach((rango) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (rango === ordersFilterState.rango ? " chip--active" : "");
+    btn.textContent = rango;
+    btn.addEventListener("click", () => {
+      dateChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.rango = rango;
+      persistFilterState();
+      renderOrders();
+    });
+    dateChipsContainer.appendChild(btn);
+  });
+
+  /* Los nombres salen del <select> "Encargado de venta" del formulario,
+   * para no mantener la misma lista duplicada en dos lugares. */
+  const vendedorChipsContainer = document.getElementById("orders-vendedor-filter");
+  const vendedorNames = Array.from(document.getElementById("order-vendedor").options)
+    .map((o) => o.value)
+    .filter(Boolean);
+  const vendedores = ["Todos", ...vendedorNames];
+  // Si el encargado guardado ya no existe en el <select> (lo borraron o
+  // le cambiaron el nombre), vuelve a "Todos" en vez de quedar en un
+  // filtro que nunca va a mostrar nada.
+  if (!vendedores.includes(ordersFilterState.vendedor)) ordersFilterState.vendedor = "Todos";
+  vendedorChipsContainer.innerHTML = "";
+  vendedores.forEach((vendedor) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip chip--small" + (vendedor === ordersFilterState.vendedor ? " chip--active" : "");
+    btn.textContent = vendedor;
+    btn.addEventListener("click", () => {
+      vendedorChipsContainer.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
+      btn.classList.add("chip--active");
+      ordersFilterState.vendedor = vendedor;
+      persistFilterState();
+      renderOrders();
+    });
+    vendedorChipsContainer.appendChild(btn);
+  });
+}
+
+/* ============ ORDEN DE LA TABLA ============ */
+const ordersSortState = { key: null, dir: "desc" };
+
+function sortOrders(orders) {
+  if (!ordersSortState.key) {
+    return [...orders].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  }
+  const { key, dir } = ordersSortState;
+  const mult = dir === "asc" ? 1 : -1;
+  return [...orders].sort((a, b) => {
+    const av = key === "ganancia" ? calcGanancia(a) : a[key];
+    const bv = key === "ganancia" ? calcGanancia(b) : b[key];
+    const aEmpty = av == null || av === "";
+    const bEmpty = bv == null || bv === "";
+    if (aEmpty || bEmpty) return aEmpty === bEmpty ? 0 : aEmpty ? 1 : -1; // vacíos siempre al final
+    if (typeof av === "number" && typeof bv === "number") return (av - bv) * mult;
+    return String(av).localeCompare(String(bv)) * mult;
+  });
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll("#orders-thead-row th[data-sort]").forEach((th) => {
+    th.classList.remove("is-sorted-asc", "is-sorted-desc");
+    if (th.dataset.sort === ordersSortState.key) {
+      th.classList.add(ordersSortState.dir === "asc" ? "is-sorted-asc" : "is-sorted-desc");
+    }
+  });
+}
+
+function initOrdersSort() {
+  document.querySelectorAll("#orders-thead-row th[data-sort]").forEach((th) => {
+    th.classList.add("sortable-th");
+    th.addEventListener("click", () => {
+      if (ordersSortState.key === th.dataset.sort) {
+        ordersSortState.dir = ordersSortState.dir === "asc" ? "desc" : "asc";
+      } else {
+        ordersSortState.key = th.dataset.sort;
+        ordersSortState.dir = th.dataset.sort === "nombre" || th.dataset.sort === "estado" ? "asc" : "desc";
+      }
+      renderOrders();
+    });
+  });
+}
+
+/**
+ * Resumen de lo que queda visible al filtrar (por encargado, fecha,
+ * estado o búsqueda) -- útil para repartir cuentas: filtras por un
+ * encargado y/o un rango de fechas y ves de una vez su total vendido y
+ * su ganancia de ese período, sin tener que sumar fila por fila.
+ */
+function renderFilteredSummary(orders, isFiltered) {
+  const bar = document.getElementById("filtered-summary");
+  if (!isFiltered) {
+    bar.hidden = true;
+    return;
+  }
+  const activeOrders = orders.filter((o) => o.estado !== "Cancelado");
+  const revenue = activeOrders.reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
+  const profit = activeOrders.reduce((sum, o) => {
+    const ganancia = calcGanancia(o);
+    return ganancia != null ? sum + ganancia : sum;
+  }, 0);
+  document.getElementById("filtered-summary-text").innerHTML = `<strong>${orders.length}</strong> ${
+    orders.length === 1 ? "pedido" : "pedidos"
+  } en esta vista · <strong>${formatCOP(revenue)}</strong> vendido · <strong>${formatCOP(profit)}</strong> ganancia`;
+  bar.hidden = false;
+}
+
+/* ============ TABLA Y ESTADÍSTICAS ============ */
+function renderOrders() {
+  const allOrders = loadOrders().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const orders = sortOrders(getFilteredOrders(allOrders));
+  const tbody = document.getElementById("orders-tbody");
+  tbody.innerHTML = "";
+  updateSortIndicators();
+
+  orders.forEach((order) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${order.fecha || ""}</td>
+      <td>${escapeHtml(order.nombre)}</td>
+      <td>${escapeHtml(order.vendedor)}</td>
+      <td>${escapeHtml(order.reloj)}</td>
+      <td>${escapeHtml(order.medioPago)}</td>
+      <td>${formatCOP(order.precio)}</td>
+      <td>${calcGanancia(order) != null ? formatCOP(calcGanancia(order)) : "—"}</td>
+      <td class="orders-table__estado"></td>
+      <td class="orders-table__actions"></td>
+    `;
+
+    const estadoCell = tr.querySelector(".orders-table__estado");
+    const estadoSelect = document.createElement("select");
+    estadoSelect.className = `status-badge status-badge--${slug(order.estado)}`;
+    estadoSelect.setAttribute("aria-label", `Cambiar estado del pedido de ${order.nombre || "cliente"}`);
+    ORDER_STATUSES.forEach((status) => {
+      const opt = document.createElement("option");
+      opt.value = status;
+      opt.textContent = status;
+      if (status === order.estado) opt.selected = true;
+      estadoSelect.appendChild(opt);
+    });
+    estadoSelect.addEventListener("change", async () => {
+      const nuevoEstado = estadoSelect.value;
+      const orders = loadOrders();
+      const idx = orders.findIndex((o) => o.id === order.id);
+      if (idx === -1) {
+        // El pedido ya no existe (por ejemplo, se borró desde otra pestaña
+        // abierta en este mismo navegador) -- refresca la tabla en vez de
+        // dejar el selector mostrando un cambio que en realidad no se guardó.
+        showToast("Este pedido ya no existe (¿se borró en otra pestaña?). No se guardó el cambio.", "error");
+        renderOrders();
+        return;
+      }
+
+      const conflict = findConflictingOrder(orders, { id: order.id, reloj: order.reloj, estado: nuevoEstado });
+      if (conflict && !(await confirmSaleConflict(conflict, order.reloj))) {
+        estadoSelect.value = order.estado;
+        return;
+      }
+
+      const wasEntregado = orders[idx].estado === "Entregado";
+      orders[idx] = { ...orders[idx], estado: nuevoEstado };
+      if (!(await saveOrders(orders))) {
+        estadoSelect.value = order.estado;
+        return;
+      }
+      const updatedOrder = orders[idx];
+      showToast(`Estado de ${order.nombre || "el pedido"} actualizado a "${nuevoEstado}" ✓`);
+      renderOrders();
+      // Misma regla que en el formulario: solo dispara el comprobante
+      // automático en el momento exacto en que pasa a Entregado.
+      if (!wasEntregado && nuevoEstado === "Entregado" && typeof triggerAutoReceipt === "function") {
+        triggerAutoReceipt(updatedOrder);
+      }
+    });
+    estadoCell.appendChild(estadoSelect);
+
+    const actionsCell = tr.querySelector(".orders-table__actions");
+
+    if (order.telefono) {
+      const waBtn = document.createElement("a");
+      waBtn.className = "icon-btn";
+      waBtn.title = "Escribir por WhatsApp";
+      waBtn.textContent = "💬";
+      waBtn.href = toWhatsAppLink(order.telefono);
+      waBtn.target = "_blank";
+      waBtn.rel = "noopener";
+      actionsCell.appendChild(waBtn);
+    }
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "icon-btn";
+    viewBtn.title = "Ver detalle";
+    viewBtn.textContent = "👁";
+    viewBtn.addEventListener("click", () => openDetail(order));
+    actionsCell.appendChild(viewBtn);
+
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "icon-btn";
+    editBtn.title = "Editar pedido";
+    editBtn.textContent = "✏️";
+    editBtn.addEventListener("click", () => startEditOrder(order));
+    actionsCell.appendChild(editBtn);
+
+    const dupBtn = document.createElement("button");
+    dupBtn.type = "button";
+    dupBtn.className = "icon-btn";
+    dupBtn.title = "Duplicar pedido (para un cliente que repite, o para corregir sin escribir todo de nuevo)";
+    dupBtn.textContent = "📋";
+    dupBtn.addEventListener("click", () => duplicateOrder(order));
+    actionsCell.appendChild(dupBtn);
+
+    const historyBtn = document.createElement("button");
+    historyBtn.type = "button";
+    historyBtn.className = "icon-btn";
+    historyBtn.title = "Ver historial de este cliente";
+    historyBtn.textContent = "🕘";
+    historyBtn.addEventListener("click", () => openClientHistory(order));
+    actionsCell.appendChild(historyBtn);
+
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "icon-btn";
+    delBtn.title = "Eliminar pedido";
+    delBtn.textContent = "🗑";
+    delBtn.addEventListener("click", async () => {
+      const confirmed = await confirmDialog({
+        title: "Eliminar pedido",
+        message: `¿Eliminar el pedido de ${order.nombre || "este cliente"}? Puedes deshacerlo justo después, pero no una vez que se cierre el aviso.`,
+        confirmLabel: "Eliminar",
+        danger: true,
+      });
+      if (!confirmed) return;
+      if (!(await saveOrders(loadOrders().filter((o) => o.id !== order.id)))) return;
+      renderOrders();
+      showToast(`Pedido de ${order.nombre || "cliente"} eliminado`, "success", {
+        actionLabel: "Deshacer",
+        onAction: async () => {
+          // Vuelve a insertar el mismo pedido tal cual estaba -- si mientras
+          // tanto se borró desde otro dispositivo, restaurarlo no pisa nada.
+          if (!(await saveOrders([...loadOrders(), order]))) return;
+          renderOrders();
+          showToast(`Pedido de ${order.nombre || "cliente"} restaurado ✓`);
+        },
+      });
+    });
+    actionsCell.appendChild(delBtn);
+
+    tbody.appendChild(tr);
+  });
+
+  const isFiltered =
+    ordersFilterState.busqueda.trim() !== "" ||
+    ordersFilterState.estado !== "Todos" ||
+    ordersFilterState.rango !== "Todos" ||
+    ordersFilterState.vendedor !== "Todos";
+  renderFilteredSummary(orders, isFiltered);
+  document.getElementById("orders-empty").hidden = ordersReady && orders.length !== 0;
+  document.getElementById("orders-empty").textContent = !ordersReady
+    ? "Cargando pedidos…"
+    : orders.length === 0 && allOrders.length > 0
+      ? "Ningún pedido coincide con ese filtro."
+      : "Aún no has registrado pedidos.";
+  document.getElementById("orders-table").hidden = orders.length === 0;
+  document.getElementById("orders-count").textContent = isFiltered ? `Mostrando ${orders.length} de ${allOrders.length}` : "";
+
+  document.getElementById("stat-total").textContent = allOrders.length;
+  const soldOrders = allOrders.filter((o) => o.estado !== "Cancelado");
+  const revenue = soldOrders.reduce((sum, o) => sum + (Number(o.precio) || 0), 0);
+  document.getElementById("stat-revenue").textContent = formatCOP(revenue);
+  const profit = soldOrders.reduce((sum, o) => {
+    const g = calcGanancia(o);
+    return g != null ? sum + g : sum;
+  }, 0);
+  const ordersWithoutCosto = soldOrders.filter((o) => calcGanancia(o) == null).length;
+  document.getElementById("stat-profit").textContent = formatCOP(profit);
+  document.getElementById("stat-profit-note").textContent = ordersWithoutCosto
+    ? `No incluye ${ordersWithoutCosto} pedido(s) sin costo registrado`
+    : "";
+  document.getElementById("stat-pending").textContent = allOrders.filter((o) => o.estado === "Pendiente").length;
+
+  const allWatches = typeof WATCHES !== "undefined" ? WATCHES : [];
+  const totalUnits = sumWatchQuantities(allWatches);
+  const available = sumWatchQuantities(allWatches.filter((w) => w.disponible !== false));
+  document.getElementById("stat-catalog-available").textContent = `${available} de ${totalUnits}`;
+  const sold = totalUnits - available;
+  document.getElementById("stat-catalog-note").textContent = sold > 0 ? `${sold} marcado(s) como vendido(s)` : "";
+
+  if (typeof renderCharts === "function") renderCharts();
+  if (typeof renderAvailabilityAlerts === "function") renderAvailabilityAlerts();
+  if (typeof updateBackupStatus === "function") updateBackupStatus();
+}
+
+/* ============ DETALLE DE UN PEDIDO ============ */
+function initDetailModal() {
+  const modal = document.getElementById("order-detail");
+  document.getElementById("detail-close").addEventListener("click", () => modal.close());
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.close();
+  });
+}
+
+function openDetail(order) {
+  const body = document.getElementById("detail-body");
+  const rows = [
+    ["Fecha", order.fecha],
+    ["Nombre", order.nombre],
+    ["Cédula", order.cedula],
+    ["Teléfono", order.telefono],
+    ["Correo", order.correo || "—"],
+    ["Lugar de entrega", order.lugar],
+    ["Reloj", order.reloj],
+    ["Encargado de venta", order.vendedor],
+    ["Medio de pago", order.medioPago],
+    ["Precio de venta", formatCOP(order.precio)],
+    ["Costo", order.costo != null ? formatCOP(order.costo) : "—"],
+    ["Ganancia", calcGanancia(order) != null ? formatCOP(calcGanancia(order)) : "—"],
+    ["Estado", order.estado],
+    ["Notas", order.notas || "—"],
+  ];
+  body.innerHTML =
+    `<h3>Detalle del pedido</h3><dl class="admin-detail-list">` +
+    rows.map(([k, v]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`).join("") +
+    `</dl><div class="admin-detail-actions">
+      <button type="button" id="detail-edit-btn" class="btn btn--primary btn--small">Editar este pedido</button>
+      <button type="button" id="detail-dup-btn" class="btn btn--ghost btn--small">Duplicar pedido</button>
+      <button type="button" id="detail-history-btn" class="btn btn--ghost btn--small">Historial del cliente</button>
+      <button type="button" id="detail-receipt-btn" class="btn btn--ghost btn--small">Generar comprobante</button>
+    </div>`;
+  document.getElementById("detail-edit-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    startEditOrder(order);
+  });
+  document.getElementById("detail-dup-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    duplicateOrder(order);
+  });
+  document.getElementById("detail-history-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    openClientHistory(order);
+  });
+  document.getElementById("detail-receipt-btn").addEventListener("click", () => {
+    document.getElementById("order-detail").close();
+    if (typeof openReceipt === "function") openReceipt(order);
+  });
+  document.getElementById("order-detail").showModal();
+}
