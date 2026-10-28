@@ -178,25 +178,30 @@ function openWatchFromUrl() {
  */
 function injectStructuredData() {
   const siteUrl = window.location.href.split("#")[0];
+  const toProduct = (item, i) => ({
+    "@type": "Product",
+    position: i + 1,
+    name: `${item.marca} ${item.nombre}`,
+    brand: item.marca,
+    sku: item.referencia,
+    description: item.descripcion,
+    image: siteUrl + item.imagen,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "COP",
+      price: item.precio ?? undefined,
+      availability: "https://schema.org/InStock",
+      url: siteUrl,
+    },
+  });
+  const items = [
+    ...WATCHES.filter((w) => w.disponible !== false),
+    ...(typeof BELTS !== "undefined" ? BELTS.filter((b) => b.disponible !== false) : []),
+  ];
   const data = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: WATCHES.filter((w) => w.disponible !== false).map((watch, i) => ({
-      "@type": "Product",
-      position: i + 1,
-      name: `${watch.marca} ${watch.nombre}`,
-      brand: watch.marca,
-      sku: watch.referencia,
-      description: watch.descripcion,
-      image: siteUrl + watch.imagen,
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "COP",
-        price: watch.precio ?? undefined,
-        availability: "https://schema.org/InStock",
-        url: siteUrl,
-      },
-    })),
+    itemListElement: items.map(toProduct),
   };
   const script = document.createElement("script");
   script.type = "application/ld+json";
@@ -210,6 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
   parseFiltersFromUrl();
   renderFilters();
   renderCatalog();
+  renderBelts();
   initSearch();
   initCart();
   initCompare();

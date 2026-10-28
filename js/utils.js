@@ -47,6 +47,14 @@ function buildWhatsAppLink(watch) {
   return buildWhatsAppUrl(CONFIG.whatsappNumber, message);
 }
 
+function buildBeltWhatsAppLink(belt) {
+  const message =
+    `Hola${CONFIG.businessName ? " " + CONFIG.businessName : ""}, ` +
+    `estoy interesado/a en la correa "${belt.nombre}" (${belt.referencia}) ` +
+    `que vi en la página. ¿Me confirmas disponibilidad y cómo sería el proceso de compra?`;
+  return buildWhatsAppUrl(CONFIG.whatsappNumber, message);
+}
+
 function buildGeneralWhatsAppLink() {
   const message = `Hola${CONFIG.businessName ? " " + CONFIG.businessName : ""}, quisiera más información sobre tu catálogo de relojes.`;
   return buildWhatsAppUrl(CONFIG.whatsappNumber, message);

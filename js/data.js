@@ -432,3 +432,58 @@ const WATCHES = [
     resistenteAgua: true,
   },
 ];
+
+/**
+ * CATÁLOGO DE CORREAS (cinturones)
+ * Mismo formato que WATCHES pero para la sección "Correas" -- un
+ * producto distinto, no se mezclan en el mismo catálogo ni en los
+ * mismos filtros. Los mismos campos `disponible` e `imagen` funcionan
+ * igual aquí (ver notas en WATCHES más arriba).
+ */
+const BELTS = [
+  {
+    id: 1,
+    referencia: "COR-01",
+    marca: "Ferragamo",
+    nombre: "Negra Hebilla Plata Pulida",
+    precio: 70000,
+    descripcion: "Correa en cuero negro con hebilla doble aro en acero pulido tipo espejo. Clásica y elegante, perfecta para combinar con cualquier outfit formal.",
+    imagen: "images/belts/correa-01.jpg",
+  },
+  {
+    id: 2,
+    referencia: "COR-02",
+    marca: "Ferragamo",
+    nombre: "Negra Hebilla Plata Detalle Negro",
+    precio: 70000,
+    descripcion: "Correa en cuero negro con hebilla doble aro en acero pulido y detalle central en negro. Un toque distinto sin perder la elegancia del clásico.",
+    imagen: "images/belts/correa-02.jpg",
+  },
+  {
+    id: 3,
+    referencia: "COR-03",
+    marca: "Ferragamo",
+    nombre: "Negra Hebilla Plata Cepillada",
+    precio: 70000,
+    descripcion: "Correa en cuero negro con hebilla doble aro en acero cepillado y contorno negro brillante. Un acabado más mate y moderno.",
+    imagen: "images/belts/correa-03.jpg",
+  },
+  {
+    id: 4,
+    referencia: "COR-04",
+    marca: "Ferragamo",
+    nombre: "Negra Texturizada Hebilla Bronce",
+    precio: 70000,
+    descripcion: "Correa en cuero negro con textura grabada y hebilla doble aro en acabado bronce envejecido. Con personalidad, para destacar sin esforzarte.",
+    imagen: "images/belts/correa-04.jpg",
+  },
+  {
+    id: 5,
+    referencia: "COR-05",
+    marca: "Ferragamo",
+    nombre: "Café Hebilla Bronce",
+    precio: 70000,
+    descripcion: "Correa en cuero café con hebilla doble aro en acabado bronce envejecido. Cálida y versátil, ideal para looks casuales o semi-formales.",
+    imagen: "images/belts/correa-05.jpg",
+  },
+];

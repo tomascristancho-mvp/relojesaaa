@@ -1135,6 +1135,16 @@ section[id] {
   font-size: 1.15rem;
 }
 
+.belt-card__desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 4px 0 10px;
+}
+
+.catalog--belts .watch-card__media {
+  cursor: default;
+}
+
 .watch-card__price {
   color: var(--accent-soft);
   font-family: var(--font-display);
